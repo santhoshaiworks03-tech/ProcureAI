@@ -1,9 +1,9 @@
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import 'ag-grid-community/styles/ag-grid.css';
-@import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 .ag-theme-quartz {
   --ag-font-family: inherit;
@@ -22,10 +22,30 @@
 }
 
 @layer base {
+  :root {
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
   body {
     @apply bg-[#F5F8FC] text-slate-800 font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.18s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 @keyframes fadeIn {
@@ -40,7 +60,7 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.18s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 /* Custom subtle scrollbars */

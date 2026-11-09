@@ -44,26 +44,26 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/60 backdrop-blur-xs transition-opacity duration-200">
       <div
         className={cn(
-          'w-full bg-white rounded-2xl shadow-modal border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]',
+          'w-full bg-white rounded-xl shadow-modal border border-slate-200/80 overflow-hidden flex flex-col max-h-[90vh] animate-scaleIn origin-center',
           maxWidthStyles[maxWidth]
         )}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/60">
           <div>
-            <h3 className="text-lg font-bold text-navy-900">{title}</h3>
+            <h3 className="text-base font-semibold text-ink-950">{title}</h3>
             {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto">{children}</div>
+        <div className="p-5 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

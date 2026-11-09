@@ -39,7 +39,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.99] whitespace-nowrap',
+        'inline-flex items-center justify-center transition-[transform,background-color,border-color,color] duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.97] whitespace-nowrap',
         variantStyles[variant],
         sizeStyles[size],
         className
