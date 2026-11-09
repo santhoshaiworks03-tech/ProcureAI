@@ -41,3 +41,4 @@ flowchart TD
 - Append-only audit trail.
 - Every state change (PO creation, approval, payment capture, shipment) computes a SHA-256 hash chained to the prior block.
 - Generates verifiable reference codes (e.g., `PRC-VRF-8F2B1C90D4A1`).
+

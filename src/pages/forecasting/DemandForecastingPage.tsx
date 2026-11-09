@@ -174,3 +174,4 @@ export const DemandForecastingPage: React.FC = () => {
     </div>
   );
 };
+

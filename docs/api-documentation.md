@@ -62,3 +62,4 @@ Captures the PayPal order upon buyer approval.
 Initializes a 5-minute time-limited checkout session.
 - Computes SHA-256 session integrity signature.
 - Automatically transitions to `expired` if not completed within 300 seconds.
+

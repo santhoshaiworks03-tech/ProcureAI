@@ -427,3 +427,4 @@ export class AIProcurementService {
 }
 
 export const aiProcurementService = new AIProcurementService();
+

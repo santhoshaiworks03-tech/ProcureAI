@@ -370,3 +370,4 @@ export interface AIAgentChatMessage {
     details?: string;
   }[];
 }
+

@@ -166,3 +166,4 @@ export function generatePurchaseOrderPDF(po: PurchaseOrder) {
   // Save PDF
   doc.save(`${po.po_number}.pdf`);
 }
+

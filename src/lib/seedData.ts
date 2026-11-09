@@ -1417,3 +1417,4 @@ export const SEED_NOTIFICATIONS: NotificationItem[] = [
     created_at: '2024-03-08T08:00:00Z'
   }
 ];
+

@@ -55,3 +55,4 @@ A business user submits the following natural-language request:
     - Navigate to `/analytics`. Verify the settled transaction is reflected in total spend and monthly charts.
 12. **Download Purchase Order PDF**:
     - Navigate to `/orders`. Click the download button to generate an official B2B PDF invoice.
+

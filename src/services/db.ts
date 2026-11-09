@@ -54,3 +54,4 @@ export const db = {
     return store.getProvenanceEvents();
   }
 };
+

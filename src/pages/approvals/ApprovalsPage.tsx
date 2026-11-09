@@ -266,3 +266,4 @@ export const ApprovalsPage: React.FC = () => {
     </div>
   );
 };
+

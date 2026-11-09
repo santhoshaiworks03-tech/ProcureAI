@@ -31,3 +31,4 @@ The database architecture is implemented in PostgreSQL / Supabase, consisting of
 26. **`provenance_events`**: Tamper-evident ledger with SHA-256 hash chaining.
 27. **`notifications`**: Targeted user alerts.
 28. **`organisation_settings`**: Configurable policies, approval limits, and preferred AI engines.
+

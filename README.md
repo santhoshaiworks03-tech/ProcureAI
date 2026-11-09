@@ -89,3 +89,4 @@ Open **`http://localhost:5173`** in your browser.
 
 ## 📄 License
 MIT License. Built for the **PayPal AI Hackathon 2026**.
+

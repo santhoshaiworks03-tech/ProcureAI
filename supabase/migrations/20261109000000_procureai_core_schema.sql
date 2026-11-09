@@ -500,3 +500,4 @@ CREATE TRIGGER trg_provenance_hash
 BEFORE INSERT ON provenance_events
 FOR EACH ROW
 EXECUTE FUNCTION fn_generate_provenance_hash();
+
