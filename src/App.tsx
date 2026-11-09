@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { AppLayout } from './components/layout/AppLayout';
 import { LandingPage } from './pages/landing/LandingPage';
@@ -19,7 +19,12 @@ import { NotificationsPage } from './pages/notifications/NotificationsPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { store } from './lib/store';
 
-const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+/**
+ * Persistent Protected Layout with React Router <Outlet />
+ * Keeps AppLayout permanently mounted across all authenticated routes
+ * ensuring Framer Motion layoutId="activeSideNavPill" animates smoothly with true flow motion!
+ */
+const ProtectedLayout: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(store.isAuthenticated());
   const location = useLocation();
 
@@ -31,29 +36,15 @@ const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }, []);
 
   if (!authenticated) {
+    if (location.pathname === '/') {
+      return <LandingPage />;
+    }
     return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
-  }
-
-  return <AppLayout>{children}</AppLayout>;
-};
-
-const RootRouteHandler: React.FC = () => {
-  const [authenticated, setAuthenticated] = useState<boolean>(store.isAuthenticated());
-
-  useEffect(() => {
-    const unsub = store.subscribe(() => {
-      setAuthenticated(store.isAuthenticated());
-    });
-    return unsub;
-  }, []);
-
-  if (!authenticated) {
-    return <LandingPage />;
   }
 
   return (
     <AppLayout>
-      <DashboardPage />
+      <Outlet />
     </AppLayout>
   );
 };
@@ -72,38 +63,29 @@ export function App() {
     >
       <BrowserRouter>
         <Routes>
-          {/* Public Landing & Authentication Portals */}
+          {/* Public Landing & Multi-Portal Authentication Gateway */}
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signin" element={<Navigate to="/login" replace />} />
 
-          {/* Root Route: Landing for Visitors, Dashboard for Authenticated Users */}
-          <Route path="/" element={<RootRouteHandler />} />
-
-          {/* Protected Application Workspace */}
-          <Route
-            path="/*"
-            element={
-              <ProtectedLayout>
-                <Routes>
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/agent" element={<AIAgentPage />} />
-                  <Route path="/catalogue" element={<CataloguePage />} />
-                  <Route path="/suppliers" element={<SuppliersPage />} />
-                  <Route path="/intelligence" element={<SupplierIntelligencePage />} />
-                  <Route path="/forecasting" element={<DemandForecastingPage />} />
-                  <Route path="/orders" element={<PurchaseOrdersPage />} />
-                  <Route path="/approvals" element={<ApprovalsPage />} />
-                  <Route path="/payments" element={<PaymentsPage />} />
-                  <Route path="/provenance" element={<ProvenanceLedgerPage />} />
-                  <Route path="/analytics" element={<AnalyticsPage />} />
-                  <Route path="/notifications" element={<NotificationsPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </ProtectedLayout>
-            }
-          />
+          {/* Protected Application Workspace with Persistent Shared AppLayout */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/agent" element={<AIAgentPage />} />
+            <Route path="/catalogue" element={<CataloguePage />} />
+            <Route path="/suppliers" element={<SuppliersPage />} />
+            <Route path="/intelligence" element={<SupplierIntelligencePage />} />
+            <Route path="/forecasting" element={<DemandForecastingPage />} />
+            <Route path="/orders" element={<PurchaseOrdersPage />} />
+            <Route path="/approvals" element={<ApprovalsPage />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/provenance" element={<ProvenanceLedgerPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </PayPalScriptProvider>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   TrendingUp,
   CreditCard,
@@ -10,6 +11,7 @@ import {
   Bot,
   Package,
   Building,
+  Building2,
   CheckCircle2,
   ExternalLink,
   Plus,
@@ -18,7 +20,10 @@ import {
   Activity,
   History,
   FileText,
-  Sparkles
+  Sparkles,
+  MapPin,
+  Check,
+  X
 } from 'lucide-react';
 import { ProcurementWorkflowJourney } from '../../components/workflow/ProcurementWorkflowJourney';
 import {
@@ -134,39 +139,87 @@ export const DashboardPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Stat Cards */}
+        {/* Stat Cards - Verity Elevated SaaS System */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card hoverEffect className="p-4 border-slate-200/80">
-            <span className="text-xs font-medium text-slate-500 block">Total spend</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-blue-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <CreditCard className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Settled
+              </span>
+            </div>
+            <span className="text-xs font-medium text-slate-500 block">Total gross spend</span>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {formatCurrency(totalSpend)}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Settled across verified orders</p>
-          </Card>
+          </motion.div>
 
-          <Card hoverEffect className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-amber-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Clock className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Action Required
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Pending approvals</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {pendingApprovals}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Requires management sign-off</p>
-          </Card>
+          </motion.div>
 
-          <Card hoverEffect className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-indigo-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" /> 5-Min Lock
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Pending checkout</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {pendingPayments}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">5-min PayPal session active</p>
-          </Card>
+          </motion.div>
 
-          <Card hoverEffect className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-emerald-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 7.4% Savings
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">AI-negotiated savings</span>
-            <p className="text-2xl font-semibold text-emerald-600 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-600 mt-1 tabular-nums font-mono tracking-tight">
               {formatCurrency(aiIdentifiedSavings)}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">7.4% under benchmark price ceilings</p>
-          </Card>
+          </motion.div>
         </div>
 
         {/* Embedded Animated Workflow Journey */}
@@ -174,7 +227,7 @@ export const DashboardPage: React.FC = () => {
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 p-5 border-slate-200/80 space-y-4">
+          <Card className="lg:col-span-2 p-5 border-slate-200/80 space-y-4 rounded-2xl">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-semibold text-slate-900">Spending velocity & AI savings</h3>
@@ -194,21 +247,21 @@ export const DashboardPage: React.FC = () => {
                     contentStyle={{
                       backgroundColor: '#07090E',
                       color: '#F8FAFC',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       fontSize: '11px',
-                      border: 'none',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                  <Area type="monotone" dataKey="spend" name="Gross spend" stroke="#1D4ED8" fill="#1D4ED8" fillOpacity={0.12} strokeWidth={1.5} />
-                  <Area type="monotone" dataKey="aiSavings" name="AI savings" stroke="#16A36A" fill="#16A36A" fillOpacity={0.12} strokeWidth={1.5} />
+                  <Area type="monotone" dataKey="spend" name="Gross spend" stroke="#1D4ED8" fill="#1D4ED8" fillOpacity={0.12} strokeWidth={2} />
+                  <Area type="monotone" dataKey="aiSavings" name="AI savings" stroke="#16A36A" fill="#16A36A" fillOpacity={0.15} strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </Card>
 
-          <Card className="p-5 border-slate-200/80 space-y-4 flex flex-col justify-between">
+          <Card className="p-5 border-slate-200/80 space-y-4 flex flex-col justify-between rounded-2xl">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xs font-semibold text-slate-900">Budget allocation</h3>
@@ -223,82 +276,101 @@ export const DashboardPage: React.FC = () => {
               <h4 className="text-xs font-semibold text-slate-900 mb-2.5">Category distribution</h4>
               <div className="space-y-2 text-xs">
                 {categoryData.map(c => (
-                  <div key={c.name} className="flex items-center justify-between py-1 border-b border-slate-100">
+                  <div key={c.name} className="flex items-center justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-600 text-[11px]">{c.name}</span>
-                    <span className="font-mono text-slate-800 text-[11px] tabular-nums">{formatCurrency(c.value)}</span>
+                    <span className="font-mono text-slate-800 text-[11px] tabular-nums font-semibold">{formatCurrency(c.value)}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <Link to="/analytics" className="pt-2">
-              <Button variant="outline" size="sm" className="w-full" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+              <Button variant="outline" size="sm" className="w-full rounded-xl" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
                 Detailed analytics
               </Button>
             </Link>
           </Card>
         </div>
 
-        {/* Recent Purchase Orders */}
-        <Card className="overflow-hidden p-0 border border-slate-200/80">
-          <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-slate-900">Recent purchase orders</h3>
-            <Link to="/orders" className="text-[11px] text-blue-600 hover:underline">
-              View all
+        {/* Recent Purchase Orders - Verity Style Table */}
+        <div className="rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div>
+              <h3 className="text-xs font-semibold text-slate-900">Recent purchase orders</h3>
+              <p className="text-[11px] text-slate-400">Track real-time purchase order settlement and dispatch status</p>
+            </div>
+            <Link to="/orders" className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+              View all orders <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
+              <thead className="bg-slate-50/80 text-slate-500 text-[10px] font-semibold uppercase tracking-wider border-b border-slate-200/80">
                 <tr>
-                  <th className="py-2.5 px-3.5 font-medium">PO number</th>
-                  <th className="py-2.5 px-3 font-medium">Supplier</th>
-                  <th className="py-2.5 px-3 font-medium text-center">Items</th>
-                  <th className="py-2.5 px-3 font-medium text-right">Amount</th>
-                  <th className="py-2.5 px-3 font-medium text-center">Status</th>
-                  <th className="py-2.5 px-3.5 font-medium text-right">Action</th>
+                  <th className="py-3 px-4 font-semibold">PO number</th>
+                  <th className="py-3 px-4 font-semibold">Supplier</th>
+                  <th className="py-3 px-4 font-semibold text-center">Items</th>
+                  <th className="py-3 px-4 font-semibold text-right">Amount</th>
+                  <th className="py-3 px-4 font-semibold text-center">Status</th>
+                  <th className="py-3 px-4 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {purchaseOrders.slice(0, 5).map(po => (
-                  <tr key={po.id} className="hover:bg-slate-50/70">
-                    <td className="py-2.5 px-3.5 font-mono font-medium text-slate-900">{po.po_number}</td>
-                    <td className="py-2.5 px-3 text-slate-700">{po.supplier_name}</td>
-                    <td className="py-2.5 px-3 text-center text-slate-500 font-mono tabular-nums">{po.items.length}</td>
-                    <td className="py-2.5 px-3 text-right font-medium text-slate-900 font-mono tabular-nums">{formatCurrency(po.total_amount)}</td>
-                    <td className="py-2.5 px-3 text-center">
-                      <Badge
-                        variant={
-                          po.status === 'payment_completed' || po.status === 'delivered'
-                            ? 'success'
-                            : po.status === 'pending_approval'
-                            ? 'warning'
-                            : 'neutral'
-                        }
-                        dot
-                        size="sm"
-                      >
-                        {po.status.replace('_', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="py-2.5 px-3.5 text-right">
-                      {po.status === 'approved' ? (
-                        <Link to={`/payments?po=${po.id}`}>
-                          <Button variant="primary" size="sm">Pay</Button>
-                        </Link>
-                      ) : (
-                        <Link to={`/orders?id=${po.id}`}>
-                          <Button variant="outline" size="sm">View</Button>
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {purchaseOrders.slice(0, 5).map(po => {
+                  const initials = po.supplier_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+                  return (
+                    <tr key={po.id} className="hover:bg-blue-50/30 transition-colors">
+                      <td className="py-3 px-4">
+                        <span className="font-mono font-semibold text-slate-900 block">{po.po_number}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">{formatDate(po.created_at)}</span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200/80 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0 shadow-subtle">
+                            {initials}
+                          </div>
+                          <div>
+                            <span className="font-medium text-slate-800 block">{po.supplier_name}</span>
+                            <span className="text-[10px] text-slate-400">Verified Partner</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-center text-slate-600 font-mono tabular-nums">{po.items.length} units</td>
+                      <td className="py-3 px-4 text-right font-semibold text-slate-900 font-mono tabular-nums">{formatCurrency(po.total_amount)}</td>
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
+                            po.status === 'payment_completed' || po.status === 'delivered'
+                              ? 'success'
+                              : po.status === 'pending_approval'
+                              ? 'warning'
+                              : 'neutral'
+                          }
+                          dot
+                          size="sm"
+                        >
+                          {po.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        {po.status === 'approved' ? (
+                          <Link to={`/payments?po=${po.id}`}>
+                            <Button variant="primary" size="sm" className="rounded-lg shadow-sm">Pay</Button>
+                          </Link>
+                        ) : (
+                          <Link to={`/orders?id=${po.id}`}>
+                            <Button variant="outline" size="sm" className="rounded-lg">View</Button>
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </div>
     );
   };
@@ -359,120 +431,190 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Stat Cards */}
+        {/* Stat Cards - Verity Supplier Fulfillment System */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-emerald-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <CreditCard className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Merchant Capture
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Settled PayPal revenue</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {formatCurrency(settledRevenue)}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Instant merchant capture</p>
-          </Card>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-amber-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Clock className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Pending Action
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Orders to fulfill</span>
-            <p className="text-2xl font-semibold text-amber-600 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-amber-600 mt-1 tabular-nums font-mono tracking-tight">
               {toDispatchCount}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Awaiting dispatch or delivery</p>
-          </Card>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-blue-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Package className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Contracted
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Active catalogue listings</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {myListings.length}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Contracted enterprise SKUs</p>
-          </Card>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-emerald-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Tier-1 SLA
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Fulfillment SLA score</span>
-            <p className="text-2xl font-semibold text-emerald-600 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-600 mt-1 tabular-nums font-mono tracking-tight">
               98.4%
             </p>
             <p className="text-[11px] text-slate-400 mt-1">Quality {mySupplier.quality_score}% · Rating {mySupplier.delivery_rating}/5.0</p>
-          </Card>
+          </motion.div>
         </div>
 
-        {/* Incoming Orders to Fulfill */}
-        <Card className="overflow-hidden p-0 border border-slate-200/80">
-          <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
+        {/* Incoming Orders to Fulfill - Verity Table */}
+        <div className="rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white">
             <div>
               <h3 className="text-xs font-semibold text-slate-900">Incoming enterprise orders</h3>
-              <p className="text-[11px] text-slate-400">Accept, dispatch, and track payment settlement</p>
+              <p className="text-[11px] text-slate-400">Accept, dispatch, and track payment settlement in real time</p>
             </div>
             <Badge variant="neutral" size="sm">{incomingOrders.length} orders total</Badge>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
+              <thead className="bg-slate-50/80 text-slate-500 text-[10px] font-semibold uppercase tracking-wider border-b border-slate-200/80">
                 <tr>
-                  <th className="py-2.5 px-3.5 font-medium">PO number</th>
-                  <th className="py-2.5 px-3 font-medium">Buyer organisation</th>
-                  <th className="py-2.5 px-3 font-medium">Delivery destination</th>
-                  <th className="py-2.5 px-3 font-medium text-right">Amount</th>
-                  <th className="py-2.5 px-3 font-medium text-center">Order status</th>
-                  <th className="py-2.5 px-3.5 font-medium text-right">Fulfillment action</th>
+                  <th className="py-3 px-4 font-semibold">PO number</th>
+                  <th className="py-3 px-4 font-semibold">Buyer organisation</th>
+                  <th className="py-3 px-4 font-semibold">Delivery destination</th>
+                  <th className="py-3 px-4 font-semibold text-right">Amount</th>
+                  <th className="py-3 px-4 font-semibold text-center">Order status</th>
+                  <th className="py-3 px-4 font-semibold text-right">Fulfillment action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {incomingOrders.map(po => (
-                  <tr key={po.id} className="hover:bg-slate-50/70">
-                    <td className="py-2.5 px-3.5 font-mono font-medium text-slate-900">{po.po_number}</td>
-                    <td className="py-2.5 px-3 text-slate-700">{po.organisation_name || org.name}</td>
-                    <td className="py-2.5 px-3 text-slate-500">{po.delivery_address.city}, {po.delivery_address.state}</td>
-                    <td className="py-2.5 px-3 text-right font-medium text-slate-900 font-mono tabular-nums">{formatCurrency(po.total_amount)}</td>
-                    <td className="py-2.5 px-3 text-center">
-                      <Badge
-                        variant={
-                          po.status === 'delivered'
-                            ? 'success'
-                            : po.status === 'shipped'
-                            ? 'info'
-                            : po.status === 'payment_completed' || po.status === 'confirmed'
-                            ? 'warning'
-                            : 'neutral'
-                        }
-                        dot
-                        size="sm"
-                      >
-                        {po.status.replace('_', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="py-2.5 px-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {po.status === 'payment_completed' || po.status === 'confirmed' ? (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => handleDispatch(po.id)}
-                            leftIcon={<Truck className="w-3.5 h-3.5" />}
-                          >
-                            Dispatch
-                          </Button>
-                        ) : po.status === 'shipped' ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeliver(po.id)}
-                            leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
-                          >
-                            Mark delivered
-                          </Button>
-                        ) : (
-                          <Link to={`/orders?id=${po.id}`}>
-                            <Button variant="outline" size="sm">Details</Button>
-                          </Link>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {incomingOrders.map(po => {
+                  const buyerName = po.organisation_name || org.name;
+                  const initials = buyerName.split(' ').map((n: string) => n[0]).slice(0, 2).join('');
+                  return (
+                    <tr key={po.id} className="hover:bg-blue-50/30 transition-colors">
+                      <td className="py-3 px-4">
+                        <span className="font-mono font-semibold text-slate-900 block">{po.po_number}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">{formatDate(po.created_at)}</span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/70 text-blue-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0 shadow-subtle">
+                            {initials}
+                          </div>
+                          <div>
+                            <span className="font-medium text-slate-800 block">{buyerName}</span>
+                            <span className="text-[10px] text-slate-400">Enterprise Tenant</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                        <span>{po.delivery_address.city}, {po.delivery_address.state}</span>
+                      </td>
+                      <td className="py-3 px-4 text-right font-semibold text-slate-900 font-mono tabular-nums">{formatCurrency(po.total_amount)}</td>
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
+                            po.status === 'delivered'
+                              ? 'success'
+                              : po.status === 'shipped'
+                              ? 'info'
+                              : po.status === 'payment_completed' || po.status === 'confirmed'
+                              ? 'warning'
+                              : 'neutral'
+                          }
+                          dot
+                          size="sm"
+                        >
+                          {po.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {po.status === 'payment_completed' || po.status === 'confirmed' ? (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="rounded-lg shadow-sm"
+                              onClick={() => handleDispatch(po.id)}
+                              leftIcon={<Truck className="w-3.5 h-3.5" />}
+                            >
+                              Dispatch
+                            </Button>
+                          ) : po.status === 'shipped' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-lg"
+                              onClick={() => handleDeliver(po.id)}
+                              leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                            >
+                              Mark delivered
+                            </Button>
+                          ) : (
+                            <Link to={`/orders?id=${po.id}`}>
+                              <Button variant="outline" size="sm" className="rounded-lg">Details</Button>
+                            </Link>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
 
         {/* Inventory Stock & PayPal Merchant Account Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -607,115 +749,192 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Stat Cards */}
+        {/* Stat Cards - Verity Global Control Tower */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-emerald-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <CreditCard className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Settlement
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Platform GMV settled</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {formatCurrency(totalPlatformGMV)}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">PayPal Orders v2 capture</p>
-          </Card>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-blue-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Multi-Tenant RLS
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Registered enterprises</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               3 tenants
             </p>
             <p className="text-[11px] text-slate-400 mt-1">PostgreSQL RLS isolated</p>
-          </Card>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-indigo-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <Truck className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> KYC Verified
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Commercial suppliers</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {suppliers.length} vendors
             </p>
-            <p className="text-[11px] text-emerald-600 mt-1">{verifiedSuppliers} verified · {provisionalSuppliers} review</p>
-          </Card>
+            <p className="text-[11px] text-emerald-600 mt-1 font-medium">{verifiedSuppliers} verified · {provisionalSuppliers} review</p>
+          </motion.div>
 
-          <Card className="p-4 border-slate-200/80">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:border-violet-400/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 border border-violet-200/70 flex items-center justify-center flex-shrink-0 shadow-subtle">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-700 border border-violet-200/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" /> SHA-256 Chained
+              </span>
+            </div>
             <span className="text-xs font-medium text-slate-500 block">Cryptographic blocks</span>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
-              {provenanceEvents.length}
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
+              {provenanceEvents.length} blocks
             </p>
             <p className="text-[11px] text-slate-400 mt-1">SHA-256 chained ledger</p>
-          </Card>
+          </motion.div>
         </div>
 
-        {/* Supplier Verification Queue */}
-        <Card className="overflow-hidden p-0 border border-slate-200/80">
-          <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
+        {/* Supplier Verification Queue - Verity Enterprise Table */}
+        <div className="rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white">
             <div>
-              <h3 className="text-xs font-semibold text-slate-900">Supplier legal verification & KYC queue</h3>
-              <p className="text-[11px] text-slate-400">Review business registration, GSTIN, and PayPal settlement accounts</p>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-xs font-semibold text-slate-900">Supplier legal verification & KYC queue</h3>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">Review business registration, GSTIN, and PayPal settlement accounts</p>
             </div>
-            <Link to="/suppliers" className="text-[11px] text-blue-600 hover:underline">
-              View directory
+            <Link to="/suppliers" className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+              View directory <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
+              <thead className="bg-slate-50/80 text-slate-500 text-[10px] font-semibold uppercase tracking-wider border-b border-slate-200/80">
                 <tr>
-                  <th className="py-2.5 px-3.5 font-medium">Company name</th>
-                  <th className="py-2.5 px-3 font-medium">GSTIN / Tax ID</th>
-                  <th className="py-2.5 px-3 font-medium">Category</th>
-                  <th className="py-2.5 px-3 font-medium">City</th>
-                  <th className="py-2.5 px-3 font-medium text-center">Audit status</th>
-                  <th className="py-2.5 px-3.5 font-medium text-right">Action</th>
+                  <th className="py-3 px-4 font-semibold">Company name</th>
+                  <th className="py-3 px-4 font-semibold">GSTIN / Tax ID</th>
+                  <th className="py-3 px-4 font-semibold">Category</th>
+                  <th className="py-3 px-4 font-semibold">City</th>
+                  <th className="py-3 px-4 font-semibold text-center">Audit status</th>
+                  <th className="py-3 px-4 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {suppliers.map(sup => (
-                  <tr key={sup.id} className="hover:bg-slate-50/70">
-                    <td className="py-2.5 px-3.5 font-medium text-slate-900">{sup.company_name}</td>
-                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600">{sup.gstin_tax_id}</td>
-                    <td className="py-2.5 px-3 text-slate-600">{sup.business_category}</td>
-                    <td className="py-2.5 px-3 text-slate-500">{sup.address.city}</td>
-                    <td className="py-2.5 px-3 text-center">
-                      <Badge
-                        variant={
-                          sup.verification_status === 'verified'
-                            ? 'success'
-                            : sup.verification_status === 'rejected'
-                            ? 'danger'
-                            : 'warning'
-                        }
-                        dot
-                        size="sm"
-                      >
-                        {sup.verification_status}
-                      </Badge>
-                    </td>
-                    <td className="py-2.5 px-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {sup.verification_status !== 'verified' && (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => handleVerify(sup.id, 'verified')}
-                          >
-                            Verify
-                          </Button>
-                        )}
-                        {sup.verification_status !== 'rejected' && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleVerify(sup.id, 'rejected')}
-                          >
-                            Reject
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {suppliers.map(sup => {
+                  const initials = sup.company_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+                  return (
+                    <tr key={sup.id} className="hover:bg-blue-50/30 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200/80 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0 shadow-subtle">
+                            {initials}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-slate-900 block">{sup.company_name}</span>
+                            <span className="text-[10px] text-slate-400">PayPal Settlement Enabled</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-[11px] text-slate-700 bg-slate-100/90 px-2 py-0.5 rounded-md border border-slate-200/60 inline-block font-semibold">
+                          {sup.gstin_tax_id}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600">
+                        <span className="text-xs">{sup.business_category}</span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                          {sup.address.city}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
+                            sup.verification_status === 'verified'
+                              ? 'success'
+                              : sup.verification_status === 'rejected'
+                              ? 'danger'
+                              : 'warning'
+                          }
+                          dot
+                          size="sm"
+                        >
+                          {sup.verification_status}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {sup.verification_status !== 'verified' && (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="rounded-lg shadow-sm"
+                              onClick={() => handleVerify(sup.id, 'verified')}
+                            >
+                              Verify
+                            </Button>
+                          )}
+                          {sup.verification_status !== 'rejected' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-lg hover:border-rose-300 hover:text-rose-600 hover:bg-rose-50/60 transition-colors"
+                              onClick={() => handleVerify(sup.id, 'rejected')}
+                            >
+                              Reject
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
 
         {/* System Architecture & Real-Time Audit Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

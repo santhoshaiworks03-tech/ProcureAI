@@ -149,12 +149,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.18 }}
-              className="px-3 py-2.5 mx-2 my-2 rounded-xl bg-[#141A26] border border-[#1E2638] overflow-hidden"
+              className="px-3 py-2.5 mx-2.5 my-2 rounded-xl bg-gradient-to-br from-[#131926] to-[#0D111A] border border-[#1F2738] shadow-inner overflow-hidden"
             >
-              <div className="flex items-center gap-2">
-                <Building2 className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-slate-200 truncate">
+                  <p className="text-xs font-semibold text-slate-100 truncate tracking-tight">
                     {activeRole === 'supplier'
                       ? 'OmniOffice Direct Ltd'
                       : activeRole === 'admin'
@@ -177,85 +179,100 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           )}
         </AnimatePresence>
 
-        {/* Navigation Items with Fluid Layout Animations */}
+        {/* Navigation Items with Fluid Spring Flow Motion */}
         <nav
           onMouseLeave={() => setHoveredPath(null)}
-          className="flex-1 overflow-y-auto px-2 py-2 space-y-1 relative scrollbar-thin scrollbar-thumb-slate-800"
+          className="flex-1 overflow-y-auto px-2.5 py-2 space-y-1 relative scrollbar-thin scrollbar-thumb-slate-800"
         >
           {navItems.map(item => {
             const isActive = location.pathname === item.path;
             const isHovered = hoveredPath === item.path;
 
             return (
-              <Link
+              <motion.div
                 key={item.path}
-                to={item.path}
-                onMouseEnter={() => setHoveredPath(item.path)}
-                className={`relative flex items-center gap-3 px-3 h-9 rounded-xl text-xs font-medium transition-colors select-none ${
-                  isActive
-                    ? 'text-white font-semibold'
-                    : 'text-slate-400 hover:text-slate-100'
-                }`}
-                title={collapsed ? item.label : undefined}
+                whileHover={{ x: 2 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               >
-                {/* 1. Fluid Active Pill Animation (Flow Motion) */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeSideNavPill"
-                    className="absolute inset-0 bg-blue-600 rounded-xl -z-10 shadow-sm shadow-blue-500/30"
-                    transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-                  />
-                )}
-
-                {/* 2. Fluid Hover Ghost Pill Animation (Flow Motion) */}
-                {isHovered && !isActive && (
-                  <motion.div
-                    layoutId="hoverSideNavPill"
-                    className="absolute inset-0 bg-white/[0.06] rounded-xl -z-10"
-                    transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                  />
-                )}
-
-                {/* Nav Icon */}
-                <motion.div
-                  whileHover={{ scale: 1.15 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  className="flex-shrink-0"
+                <Link
+                  to={item.path}
+                  onMouseEnter={() => setHoveredPath(item.path)}
+                  className={`relative flex items-center gap-3 px-3 h-9 rounded-xl text-xs font-medium transition-colors select-none group ${
+                    isActive
+                      ? 'text-white font-semibold'
+                      : 'text-slate-400 hover:text-slate-100'
+                  }`}
+                  title={collapsed ? item.label : undefined}
                 >
-                  <item.icon
-                    className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`}
-                    strokeWidth={1.75}
-                  />
-                </motion.div>
-
-                {/* Nav Label with Fade & Slide Motion */}
-                <AnimatePresence initial={false}>
-                  {!collapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -8 }}
-                      transition={{ duration: 0.15 }}
-                      className="flex-1 truncate tracking-tight"
+                  {/* 1. Fluid Active Pill Animation (Flow Motion with Glowing Edge) */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeSideNavPill"
+                      className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 rounded-xl -z-10 shadow-md shadow-blue-500/25 border border-blue-400/30 overflow-hidden"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                     >
-                      {item.label}
+                      <span className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full bg-blue-300" />
+                    </motion.div>
+                  )}
+
+                  {/* 2. Fluid Hover Ghost Pill Animation (Flow Motion) */}
+                  {isHovered && !isActive && (
+                    <motion.div
+                      layoutId="hoverSideNavPill"
+                      className="absolute inset-0 bg-white/[0.07] border border-white/[0.05] rounded-xl -z-10 backdrop-blur-sm shadow-inner"
+                      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                    />
+                  )}
+
+                  {/* Nav Icon */}
+                  <motion.div
+                    whileHover={{ scale: 1.12 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="flex-shrink-0"
+                  >
+                    <item.icon
+                      className={`w-4 h-4 transition-colors ${
+                        isActive
+                          ? 'text-white'
+                          : isHovered
+                          ? 'text-blue-300'
+                          : 'text-slate-400'
+                      }`}
+                      strokeWidth={isActive ? 2 : 1.75}
+                    />
+                  </motion.div>
+
+                  {/* Nav Label with Fade & Slide Motion */}
+                  <AnimatePresence initial={false}>
+                    {!collapsed && (
+                      <motion.span
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -8 }}
+                        transition={{ duration: 0.15 }}
+                        className="flex-1 truncate tracking-tight"
+                      >
+                        {item.label}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Badge */}
+                  {!collapsed && item.badge !== undefined && item.badge > 0 && (
+                    <motion.span
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono tabular-nums font-semibold ${
+                        isActive
+                          ? 'bg-white/20 text-white shadow-sm'
+                          : 'bg-slate-800 text-slate-300 border border-slate-700/60'
+                      }`}
+                    >
+                      {item.badge}
                     </motion.span>
                   )}
-                </AnimatePresence>
-
-                {/* Badge */}
-                {!collapsed && item.badge !== undefined && item.badge > 0 && (
-                  <motion.span
-                    initial={{ scale: 0.8 }}
-                    animate={{ scale: 1 }}
-                    className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono tabular-nums ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
-                    }`}
-                  >
-                    {item.badge}
-                  </motion.span>
-                )}
-              </Link>
+                </Link>
+              </motion.div>
             );
           })}
         </nav>
@@ -420,7 +437,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         className="flex-1 flex flex-col min-h-screen w-full md:w-auto"
       >
         {/* Top Header */}
-        <header className="h-14 bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
+        <header className="h-14 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
           {/* Mobile Menu Trigger & Search */}
           <div className="flex items-center gap-3 flex-1 max-w-md">
             <button
@@ -443,34 +460,42 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     navigate(`/catalogue?q=${encodeURIComponent(searchQuery)}`);
                   }
                 }}
-                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full pl-8 pr-11 py-1.5 bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-subtle"
               />
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-200/60 border border-slate-300/60 rounded text-[9px] font-mono text-slate-500 select-none">
+                ⌘K
+              </kbd>
             </div>
           </div>
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Authenticated Portal Badge & Role Switcher */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200/80">
-              <span className="text-[11px] font-medium text-slate-500 px-2 hidden sm:flex items-center gap-1">
+            {/* Authenticated Portal Badge & Role Switcher with Fluid Spring Flow Motion */}
+            <div className="flex items-center bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/80 relative shadow-subtle">
+              <span className="text-[11px] font-medium text-slate-500 px-2 hidden sm:flex items-center gap-1 select-none">
                 <UserCheck className="w-3 h-3 text-slate-400" /> Portal:
               </span>
               {(['buyer', 'supplier', 'admin'] as UserRole[]).map(r => (
                 <button
                   key={r}
                   onClick={() => handleRoleChange(r)}
-                  className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-all capitalize ${
-                    activeRole === r
-                      ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                      : 'text-slate-500 hover:text-slate-900'
+                  className={`relative text-[11px] px-3 py-1 rounded-lg font-medium transition-colors capitalize select-none z-10 ${
+                    activeRole === r ? 'text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
+                  {activeRole === r && (
+                    <motion.div
+                      layoutId="activeRoleFlowPill"
+                      className="absolute inset-0 bg-white rounded-lg shadow-sm border border-slate-200/90 -z-10"
+                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                    />
+                  )}
                   {r}
                 </button>
               ))}
               <Link
                 to={`/login?role=${activeRole}`}
-                className="text-[10px] text-blue-600 hover:text-blue-800 font-medium px-2 border-l border-slate-200 hover:underline"
+                className="text-[10px] text-blue-600 hover:text-blue-800 font-medium px-2.5 border-l border-slate-200 hover:underline z-10"
                 title="Switch via dedicated portal login"
               >
                 Sign In
