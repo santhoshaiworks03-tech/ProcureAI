@@ -5,7 +5,7 @@
 [![Live on Vercel](https://img.shields.io/badge/Vercel-Live%20Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://procureai-zeta.vercel.app)
 [![PayPal Orders API v2](https://img.shields.io/badge/PayPal-Orders%20API%20v2-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://developer.paypal.com)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20RLS-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
-[![Playwright Tests](https://img.shields.io/badge/Playwright%20E2E-33%2F33%20Passing%20(100%25)-45ba4b?style=for-the-badge&logo=playwright&logoColor=white)](https://procureai-zeta.vercel.app)
+[![Playwright Tests](https://img.shields.io/badge/Playwright%20E2E-37%2F37%20Passing%20(100%25)-45ba4b?style=for-the-badge&logo=playwright&logoColor=white)](https://procureai-zeta.vercel.app)
 
 **ProcureAI** is an enterprise-grade autonomous B2B procurement and FinTech SaaS platform engineered for the **PayPal AI Hackathon 2026**. It transforms manual corporate purchasing into an intelligent, transparent, and human-controlled autonomous workflow powered by multi-provider AI agents, transparent supplier intelligence, demand forecasting, automated purchase order generation, human-in-the-loop authorization gating, and tokenized PayPal Orders API v2 settlement.
 
