@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+
+.ag-theme-quartz {
+  --ag-font-family: inherit;
+  --ag-font-size: 12px;
+  --ag-background-color: #ffffff;
+  --ag-header-background-color: #f8fafc;
+  --ag-header-foreground-color: #475569;
+  --ag-border-color: #e2e8f0;
+  --ag-row-hover-color: #f8fafc;
+  --ag-selected-row-background-color: #eff6ff;
+  --ag-header-column-separator-display: block;
+  --ag-header-column-separator-color: #e2e8f0;
+  --ag-header-column-separator-height: 50%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 @layer base {
   body {
     @apply bg-[#F5F8FC] text-slate-800 font-sans antialiased;
