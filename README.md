@@ -5,7 +5,7 @@
 [![Live on Vercel](https://img.shields.io/badge/Vercel-Live%20Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://procureai-zeta.vercel.app)
 [![PayPal Orders API v2](https://img.shields.io/badge/PayPal-Orders%20API%20v2-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://developer.paypal.com)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20RLS-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
-[![Playwright Tests](https://img.shields.io/badge/Playwright%20E2E-21%2F21%20Passing%20(100%25)-45ba4b?style=for-the-badge&logo=playwright&logoColor=white)](https://procureai-zeta.vercel.app)
+[![Playwright Tests](https://img.shields.io/badge/Playwright%20E2E-33%2F33%20Passing%20(100%25)-45ba4b?style=for-the-badge&logo=playwright&logoColor=white)](https://procureai-zeta.vercel.app)
 
 **ProcureAI** is an enterprise-grade autonomous B2B procurement and FinTech SaaS platform engineered for the **PayPal AI Hackathon 2026**. It transforms manual corporate purchasing into an intelligent, transparent, and human-controlled autonomous workflow powered by multi-provider AI agents, transparent supplier intelligence, demand forecasting, automated purchase order generation, human-in-the-loop authorization gating, and tokenized PayPal Orders API v2 settlement.
 
@@ -41,7 +41,16 @@ flowchart TD
 
 ## 🌟 Core Modules & Capabilities
 
-### 1. Autonomous AI Procurement Terminal (`/agent`)
+### 1. Multi-Portal Authentication Gateway (`/login`)
+- Dedicated, role-isolated sign-in portals for all three enterprise stakeholders:
+  - **Enterprise Buyer Portal** (`priya.sharma@apextech.com` / Apex Tech Solutions Pvt Ltd)
+  - **Supplier Partner Portal** (`vikram@omniofficedirect.com` / OmniOffice Direct Ltd)
+  - **Platform Operations & Governance** (`aditi.admin@procureai.io` / ProcureAI Global Operations)
+- Instant 1-click evaluation authentication for hackathon judges and evaluators (no typing required).
+- Protected client-side routing with automatic redirection and session persistence.
+- Clean workstation sign-out and seamless account switching.
+
+### 2. Autonomous AI Procurement Terminal (`/agent`)
 - Natural language purchasing requirements (e.g. *"I need 50 Ergonomic Task Chairs, 25 Standing Desks, and 10 Filing Cabinets under ₹5,00,000"*).
 - Extracts products, quantities, specifications, and budget into validated JSON schemas.
 - Matches requirements strictly against real database catalogue records (no fabricated inventory).
