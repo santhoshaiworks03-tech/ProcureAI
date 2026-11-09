@@ -1,6 +1,6 @@
 -- ==============================================================================
--- PROCUREAI SEED DATA SCRIPT
--- Populates all master organisations, categories, products, suppliers, listings
+-- PROCUREAI SEED DATA SCRIPT (CORRECTED SCHEMA IDENTIFIERS)
+-- Populates master organisations, categories, products, suppliers, listings
 -- ==============================================================================
 
 -- 1. ORGANISATIONS
@@ -32,13 +32,13 @@ VALUES
   ('d0000000-0000-0000-0000-000000000006', 'c0000000-0000-0000-0000-000000000005', 'EliteBook 14-inch G10 Business Laptop', 'IT-LAP-ELITE-01', '8901234567931', 'HewlettPro', 'Intel Core i7 vPro 13th Gen, 32GB DDR5 RAM, 1TB NVMe Gen4 SSD notebook.', 'unit', 98000, true)
 ON CONFLICT (id) DO NOTHING;
 
--- 4. SUPPLIERS
-INSERT INTO suppliers (id, company_name, legal_name, gtin_tax_id, contact_email, contact_phone, business_category, verification_status, reliability_score, delivery_rating, quality_score, payment_terms, paypal_merchant_id, is_provisional)
+-- 4. SUPPLIERS (Fixed gstin_tax_id & address)
+INSERT INTO suppliers (id, company_name, legal_name, gstin_tax_id, contact_email, contact_phone, business_category, address, verification_status, reliability_score, delivery_rating, quality_score, payment_terms, paypal_merchant_id, is_provisional)
 VALUES
-  ('e0000000-0000-0000-0000-000000000001', 'OmniOffice Direct Ltd', 'OmniOffice Infrastructure & Supplies Pvt Ltd', '29AAACH1122M1ZX', 'sales@omniofficedirect.com', '+91 80 4455 6677', 'Office Furniture & Workstations', 'verified', 96.5, 4.8, 95.0, 'PayPal Express / Net 30', 'PPL-MERCH-OMNI01', false),
-  ('e0000000-0000-0000-0000-000000000002', 'Ergotech Furnishings Corp', 'Ergotech India Seating Systems LLP', '27AABFE3344P1Z3', 'procurement@ergotechindia.com', '+91 22 2890 1234', 'Ergonomic Chairs & Desks', 'verified', 94.0, 4.7, 96.5, 'PayPal Instant Capture / Net 15', 'PPL-MERCH-ERGO02', false),
-  ('e0000000-0000-0000-0000-000000000003', 'Horizon Office Ware', 'Horizon Modular Works Ltd', '07AAACH9988R1Z1', 'orders@horizonoffice.com', '+91 11 2680 5544', 'Storage Cabinets & Partitions', 'verified', 91.0, 4.5, 90.0, 'PayPal Express / Net 30', 'PPL-MERCH-HORIZON03', false),
-  ('e0000000-0000-0000-0000-000000000004', 'CloudNine Tech Supplies', 'CloudNine Enterprise Computing Hub', '29AABCC8899J1Z7', 'enterprise@cloudninetech.com', '+91 80 6712 9000', 'Enterprise Hardware & Accessories', 'verified', 95.0, 4.8, 97.0, 'PayPal Instant Capture', 'PPL-MERCH-CLOUD07', false)
+  ('e0000000-0000-0000-0000-000000000001', 'OmniOffice Direct Ltd', 'OmniOffice Infrastructure & Supplies Pvt Ltd', '29AAACH1122M1ZX', 'sales@omniofficedirect.com', '+91 80 4455 6677', 'Office Furniture & Workstations', '{"city": "Bengaluru", "state": "Karnataka", "country": "India"}'::jsonb, 'verified', 96.5, 4.8, 95.0, 'PayPal Express / Net 30', 'PPL-MERCH-OMNI01', false),
+  ('e0000000-0000-0000-0000-000000000002', 'Ergotech Furnishings Corp', 'Ergotech India Seating Systems LLP', '27AABFE3344P1Z3', 'procurement@ergotechindia.com', '+91 22 2890 1234', 'Ergonomic Chairs & Desks', '{"city": "Mumbai", "state": "Maharashtra", "country": "India"}'::jsonb, 'verified', 94.0, 4.7, 96.5, 'PayPal Instant Capture / Net 15', 'PPL-MERCH-ERGO02', false),
+  ('e0000000-0000-0000-0000-000000000003', 'Horizon Office Ware', 'Horizon Modular Works Ltd', '07AAACH9988R1Z1', 'orders@horizonoffice.com', '+91 11 2680 5544', 'Storage Cabinets & Partitions', '{"city": "New Delhi", "state": "Delhi", "country": "India"}'::jsonb, 'verified', 91.0, 4.5, 90.0, 'PayPal Express / Net 30', 'PPL-MERCH-HORIZON03', false),
+  ('e0000000-0000-0000-0000-000000000004', 'CloudNine Tech Supplies', 'CloudNine Enterprise Computing Hub', '29AABCC8899J1Z7', 'enterprise@cloudninetech.com', '+91 80 6712 9000', 'Enterprise Hardware & Accessories', '{"city": "Bengaluru", "state": "Karnataka", "country": "India"}'::jsonb, 'verified', 95.0, 4.8, 97.0, 'PayPal Instant Capture', 'PPL-MERCH-CLOUD07', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- 5. SUPPLIER_PRODUCTS (Listings with price & stock)
