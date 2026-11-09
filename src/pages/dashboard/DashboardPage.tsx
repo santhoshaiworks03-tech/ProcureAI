@@ -154,7 +154,7 @@ export const DashboardPage: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Settled
               </span>
             </div>
-            <span className="text-xs font-medium text-slate-500 block">Total gross spend</span>
+            <span className="text-xs font-medium text-slate-500 block">Total spend</span>
             <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 tabular-nums font-mono tracking-tight">
               {formatCurrency(totalSpend)}
             </p>
