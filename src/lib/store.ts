@@ -211,6 +211,15 @@ class ReactiveDataStore {
     return newListing;
   }
 
+  public updateSupplierProductStock(listingId: string, delta: number): void {
+    this.supplierProducts = this.supplierProducts.map(sp =>
+      sp.id === listingId
+        ? { ...sp, available_stock: Math.max(0, sp.available_stock + delta), last_updated: new Date().toISOString() }
+        : sp
+    );
+    this.save('procureai_supplier_products', this.supplierProducts);
+  }
+
   // --- Purchase Orders ---
   public getPurchaseOrders(): PurchaseOrder[] {
     return [...this.purchaseOrders].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

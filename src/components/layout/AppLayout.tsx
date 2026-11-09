@@ -112,9 +112,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <div className="flex items-center gap-2">
               <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-slate-200 truncate">{org.name}</p>
+                <p className="text-xs font-medium text-slate-200 truncate">
+                  {activeRole === 'supplier'
+                    ? 'OmniOffice Direct Ltd'
+                    : activeRole === 'admin'
+                    ? 'ProcureAI Global'
+                    : org.name}
+                </p>
                 <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified Enterprise
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  {activeRole === 'supplier'
+                    ? 'Verified Supplier Partner'
+                    : activeRole === 'admin'
+                    ? 'Root Administrator'
+                    : 'Verified Enterprise'}
                 </p>
               </div>
             </div>
