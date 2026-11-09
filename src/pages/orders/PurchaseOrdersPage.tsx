@@ -3,16 +3,8 @@ import { useSearchParams, Link } from 'react-router-dom';
 import {
   FileText,
   Download,
-  CreditCard,
-  CheckCircle2,
-  Clock,
   Search,
-  Filter,
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
-  Building,
-  Printer
+  ExternalLink
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { PurchaseOrder, PurchaseOrderStatus } from '../../types';
@@ -60,64 +52,64 @@ export const PurchaseOrdersPage: React.FC = () => {
     switch (status) {
       case 'payment_completed':
       case 'delivered':
-        return <Badge variant="success">{status.replace('_', ' ').toUpperCase()}</Badge>;
+        return <Badge variant="success" dot>{status.replace('_', ' ')}</Badge>;
       case 'approved':
-        return <Badge variant="info">APPROVED (READY FOR CHECKOUT)</Badge>;
+        return <Badge variant="info" dot>Approved</Badge>;
       case 'pending_approval':
-        return <Badge variant="warning">PENDING APPROVAL</Badge>;
+        return <Badge variant="warning" dot>Pending approval</Badge>;
       case 'payment_pending':
-        return <Badge variant="info" className="animate-pulse">PAYMENT PENDING</Badge>;
+        return <Badge variant="info" dot>Payment pending</Badge>;
       case 'rejected':
       case 'cancelled':
-        return <Badge variant="danger">{status.toUpperCase()}</Badge>;
+        return <Badge variant="danger" dot>{status}</Badge>;
       default:
-        return <Badge variant="default">{status.toUpperCase()}</Badge>;
+        return <Badge variant="default" dot>{status}</Badge>;
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy-900">Purchase Order Management</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Complete procurement lifecycle tracking, exportable B2B PDF documentation, and PayPal settlement history.
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Purchase Orders</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Full lifecycle documentation, official PDF invoice generation, and PayPal payment tracking.
           </p>
         </div>
         <Link to="/agent">
-          <Button variant="primary" size="md">
-            New Procurement Request
+          <Button variant="primary" size="sm">
+            New procurement request
           </Button>
         </Link>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="p-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <Card className="p-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by PO number, supplier, or payment reference..."
+              placeholder="Search by PO number, supplier, or capture ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:bg-white"
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
             {['all', 'pending_approval', 'approved', 'payment_pending', 'payment_completed'].map(st => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap capitalize ${
+                className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors whitespace-nowrap capitalize ${
                   statusFilter === st
-                    ? 'bg-navy-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:text-navy-900'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {st === 'all' ? 'All Orders' : st.replace('_', ' ')}
+                {st === 'all' ? 'All orders' : st.replace('_', ' ')}
               </button>
             ))}
           </div>
@@ -128,41 +120,41 @@ export const PurchaseOrdersPage: React.FC = () => {
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase border-b border-slate-200">
+            <thead className="bg-slate-50/70 text-slate-500 text-[11px] border-b border-slate-200">
               <tr>
-                <th className="py-3 px-4">PO Number</th>
-                <th className="py-3 px-3">Supplier</th>
-                <th className="py-3 px-3">Buyer / Department</th>
-                <th className="py-3 px-3 text-right">Total Payable</th>
-                <th className="py-3 px-3 text-center">Status</th>
-                <th className="py-3 px-3">Date</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-2.5 px-4 font-medium">PO number</th>
+                <th className="py-2.5 px-3 font-medium">Supplier</th>
+                <th className="py-2.5 px-3 font-medium">Buyer</th>
+                <th className="py-2.5 px-3 font-medium text-right">Amount</th>
+                <th className="py-2.5 px-3 font-medium text-center">Status</th>
+                <th className="py-2.5 px-3 font-medium">Date</th>
+                <th className="py-2.5 px-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredOrders.map(po => (
-                <tr key={po.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3.5 px-4 font-mono font-bold text-brand-blue">
+                <tr key={po.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="py-3 px-4 font-mono font-medium text-slate-900">
                     {po.po_number}
                   </td>
-                  <td className="py-3.5 px-3">
-                    <span className="font-semibold text-navy-900 block">{po.supplier_name}</span>
+                  <td className="py-3 px-3">
+                    <span className="font-medium text-slate-900 block">{po.supplier_name}</span>
                     <span className="text-[10px] text-slate-400">{po.items.length} line items</span>
                   </td>
-                  <td className="py-3.5 px-3 text-slate-600">
-                    <span className="block font-medium">{po.created_by_name || 'Procurement Team'}</span>
+                  <td className="py-3 px-3 text-slate-600">
+                    <span className="block">{po.created_by_name || 'Procurement Officer'}</span>
                     <span className="text-[10px] text-slate-400">{po.organisation_name}</span>
                   </td>
-                  <td className="py-3.5 px-3 text-right font-bold text-navy-900">
+                  <td className="py-3 px-3 text-right font-medium text-slate-900 tabular-nums">
                     {formatCurrency(po.total_amount, po.currency)}
                   </td>
-                  <td className="py-3.5 px-3 text-center">
+                  <td className="py-3 px-3 text-center">
                     {getStatusBadge(po.status)}
                   </td>
-                  <td className="py-3.5 px-3 text-slate-500">
+                  <td className="py-3 px-3 text-slate-500">
                     {formatDate(po.created_at)}
                   </td>
-                  <td className="py-3.5 px-4 text-right">
+                  <td className="py-3 px-4 text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       <Button
                         variant="outline"
@@ -175,7 +167,7 @@ export const PurchaseOrdersPage: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => generatePurchaseOrderPDF(po)}
-                        title="Download Official PDF"
+                        title="Download PDF Invoice"
                       >
                         <Download className="w-3.5 h-3.5 text-slate-600" />
                       </Button>
@@ -195,23 +187,23 @@ export const PurchaseOrdersPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* PO Detail Modal */}
+      {/* Detail Modal */}
       {selectedOrder && (
         <Modal
           isOpen={Boolean(selectedOrder)}
           onClose={() => setSelectedOrder(null)}
-          title={`Purchase Order: ${selectedOrder.po_number}`}
-          subtitle={`Created on ${formatDateTime(selectedOrder.created_at)}`}
+          title={`Purchase Order ${selectedOrder.po_number}`}
+          subtitle={`Issued on ${formatDateTime(selectedOrder.created_at)}`}
           maxWidth="xl"
         >
-          <div className="space-y-6">
-            {/* Header Status & Action Bar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="space-y-5 text-xs">
+            {/* Status & actions bar */}
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
               <div className="flex items-center gap-3">
                 {getStatusBadge(selectedOrder.status)}
                 {selectedOrder.payment_reference && (
-                  <span className="text-xs text-slate-600 font-mono">
-                    Capture ID: <strong className="text-emerald-700">{selectedOrder.payment_reference}</strong>
+                  <span className="font-mono text-slate-600">
+                    Capture ID: <strong className="text-slate-900">{selectedOrder.payment_reference}</strong>
                   </span>
                 )}
               </div>
@@ -219,7 +211,7 @@ export const PurchaseOrdersPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  leftIcon={<Download className="w-4 h-4" />}
+                  leftIcon={<Download className="w-3.5 h-3.5" />}
                   onClick={() => generatePurchaseOrderPDF(selectedOrder)}
                 >
                   Download PDF
@@ -227,81 +219,74 @@ export const PurchaseOrdersPage: React.FC = () => {
                 {selectedOrder.status === 'approved' && (
                   <Link to={`/payments?po=${selectedOrder.id}`}>
                     <Button variant="paypal" size="sm">
-                      Proceed to PayPal Checkout
+                      PayPal checkout
                     </Button>
                   </Link>
                 )}
               </div>
             </div>
 
-            {/* Buyer and Supplier info blocks */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-1 text-xs">
-                <h4 className="font-bold text-navy-900 uppercase tracking-wider text-[11px] mb-2">
-                  Buyer Information
-                </h4>
-                <p className="font-semibold text-navy-900">{selectedOrder.organisation_name || 'Apex Tech Solutions Pvt Ltd'}</p>
-                <p className="text-slate-500">Contact: {selectedOrder.created_by_name || 'Strategic Procurement'}</p>
-                <p className="text-slate-500">Shipping: {selectedOrder.delivery_address.street}, {selectedOrder.delivery_address.city}, {selectedOrder.delivery_address.state}</p>
+            {/* Buyer and Supplier details */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 rounded-lg border border-slate-200 space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 block uppercase tracking-wider">Buyer</span>
+                <p className="font-medium text-slate-900">{selectedOrder.organisation_name || 'Apex Tech Solutions'}</p>
+                <p className="text-slate-500">Officer: {selectedOrder.created_by_name || 'Strategic Procurement'}</p>
+                <p className="text-slate-500">Location: {selectedOrder.delivery_address.city}, {selectedOrder.delivery_address.state}</p>
               </div>
 
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-1 text-xs">
-                <h4 className="font-bold text-navy-900 uppercase tracking-wider text-[11px] mb-2">
-                  Supplier / Vendor
-                </h4>
-                <p className="font-semibold text-navy-900">{selectedOrder.supplier_name}</p>
-                <p className="text-slate-500">Expected Delivery: {selectedOrder.expected_delivery_date || 'Within 5 Business Days'}</p>
-                <p className="text-slate-500">Settlement: PayPal Express Business Gateway</p>
+              <div className="p-3 rounded-lg border border-slate-200 space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 block uppercase tracking-wider">Vendor</span>
+                <p className="font-medium text-slate-900">{selectedOrder.supplier_name}</p>
+                <p className="text-slate-500">Expected delivery: {selectedOrder.expected_delivery_date || 'Within 5 business days'}</p>
+                <p className="text-slate-500">Terms: Net 30 / PayPal Express</p>
               </div>
             </div>
 
             {/* Line items table */}
-            <div>
-              <h4 className="font-bold text-navy-900 text-xs mb-2">Order Line Items</h4>
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase border-b border-slate-200">
-                    <tr>
-                      <th className="py-2.5 px-3">Item Description</th>
-                      <th className="py-2.5 px-3">SKU</th>
-                      <th className="py-2.5 px-3 text-center">Quantity</th>
-                      <th className="py-2.5 px-3 text-right">Unit Price</th>
-                      <th className="py-2.5 px-3 text-right">Total</th>
+            <div className="overflow-x-auto border border-slate-200 rounded-lg">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50/70 text-slate-500 text-[11px] border-b border-slate-200">
+                  <tr>
+                    <th className="py-2 px-3 font-medium">Description</th>
+                    <th className="py-2 px-3 font-medium">SKU</th>
+                    <th className="py-2 px-3 font-medium text-center">Qty</th>
+                    <th className="py-2 px-3 font-medium text-right">Unit price</th>
+                    <th className="py-2 px-3 font-medium text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {selectedOrder.items.map((line, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/40">
+                      <td className="py-2 px-3 font-medium text-slate-900">{line.product_name}</td>
+                      <td className="py-2 px-3 font-mono text-slate-500">{line.sku || '—'}</td>
+                      <td className="py-2 px-3 text-center font-medium text-slate-900 tabular-nums">{line.quantity}</td>
+                      <td className="py-2 px-3 text-right text-slate-600 tabular-nums">{formatCurrency(line.unit_price)}</td>
+                      <td className="py-2 px-3 text-right font-medium text-slate-900 tabular-nums">{formatCurrency(line.total_amount)}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {selectedOrder.items.map((line, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="py-2.5 px-3 font-semibold text-navy-900">{line.product_name}</td>
-                        <td className="py-2.5 px-3 font-mono text-slate-500">{line.sku || 'N/A'}</td>
-                        <td className="py-2.5 px-3 text-center font-bold text-navy-900">{line.quantity}</td>
-                        <td className="py-2.5 px-3 text-right text-slate-600">{formatCurrency(line.unit_price)}</td>
-                        <td className="py-2.5 px-3 text-right font-bold text-navy-900">{formatCurrency(line.total_amount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* Financial summary breakdown */}
-            <div className="flex justify-end">
-              <div className="w-72 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-600">
+            {/* Summary */}
+            <div className="flex justify-end pt-1">
+              <div className="w-64 space-y-1 text-slate-600">
+                <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span>{formatCurrency(selectedOrder.subtotal_amount)}</span>
+                  <span className="tabular-nums">{formatCurrency(selectedOrder.subtotal_amount)}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between">
                   <span>GST (18%):</span>
-                  <span>{formatCurrency(selectedOrder.tax_amount)}</span>
+                  <span className="tabular-nums">{formatCurrency(selectedOrder.tax_amount)}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Shipping & Logistics:</span>
-                  <span>{formatCurrency(selectedOrder.shipping_amount)}</span>
+                <div className="flex justify-between">
+                  <span>Shipping:</span>
+                  <span className="tabular-nums">{formatCurrency(selectedOrder.shipping_amount)}</span>
                 </div>
-                <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-navy-900">
-                  <span>Total Payable:</span>
-                  <span className="text-brand-blue">{formatCurrency(selectedOrder.total_amount)}</span>
+                <div className="pt-1.5 border-t border-slate-200 flex justify-between font-semibold text-slate-900 text-sm">
+                  <span>Total:</span>
+                  <span className="tabular-nums">{formatCurrency(selectedOrder.total_amount)}</span>
                 </div>
               </div>
             </div>
@@ -311,4 +296,3 @@ export const PurchaseOrdersPage: React.FC = () => {
     </div>
   );
 };
-

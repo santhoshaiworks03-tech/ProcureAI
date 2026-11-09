@@ -22,24 +22,24 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    primary: 'bg-brand-blue hover:bg-blue-600 text-white shadow-sm border border-transparent font-medium',
-    secondary: 'bg-navy-900 hover:bg-navy-800 text-white font-medium border border-navy-700 shadow-sm',
-    outline: 'border border-slate-300 hover:bg-slate-50 text-slate-700 bg-white shadow-sm',
-    danger: 'bg-brand-error hover:bg-red-600 text-white font-medium shadow-sm',
-    ghost: 'hover:bg-slate-100 text-slate-700',
-    paypal: 'bg-[#FFC439] hover:bg-[#F2BA36] text-navy-900 font-bold border border-[#E0AC30] shadow-sm hover:shadow'
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white font-medium border border-blue-700/80 shadow-subtle',
+    secondary: 'bg-ink-900 hover:bg-ink-800 text-white font-medium border border-ink-700 shadow-subtle',
+    outline: 'border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 bg-white shadow-subtle',
+    danger: 'bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-subtle',
+    ghost: 'hover:bg-slate-100 text-slate-600 hover:text-slate-900',
+    paypal: 'bg-[#FFC439] hover:bg-[#F4BA34] text-slate-900 font-semibold border border-[#E2AC28] shadow-subtle'
   };
 
   const sizeStyles = {
-    sm: 'text-xs px-2.5 py-1.5 rounded-md gap-1.5',
-    md: 'text-sm px-4 py-2 rounded-lg gap-2',
-    lg: 'text-base px-5 py-2.5 rounded-lg gap-2.5'
+    sm: 'text-xs h-8 px-3 rounded-lg gap-1.5',
+    md: 'text-xs h-9 px-3.5 rounded-lg gap-2',
+    lg: 'text-sm h-10 px-4 rounded-lg gap-2'
   };
 
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.99]',
+        'inline-flex items-center justify-center transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.99] whitespace-nowrap',
         variantStyles[variant],
         sizeStyles[size],
         className
@@ -47,10 +47,9 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-current" /> : leftIcon}
+      {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-current" /> : leftIcon}
       {children}
       {!isLoading && rightIcon}
     </button>
   );
 };
-

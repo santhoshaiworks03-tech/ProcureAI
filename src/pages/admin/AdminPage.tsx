@@ -3,17 +3,12 @@ import {
   Settings,
   ShieldCheck,
   Building,
-  Users,
   Bot,
   CreditCard,
   RotateCcw,
   CheckCircle2,
-  XCircle,
-  AlertTriangle,
   ExternalLink,
-  Key,
-  Layers,
-  Database
+  Key
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { Card } from '../../components/ui/Card';
@@ -24,7 +19,6 @@ import { formatCurrency } from '../../lib/utils';
 export const AdminPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState(store.getSuppliers());
   const [selectedAiProvider, setSelectedAiProvider] = useState<string>('gemini');
-  const [spendingLimit, setSpendingLimit] = useState<number>(250000);
   const [isResetting, setIsResetting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -59,11 +53,11 @@ export const AdminPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy-900">
-            Platform Administration & Settings
+          <h1 className="text-xl font-semibold tracking-tight text-ink-950">
+            Settings
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Configure multi-provider AI services, manage PayPal Sandbox merchant settings, and verify supplier credentials.
+            Platform governance, AI service providers, and vendor verification
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -72,181 +66,178 @@ export const AdminPage: React.FC = () => {
             size="sm"
             onClick={handleResetData}
             isLoading={isResetting}
-            leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+            leftIcon={<RotateCcw className="w-3.5 h-3.5 text-slate-400" />}
           >
-            Reset Seed Data
+            Reset seed data
           </Button>
-          <Badge variant="success">Platform Administrator</Badge>
+          <Badge variant="neutral">Platform admin</Badge>
         </div>
       </div>
 
       {/* KPI Overview Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Registered Enterprises</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">3 Active Companies</p>
-          <p className="text-xs text-slate-500 mt-0.5">Isolated tenant partitions</p>
+        <Card className="p-4 border-slate-200/80">
+          <span className="text-xs text-slate-500 block">Registered enterprises</span>
+          <p className="text-xl font-semibold text-ink-950 mt-1 tabular-nums font-mono">3 companies</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Isolated tenant partitions</p>
         </Card>
-        <Card>
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Registered Suppliers</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">{suppliers.length} Commercial Partners</p>
-          <p className="text-xs text-emerald-600 mt-0.5">{suppliers.filter(s => s.verification_status === 'verified').length} Verified</p>
+        <Card className="p-4 border-slate-200/80">
+          <span className="text-xs text-slate-500 block">Registered suppliers</span>
+          <p className="text-xl font-semibold text-ink-950 mt-1 tabular-nums font-mono">{suppliers.length} vendors</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">{suppliers.filter(s => s.verification_status === 'verified').length} verified</p>
         </Card>
-        <Card>
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Purchase Orders Created</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">{purchaseOrders.length} Orders</p>
-          <p className="text-xs text-slate-500 mt-0.5">Tamper-evident hash logged</p>
+        <Card className="p-4 border-slate-200/80">
+          <span className="text-xs text-slate-500 block">Purchase orders</span>
+          <p className="text-xl font-semibold text-ink-950 mt-1 tabular-nums font-mono">{purchaseOrders.length} orders</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Tamper-evident hash logged</p>
         </Card>
-        <Card>
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">PayPal Settlement Pipeline</span>
-          <p className="text-xl font-bold text-emerald-600 mt-1">Orders API v2</p>
-          <p className="text-xs text-slate-500 mt-0.5">Sandbox Capture Gateway</p>
+        <Card className="p-4 border-slate-200/80">
+          <span className="text-xs text-slate-500 block">Payment pipeline</span>
+          <p className="text-xl font-semibold text-ink-950 mt-1 font-mono">PayPal v2</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Sandbox capture gateway</p>
         </Card>
       </div>
 
       {/* Configuration Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* AI Multi-Provider Configuration */}
-        <Card className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <Card className="p-4 space-y-3.5 border-slate-200/80">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <Bot className="w-4 h-4 text-brand-blue" />
-              <h3 className="text-sm font-bold text-navy-900">AI Provider Architecture</h3>
+              <Bot className="w-4 h-4 text-slate-500" />
+              <h3 className="text-xs font-semibold text-ink-950">AI provider service layer</h3>
             </div>
-            <Badge variant="info">Zero Lock-in</Badge>
+            <Badge variant="neutral">Configurable</Badge>
           </div>
 
-          <p className="text-xs text-slate-600 leading-relaxed">
-            ProcureAI features a provider-independent AI service layer. Select your organization's primary model provider:
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Select the primary AI provider. All requests enforce structured JSON validation with deterministic fallbacks:
           </p>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2.5">
             {[
-              { id: 'gemini', name: 'Google Gemini', desc: 'Gemini 1.5 Pro / Flash' },
-              { id: 'openai', name: 'OpenAI', desc: 'GPT-4o Structured Outputs' },
+              { id: 'gemini', name: 'Google Gemini', desc: '1.5 Flash / Pro' },
+              { id: 'openai', name: 'OpenAI', desc: 'GPT-4o structured' },
               { id: 'claude', name: 'Anthropic Claude', desc: 'Claude 3.5 Sonnet' }
             ].map(prov => (
               <button
                 key={prov.id}
                 onClick={() => setSelectedAiProvider(prov.id)}
-                className={`p-3 rounded-xl border text-left transition-all ${
+                className={`p-2.5 rounded-lg border text-left transition-colors ${
                   selectedAiProvider === prov.id
-                    ? 'border-brand-blue bg-blue-50/50 ring-2 ring-brand-blue/20'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-blue-600 bg-blue-50/20'
+                    : 'border-slate-200/80 hover:border-slate-300 bg-white'
                 }`}
               >
-                <span className="text-xs font-bold text-navy-900 block">{prov.name}</span>
-                <span className="text-[10px] text-slate-500 mt-0.5 block">{prov.desc}</span>
+                <span className="text-xs font-medium text-ink-950 block">{prov.name}</span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">{prov.desc}</span>
               </button>
             ))}
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-2">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/70 text-xs space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-navy-900 flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-slate-500" /> Active Provider Status
+              <span className="font-medium text-ink-950 flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-slate-400" /> Active provider status
               </span>
-              <span className="font-mono text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">
-                READY / FALLBACK ACTIVE
-              </span>
+              <Badge variant="success" dot size="sm">Ready</Badge>
             </div>
-            <p className="text-[11px] text-slate-500 leading-tight">
-              Deterministic procurement optimization engine guarantees 100% uptime even when external AI API keys are omitted or rate-limited.
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Deterministic procurement optimization engine guarantees 100% uptime even when external API keys are omitted or rate-limited
             </p>
           </div>
         </Card>
 
         {/* PayPal Sandbox Developer Platform Config */}
-        <Card className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <Card className="p-4 space-y-3.5 border-slate-200/80">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-emerald-600" />
-              <h3 className="text-sm font-bold text-navy-900">PayPal Developer Sandbox Status</h3>
+              <CreditCard className="w-4 h-4 text-slate-500" />
+              <h3 className="text-xs font-semibold text-ink-950">PayPal sandbox environment</h3>
             </div>
-            <Badge variant="success">Developer Verified</Badge>
+            <Badge variant="success" dot size="sm">Connected</Badge>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 font-mono">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/70 text-xs space-y-2 font-mono">
             <div className="flex justify-between">
-              <span className="text-slate-500 font-sans">API Environment:</span>
-              <span className="text-navy-900 font-bold">Sandbox (api-m.sandbox.paypal.com)</span>
+              <span className="text-slate-500 font-sans">API environment:</span>
+              <span className="text-ink-950 font-medium">Sandbox (api-m.sandbox.paypal.com)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-sans">Orders API Version:</span>
-              <span className="text-navy-900">v2 (Intent: CAPTURE)</span>
+              <span className="text-slate-500 font-sans">Orders API version:</span>
+              <span className="text-ink-950">v2 (Intent: CAPTURE)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-sans">Webhook Dispatcher:</span>
-              <span className="text-emerald-600 font-bold">Enabled & Verified</span>
+              <span className="text-slate-500 font-sans">Webhook dispatcher:</span>
+              <span className="text-slate-800">Verified</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-sans">Time-Limited Session:</span>
-              <span className="text-navy-900">300 Seconds (05:00)</span>
+              <span className="text-slate-500 font-sans">Checkout session ttl:</span>
+              <span className="text-ink-950 tabular-nums">300s (05:00)</span>
             </div>
           </div>
 
-          <div className="pt-2 flex items-center justify-between">
+          <div className="pt-1 flex items-center justify-between">
             <a
               href="https://developer.paypal.com/dashboard/applications/sandbox"
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-brand-blue font-semibold hover:underline flex items-center gap-1"
+              className="text-xs text-blue-600 font-medium hover:underline flex items-center gap-1"
             >
-              Open PayPal Developer Portal <ExternalLink className="w-3.5 h-3.5" />
+              PayPal Developer portal <ExternalLink className="w-3 h-3" />
             </a>
             <Button variant="outline" size="sm" onClick={handleSaveSettings}>
-              {saveSuccess ? 'Saved!' : 'Save Configuration'}
+              {saveSuccess ? 'Saved' : 'Save'}
             </Button>
           </div>
         </Card>
       </div>
 
       {/* Supplier Verification Queue */}
-      <Card className="overflow-hidden p-0">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+      <Card className="overflow-hidden p-0 border border-slate-200/80">
+        <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-navy-900">Supplier Legal Verification Audit Queue</h3>
-            <p className="text-xs text-slate-500">Review GSTIN, corporate entity documents, and PayPal settlement accounts</p>
+            <h3 className="text-xs font-semibold text-ink-950">Supplier legal verification audit queue</h3>
+            <p className="text-[11px] text-slate-500">Review GSTIN, corporate entity documents, and PayPal settlement accounts</p>
           </div>
-          <Badge variant="default">Admin Governance</Badge>
+          <Badge variant="neutral">Compliance</Badge>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase border-b border-slate-200">
+            <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
               <tr>
-                <th className="py-2.5 px-4">Supplier Company</th>
-                <th className="py-2.5 px-3">GSTIN / Tax ID</th>
-                <th className="py-2.5 px-3">Category</th>
-                <th className="py-2.5 px-3">City</th>
-                <th className="py-2.5 px-3 text-center">Status</th>
-                <th className="py-2.5 px-4 text-right">Audit Action</th>
+                <th className="py-2.5 px-3.5 font-medium">Supplier</th>
+                <th className="py-2.5 px-3 font-medium">GSTIN / Tax ID</th>
+                <th className="py-2.5 px-3 font-medium">Category</th>
+                <th className="py-2.5 px-3 font-medium">City</th>
+                <th className="py-2.5 px-3 font-medium text-center">Status</th>
+                <th className="py-2.5 px-3.5 font-medium text-right">Audit action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {suppliers.map(sup => (
-                <tr key={sup.id} className="hover:bg-slate-50/60">
-                  <td className="py-3 px-4 font-semibold text-navy-900">{sup.company_name}</td>
-                  <td className="py-3 px-3 font-mono text-slate-600">{sup.gstin_tax_id}</td>
-                  <td className="py-3 px-3 text-slate-600">{sup.business_category}</td>
-                  <td className="py-3 px-3 text-slate-500">{sup.address.city}</td>
-                  <td className="py-3 px-3 text-center">
+                <tr key={sup.id} className="hover:bg-slate-50/70 transition-colors">
+                  <td className="py-2.5 px-3.5 font-medium text-ink-950">{sup.company_name}</td>
+                  <td className="py-2.5 px-3 font-mono text-slate-600 text-[11px]">{sup.gstin_tax_id}</td>
+                  <td className="py-2.5 px-3 text-slate-600">{sup.business_category}</td>
+                  <td className="py-2.5 px-3 text-slate-500">{sup.address.city}</td>
+                  <td className="py-2.5 px-3 text-center">
                     {sup.verification_status === 'verified' ? (
-                      <Badge variant="success">Verified</Badge>
+                      <Badge variant="success" dot size="sm">Verified</Badge>
                     ) : sup.verification_status === 'rejected' ? (
-                      <Badge variant="danger">Rejected</Badge>
+                      <Badge variant="danger" dot size="sm">Rejected</Badge>
                     ) : (
-                      <Badge variant="warning">Under Review</Badge>
+                      <Badge variant="warning" dot size="sm">Review</Badge>
                     )}
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-2.5 px-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       {sup.verification_status !== 'verified' && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleVerifySupplier(sup.id, 'verified')}
-                          className="text-emerald-700 hover:bg-emerald-50"
                         >
                           Approve
                         </Button>
@@ -256,7 +247,7 @@ export const AdminPage: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleVerifySupplier(sup.id, 'rejected')}
-                          className="text-rose-600 hover:bg-rose-50"
+                          className="text-slate-500 hover:text-rose-600"
                         >
                           Reject
                         </Button>
@@ -272,4 +263,3 @@ export const AdminPage: React.FC = () => {
     </div>
   );
 };
-

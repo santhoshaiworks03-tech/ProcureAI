@@ -1,13 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   SlidersHorizontal,
-  ShieldCheck,
   Search,
-  Filter,
-  TrendingUp,
-  Award,
-  Zap,
-  Info,
   Building
 } from 'lucide-react';
 import { store } from '../../lib/store';
@@ -20,7 +14,6 @@ import { DEFAULT_WEIGHTS, ScoringWeights } from '../../services/ai/aiService';
 export const SupplierIntelligencePage: React.FC = () => {
   const [weights, setWeights] = useState<ScoringWeights>({ ...DEFAULT_WEIGHTS });
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const suppliers = store.getSuppliers();
   const listings = store.getSupplierProducts();
@@ -77,32 +70,32 @@ export const SupplierIntelligencePage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy-900">
-            Supplier Intelligence & Ranking Engine
+          <h1 className="text-xl font-semibold tracking-tight text-ink-950">
+            Supplier intelligence
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Tune algorithmic evaluation weights to rank commercial partners across price, speed, inventory depth, and fulfillment reliability.
+            Algorithmic scoring model across price competitiveness, delivery lead times, stock depth, and audit records
           </p>
         </div>
-        <Badge variant="info">
-          <Zap className="w-3.5 h-3.5 text-brand-blue" /> Live Mathematical Recalculation
+        <Badge variant="neutral">
+          Evaluation matrix
         </Badge>
       </div>
 
       {/* Configurable Multi-Criteria Weights Panel */}
-      <Card className="border-brand-blue/30 bg-gradient-to-r from-white via-slate-50/50 to-blue-50/20">
-        <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+      <Card className="p-4 border-slate-200/80">
+        <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-brand-blue" />
-            <h3 className="text-xs font-bold text-navy-900 uppercase tracking-wider">
-              Scoring Model Parameter Weights
+            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+            <h3 className="text-xs font-semibold text-ink-950">
+              Scoring parameter weights
             </h3>
           </div>
           <button
             onClick={() => setWeights({ ...DEFAULT_WEIGHTS })}
-            className="text-[11px] text-brand-blue font-semibold hover:underline"
+            className="text-[11px] text-blue-600 font-medium hover:underline"
           >
-            Reset to Standard 30/20/20/20/10
+            Reset to standard (30 / 20 / 20 / 20 / 10)
           </button>
         </div>
 
@@ -110,8 +103,8 @@ export const SupplierIntelligencePage: React.FC = () => {
           {/* Price Weight */}
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-semibold text-slate-700">Price Competitiveness</span>
-              <span className="font-mono font-bold text-brand-blue">{Math.round(weights.priceWeight * 100)}%</span>
+              <span className="text-slate-600">Price competitiveness</span>
+              <span className="font-mono font-medium text-ink-950 tabular-nums">{Math.round(weights.priceWeight * 100)}%</span>
             </div>
             <input
               type="range"
@@ -120,15 +113,15 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.priceWeight}
               onChange={e => setWeights({ ...weights, priceWeight: parseFloat(e.target.value) })}
-              className="w-full accent-brand-blue cursor-pointer"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
           {/* Availability Weight */}
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-semibold text-slate-700">Stock Availability</span>
-              <span className="font-mono font-bold text-brand-blue">{Math.round(weights.availabilityWeight * 100)}%</span>
+              <span className="text-slate-600">Stock depth</span>
+              <span className="font-mono font-medium text-ink-950 tabular-nums">{Math.round(weights.availabilityWeight * 100)}%</span>
             </div>
             <input
               type="range"
@@ -137,15 +130,15 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.availabilityWeight}
               onChange={e => setWeights({ ...weights, availabilityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-brand-blue cursor-pointer"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
           {/* Delivery Speed Weight */}
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-semibold text-slate-700">Delivery Lead Time</span>
-              <span className="font-mono font-bold text-brand-blue">{Math.round(weights.deliveryWeight * 100)}%</span>
+              <span className="text-slate-600">Lead time</span>
+              <span className="font-mono font-medium text-ink-950 tabular-nums">{Math.round(weights.deliveryWeight * 100)}%</span>
             </div>
             <input
               type="range"
@@ -154,15 +147,15 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.deliveryWeight}
               onChange={e => setWeights({ ...weights, deliveryWeight: parseFloat(e.target.value) })}
-              className="w-full accent-brand-blue cursor-pointer"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
           {/* Reliability Weight */}
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-semibold text-slate-700">Historical Reliability</span>
-              <span className="font-mono font-bold text-brand-blue">{Math.round(weights.reliabilityWeight * 100)}%</span>
+              <span className="text-slate-600">SLA reliability</span>
+              <span className="font-mono font-medium text-ink-950 tabular-nums">{Math.round(weights.reliabilityWeight * 100)}%</span>
             </div>
             <input
               type="range"
@@ -171,15 +164,15 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.reliabilityWeight}
               onChange={e => setWeights({ ...weights, reliabilityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-brand-blue cursor-pointer"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
           {/* Quality Weight */}
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-semibold text-slate-700">ESG & Quality Audit</span>
-              <span className="font-mono font-bold text-brand-blue">{Math.round(weights.qualityWeight * 100)}%</span>
+              <span className="text-slate-600">Audit quality</span>
+              <span className="font-mono font-medium text-ink-950 tabular-nums">{Math.round(weights.qualityWeight * 100)}%</span>
             </div>
             <input
               type="range"
@@ -188,99 +181,90 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.qualityWeight}
               onChange={e => setWeights({ ...weights, qualityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-brand-blue cursor-pointer"
+              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
         </div>
       </Card>
 
-      {/* Comparison & Ranking Table */}
-      <Card className="overflow-hidden p-0">
-        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search evaluated suppliers..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:bg-white"
-            />
-          </div>
+      {/* Filter and Search Bar */}
+      <Card className="p-3">
+        <div className="relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search suppliers by name or category"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white"
+          />
+        </div>
+      </Card>
 
-          <span className="text-xs text-slate-500">
-            Showing <strong className="text-navy-900">{filteredSuppliers.length}</strong> ranked suppliers
+      {/* Scored Supplier Rankings Table */}
+      <Card className="overflow-hidden p-0 border border-slate-200/80">
+        <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-semibold text-ink-950">Dynamic commercial rankings</h3>
+            <p className="text-[11px] text-slate-500">Recalculated from active parameter weights</p>
+          </div>
+          <span className="text-[11px] font-mono text-slate-400 tabular-nums">
+            {filteredSuppliers.length} suppliers scored
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase border-b border-slate-200">
+            <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
               <tr>
-                <th className="py-3 px-4">Rank & Supplier</th>
-                <th className="py-3 px-3">Category</th>
-                <th className="py-3 px-3 text-center">Price Score</th>
-                <th className="py-3 px-3 text-center">Availability</th>
-                <th className="py-3 px-3 text-center">Avg Lead Time</th>
-                <th className="py-3 px-3 text-center">Reliability</th>
-                <th className="py-3 px-3 text-center">Quality</th>
-                <th className="py-3 px-4 text-center">Composite Score</th>
-                <th className="py-3 px-4 text-right">Action</th>
+                <th className="py-2.5 px-3.5 font-medium w-12 text-center">Rank</th>
+                <th className="py-2.5 px-3 font-medium">Supplier</th>
+                <th className="py-2.5 px-3 font-medium text-center">Price</th>
+                <th className="py-2.5 px-3 font-medium text-center">Stock</th>
+                <th className="py-2.5 px-3 font-medium text-center">Lead time</th>
+                <th className="py-2.5 px-3 font-medium text-center">Reliability</th>
+                <th className="py-2.5 px-3 font-medium text-center">Quality</th>
+                <th className="py-2.5 px-3.5 font-medium text-right">Composite</th>
+                <th className="py-2.5 px-3.5 font-medium text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredSuppliers.map((sup, idx) => (
-                <tr
-                  key={sup.id}
-                  className={`hover:bg-slate-50/70 transition-colors ${
-                    idx === 0 ? 'bg-blue-50/30' : ''
-                  }`}
-                >
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                          idx === 0
-                            ? 'bg-brand-blue text-white shadow-xs'
-                            : idx === 1
-                            ? 'bg-slate-300 text-slate-800'
-                            : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {idx + 1}
-                      </span>
-                      <div>
-                        <span className="font-bold text-navy-900 block">{sup.company_name}</span>
-                        <span className="text-[10px] text-slate-400">Total Stock: {sup.totalStock} units</span>
-                      </div>
-                    </div>
+                <tr key={sup.id} className="hover:bg-slate-50/70 transition-colors">
+                  <td className="py-3 px-3.5 text-center font-mono font-medium text-slate-500 tabular-nums">
+                    #{idx + 1}
                   </td>
-                  <td className="py-3 px-3 text-slate-600">{sup.business_category}</td>
-                  <td className="py-3 px-3 text-center font-mono font-semibold">{sup.priceScore}%</td>
-                  <td className="py-3 px-3 text-center font-mono font-semibold">{sup.availabilityScore}%</td>
-                  <td className="py-3 px-3 text-center font-mono font-semibold">{sup.avgLeadTime} days</td>
-                  <td className="py-3 px-3 text-center font-mono font-semibold">{sup.reliabilityScore}%</td>
-                  <td className="py-3 px-3 text-center font-mono font-semibold">{sup.qualityScore}%</td>
-                  <td className="py-3 px-4 text-center">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-bold font-mono ${
-                        idx === 0
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                          : 'bg-slate-100 text-navy-900'
-                      }`}
-                    >
-                      {sup.compositeScore}%
-                    </span>
+                  <td className="py-3 px-3">
+                    <span className="font-medium text-ink-950 block">{sup.company_name}</span>
+                    <span className="text-[11px] text-slate-500">{sup.business_category}</span>
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                    {sup.priceScore}
+                  </td>
+                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                    {sup.availabilityScore}
+                  </td>
+                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                    {sup.deliveryScore}
+                  </td>
+                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                    {sup.reliabilityScore}%
+                  </td>
+                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                    {sup.qualityScore}%
+                  </td>
+                  <td className="py-3 px-3.5 text-right font-mono font-semibold text-ink-950 tabular-nums text-sm">
+                    {sup.compositeScore}
+                  </td>
+                  <td className="py-3 px-3.5 text-right">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        window.location.href = `/agent?prompt=${encodeURIComponent(`Procure required office products from ${sup.company_name}`)}`;
+                        window.location.href = `/agent?prompt=${encodeURIComponent(`Find optimal catalogue items from ${sup.company_name}`)}`;
                       }}
                     >
-                      Select
+                      Procure
                     </Button>
                   </td>
                 </tr>
@@ -292,4 +276,3 @@ export const SupplierIntelligencePage: React.FC = () => {
     </div>
   );
 };
-
