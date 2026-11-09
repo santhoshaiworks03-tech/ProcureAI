@@ -42,6 +42,7 @@ class ReactiveDataStore {
   private profiles: Profile[];
   private currentProfileId: string;
   private currentRole: UserRole;
+  private isAuthenticatedUser: boolean;
   private suppliers: Supplier[];
   private categories: ProductCategory[];
   private products: Product[];
@@ -60,6 +61,8 @@ class ReactiveDataStore {
     this.profiles = this.load('procureai_profiles', SEED_PROFILES);
     this.currentProfileId = localStorage.getItem('procureai_active_profile') || 'usr-buyer-01';
     this.currentRole = (localStorage.getItem('procureai_active_role') as UserRole) || 'buyer';
+    const authStored = localStorage.getItem('procureai_authenticated');
+    this.isAuthenticatedUser = authStored === 'true';
     this.suppliers = this.load('procureai_suppliers', SEED_SUPPLIERS);
     this.categories = this.load('procureai_categories', SEED_CATEGORIES);
     this.products = this.load('procureai_products', SEED_PRODUCTS);
@@ -128,7 +131,31 @@ class ReactiveDataStore {
       }));
   }
 
-  // --- Profile & Role Switcher ---
+  // --- Profile, Authentication & Role Switcher ---
+  public isAuthenticated(): boolean {
+    return this.isAuthenticatedUser;
+  }
+
+  public login(role: UserRole, email?: string): void {
+    this.isAuthenticatedUser = true;
+    localStorage.setItem('procureai_authenticated', 'true');
+    this.setRole(role);
+    if (email) {
+      const match = this.profiles.find(p => p.email.toLowerCase() === email.toLowerCase());
+      if (match) {
+        this.currentProfileId = match.id;
+        localStorage.setItem('procureai_active_profile', match.id);
+      }
+    }
+    this.notify();
+  }
+
+  public logout(): void {
+    this.isAuthenticatedUser = false;
+    localStorage.setItem('procureai_authenticated', 'false');
+    this.notify();
+  }
+
   public getCurrentUser(): Profile {
     const found = this.profiles.find(p => p.id === this.currentProfileId);
     if (found) {
@@ -139,6 +166,8 @@ class ReactiveDataStore {
 
   public setRole(role: UserRole) {
     this.currentRole = role;
+    this.isAuthenticatedUser = true;
+    localStorage.setItem('procureai_authenticated', 'true');
     localStorage.setItem('procureai_active_role', role);
     if (role === 'buyer') this.currentProfileId = 'usr-buyer-01';
     else if (role === 'supplier') this.currentProfileId = 'usr-supplier-01';

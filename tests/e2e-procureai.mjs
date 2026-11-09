@@ -43,6 +43,34 @@ async function runTestSuite() {
 
   try {
     // -------------------------------------------------------------------------
+    // TEST 0: Multi-Portal Sign In & Role Authentication
+    // -------------------------------------------------------------------------
+    console.log(`\n--- Test 0: Multi-Portal Sign-In Page ---`);
+    await page.goto(`${TARGET_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.waitForTimeout(1000);
+
+    const loginTitle = await page.locator('h1').innerText();
+    assert(loginTitle.includes('Sign In to Your ProcureAI Portal'), `Sign-in page rendered: "${loginTitle}"`);
+
+    // Verify 3 distinct role selector cards exist
+    const buyerPortal = page.locator('text=Buyer Portal');
+    const supplierPortal = page.locator('text=Supplier Portal');
+    const adminPortal = page.locator('text=Admin Control Tower');
+    assert(await buyerPortal.count() > 0, `Buyer portal card available`);
+    assert(await supplierPortal.count() > 0, `Supplier portal card available`);
+    assert(await adminPortal.count() > 0, `Admin portal card available`);
+
+    // Save screenshot of the multi-login sign-in page
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, '00-signin-portals.png') });
+    console.log(`  Screenshot saved: 00-signin-portals.png`);
+
+    // Click 1-click Buyer Sign In to authenticate as Buyer
+    const buyer1Click = page.locator('button:has-text("1-Click: Priya Sharma")').first();
+    assert(await buyer1Click.isVisible(), `1-Click Buyer demo authentication button visible`);
+    await buyer1Click.click();
+    await page.waitForTimeout(1000);
+
+    // -------------------------------------------------------------------------
     // TEST 1: Overview & KPI Dashboard
     // -------------------------------------------------------------------------
     console.log(`\n--- Test 1: Overview Dashboard ---`);
@@ -253,6 +281,14 @@ async function runTestSuite() {
     const buyerRoleButton = page.locator('button:has-text("Buyer")').first();
     await buyerRoleButton.click();
     await page.waitForTimeout(500);
+
+    // 4. Test Sign Out to return to Login Portal
+    const signOutBtn = page.locator('button[title="Sign out of portal"]').first();
+    if (await signOutBtn.isVisible()) {
+      await signOutBtn.click();
+      await page.waitForTimeout(1000);
+      assert(page.url().includes('/login'), `Sign out redirects to /login portal gateway`);
+    }
 
     // -------------------------------------------------------------------------
     // SUMMARY
