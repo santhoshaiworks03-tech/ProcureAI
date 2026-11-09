@@ -213,6 +213,48 @@ async function runTestSuite() {
     console.log(`  Screenshot saved: 09-settings.png`);
 
     // -------------------------------------------------------------------------
+    // TEST 10: Role-Based Dashboards (Buyer, Supplier, Admin)
+    // -------------------------------------------------------------------------
+    console.log(`\n--- Test 10: Role-Based Dynamic Dashboards ---`);
+    await page.goto(TARGET_URL, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+
+    // 1. Supplier Role Switch
+    const supplierRoleButton = page.locator('button:has-text("Supplier")').first();
+    assert(await supplierRoleButton.isVisible(), `Supplier role button is visible in top navigation`);
+    await supplierRoleButton.click();
+    await page.waitForTimeout(1000);
+
+    const supplierHeading = await page.locator('h1').innerText();
+    assert(supplierHeading.includes('Supplier Portal') || supplierHeading.includes('Fulfillment'), `Supplier dashboard rendered with heading: "${supplierHeading}"`);
+    
+    const merchantGateway = await page.locator('text=PayPal merchant account').count();
+    assert(merchantGateway > 0, `PayPal Merchant settlement card visible for Supplier`);
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, '10-supplier-dashboard.png') });
+    console.log(`  Screenshot saved: 10-supplier-dashboard.png`);
+
+    // 2. Admin Role Switch
+    const adminRoleButton = page.locator('button:has-text("Admin")').first();
+    assert(await adminRoleButton.isVisible(), `Admin role button is visible in top navigation`);
+    await adminRoleButton.click();
+    await page.waitForTimeout(1000);
+
+    const adminHeading2 = await page.locator('h1').innerText();
+    assert(adminHeading2.includes('Platform Operations') || adminHeading2.includes('Governance'), `Admin dashboard rendered with heading: "${adminHeading2}"`);
+
+    const kycQueue = await page.locator('text=Supplier legal verification').count();
+    assert(kycQueue > 0, `Supplier verification / compliance queue visible for Admin`);
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, '11-admin-dashboard.png') });
+    console.log(`  Screenshot saved: 11-admin-dashboard.png`);
+
+    // 3. Switch back to Buyer
+    const buyerRoleButton = page.locator('button:has-text("Buyer")').first();
+    await buyerRoleButton.click();
+    await page.waitForTimeout(500);
+
+    // -------------------------------------------------------------------------
     // SUMMARY
     // -------------------------------------------------------------------------
     console.log(`\n======================================================`);
