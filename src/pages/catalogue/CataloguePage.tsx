@@ -6,8 +6,12 @@ import {
   ChevronRight,
   Package,
   Layers,
-  ArrowRight
+  ArrowRight,
+  LayoutGrid,
+  Table2
 } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
+import type { ColDef } from 'ag-grid-community';
 import { store } from '../../lib/store';
 import { Product } from '../../types';
 import { Card } from '../../components/ui/Card';
@@ -23,6 +27,7 @@ export const CataloguePage: React.FC = () => {
   const [search, setSearch] = useState(queryParam);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'aggrid'>('cards');
 
   const categories = store.getCategories();
   const products = store.getProducts();
@@ -47,6 +52,108 @@ export const CataloguePage: React.FC = () => {
     return store.getListingsForProduct(selectedProduct.id);
   }, [selectedProduct]);
 
+  // AG Grid Row Data preparation
+  const rowData = useMemo(() => {
+    return filteredProducts.map(p => {
+      const listings = store.getListingsForProduct(p.id);
+      const minPrice = listings.length > 0 ? Math.min(...listings.map(l => l.unit_price)) : p.benchmark_market_price;
+      const maxPrice = listings.length > 0 ? Math.max(...listings.map(l => l.unit_price)) : p.benchmark_market_price;
+      const totalStock = listings.reduce((sum, l) => sum + l.available_stock, 0);
+      const category = categories.find(c => c.id === p.category_id)?.name || 'General';
+
+      return {
+        id: p.id,
+        sku: p.sku,
+        gtin: p.gtin || '—',
+        brand: p.brand,
+        name: p.name,
+        category_name: category,
+        benchmark_market_price: p.benchmark_market_price,
+        minPrice,
+        maxPrice,
+        priceRange: listings.length > 1 ? `${formatCurrency(minPrice)} – ${formatCurrency(maxPrice)}` : formatCurrency(minPrice),
+        totalStock,
+        supplierCount: listings.length,
+        rawProduct: p
+      };
+    });
+  }, [filteredProducts, categories]);
+
+  // AG Grid Column Definitions
+  const columnDefs = useMemo<ColDef[]>(() => [
+    {
+      field: 'sku',
+      headerName: 'SKU',
+      width: 110,
+      cellClass: 'font-mono text-xs font-medium text-slate-800'
+    },
+    {
+      field: 'name',
+      headerName: 'Product name',
+      flex: 2,
+      minWidth: 200,
+      cellClass: 'font-medium text-ink-950 text-xs'
+    },
+    {
+      field: 'brand',
+      headerName: 'Brand',
+      width: 120,
+      cellClass: 'text-xs text-slate-600'
+    },
+    {
+      field: 'category_name',
+      headerName: 'Category',
+      width: 140,
+      cellClass: 'text-xs text-slate-600'
+    },
+    {
+      field: 'benchmark_market_price',
+      headerName: 'Benchmark',
+      width: 130,
+      valueFormatter: params => formatCurrency(params.value),
+      cellClass: 'text-xs text-slate-500 font-mono tabular-nums'
+    },
+    {
+      field: 'priceRange',
+      headerName: 'Contracted pricing',
+      width: 160,
+      cellClass: 'text-xs font-semibold text-emerald-700 font-mono tabular-nums'
+    },
+    {
+      field: 'totalStock',
+      headerName: 'Stock',
+      width: 110,
+      cellRenderer: (params: any) => {
+        const stock = params.value;
+        return (
+          <span className={`inline-flex items-center text-[11px] font-mono px-2 py-0.5 rounded ${stock > 0 ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
+            {stock > 0 ? `${stock} units` : 'Out of stock'}
+          </span>
+        );
+      }
+    },
+    {
+      field: 'supplierCount',
+      headerName: 'Vendors',
+      width: 90,
+      cellClass: 'text-center font-mono text-xs text-slate-600'
+    },
+    {
+      headerName: 'Action',
+      width: 110,
+      cellRenderer: (params: any) => {
+        return (
+          <button
+            onClick={() => setSelectedProduct(params.data.rawProduct)}
+            className="px-2.5 py-1 text-[11px] font-medium text-blue-700 hover:text-blue-900 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
+          >
+            Compare
+          </button>
+        );
+      }
+    }
+  ], []);
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -58,6 +165,29 @@ export const CataloguePage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200/80">
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`p-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+                viewMode === 'cards' ? 'bg-white text-ink-950 shadow-xs' : 'text-slate-600 hover:text-ink-950'
+              }`}
+              title="Cards view"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode('aggrid')}
+              className={`p-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+                viewMode === 'aggrid' ? 'bg-white text-ink-950 shadow-xs' : 'text-slate-600 hover:text-ink-950'
+              }`}
+              title="AG Grid table"
+            >
+              <Table2 className="w-3.5 h-3.5" />
+              <span className="text-[11px]">AG Grid</span>
+            </button>
+          </div>
+
           <Badge variant="neutral">
             <span className="tabular-nums font-mono font-medium">{filteredProducts.length}</span> items listed
           </Badge>
@@ -108,84 +238,102 @@ export const CataloguePage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filteredProducts.map(product => {
-          const listings = store.getListingsForProduct(product.id);
-          const minPrice = listings.length > 0 ? Math.min(...listings.map(l => l.unit_price)) : product.benchmark_market_price;
-          const maxPrice = listings.length > 0 ? Math.max(...listings.map(l => l.unit_price)) : product.benchmark_market_price;
-          const totalStock = listings.reduce((sum, l) => sum + l.available_stock, 0);
+      {/* AG Grid Enterprise View */}
+      {viewMode === 'aggrid' ? (
+        <Card className="p-0 overflow-hidden border border-slate-200/80">
+          <div className="ag-theme-quartz w-full" style={{ height: 480 }}>
+            <AgGridReact
+              rowData={rowData}
+              columnDefs={columnDefs}
+              pagination={true}
+              paginationPageSize={10}
+              rowHeight={44}
+              headerHeight={40}
+              animateRows={false}
+              suppressCellFocus={true}
+            />
+          </div>
+        </Card>
+      ) : (
+        /* Cards View */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredProducts.map(product => {
+            const listings = store.getListingsForProduct(product.id);
+            const minPrice = listings.length > 0 ? Math.min(...listings.map(l => l.unit_price)) : product.benchmark_market_price;
+            const maxPrice = listings.length > 0 ? Math.max(...listings.map(l => l.unit_price)) : product.benchmark_market_price;
+            const totalStock = listings.reduce((sum, l) => sum + l.available_stock, 0);
 
-          return (
-            <Card
-              key={product.id}
-              className="flex flex-col justify-between overflow-hidden p-0 border border-slate-200/80"
-            >
-              {/* Product Image Header */}
-              <div className="h-40 w-full bg-slate-100 relative overflow-hidden">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2.5 left-2.5">
-                  <span className="text-[10px] font-mono font-medium bg-ink-950/85 text-slate-100 px-2 py-0.5 rounded">
-                    {product.sku}
-                  </span>
-                </div>
-                <div className="absolute bottom-2.5 right-2.5">
-                  {totalStock > 0 ? (
-                    <Badge variant="success" dot size="sm">
-                      <span className="tabular-nums">{totalStock}</span> in stock
-                    </Badge>
-                  ) : (
-                    <Badge variant="danger" dot size="sm">
-                      Out of stock
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-                    <span>{product.brand}</span>
-                    <span className="font-mono text-[10px] text-slate-400">GTIN: {product.gtin || 'N/A'}</span>
-                  </div>
-                  <h3 className="text-xs font-semibold text-ink-950 line-clamp-2 leading-snug">
-                    {product.name}
-                  </h3>
-                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                    {product.description}
-                  </p>
-                </div>
-
-                {/* Price and Action */}
-                <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block">Unit range</span>
-                    <span className="text-xs font-semibold text-ink-950 tabular-nums">
-                      {listings.length > 1
-                        ? `${formatCurrency(minPrice)} – ${formatCurrency(maxPrice)}`
-                        : formatCurrency(minPrice)}
+            return (
+              <Card
+                key={product.id}
+                className="flex flex-col justify-between overflow-hidden p-0 border border-slate-200/80"
+              >
+                {/* Product Image Header */}
+                <div className="h-40 w-full bg-slate-100 relative overflow-hidden">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="text-[10px] font-mono font-medium bg-ink-950/85 text-slate-100 px-2 py-0.5 rounded">
+                      {product.sku}
                     </span>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedProduct(product)}
-                    rightIcon={<ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
-                  >
-                    Compare
-                  </Button>
+                  <div className="absolute bottom-2.5 right-2.5">
+                    {totalStock > 0 ? (
+                      <Badge variant="success" dot size="sm">
+                        <span className="tabular-nums">{totalStock}</span> in stock
+                      </Badge>
+                    ) : (
+                      <Badge variant="danger" dot size="sm">
+                        Out of stock
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+
+                {/* Product Info */}
+                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                      <span>{product.brand}</span>
+                      <span className="font-mono text-[10px] text-slate-400">GTIN: {product.gtin || 'N/A'}</span>
+                    </div>
+                    <h3 className="text-xs font-semibold text-ink-950 line-clamp-2 leading-snug">
+                      {product.name}
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                      {product.description}
+                    </p>
+                  </div>
+
+                  {/* Price and Action */}
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Unit range</span>
+                      <span className="text-xs font-semibold text-ink-950 tabular-nums">
+                        {listings.length > 1
+                          ? `${formatCurrency(minPrice)} – ${formatCurrency(maxPrice)}`
+                          : formatCurrency(minPrice)}
+                      </span>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedProduct(product)}
+                      rightIcon={<ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                    >
+                      Compare
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Multi-Supplier Price Comparison Modal */}
       {selectedProduct && (
