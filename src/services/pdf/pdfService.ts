@@ -1,0 +1,168 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { PurchaseOrder } from '../../types';
+
+export function generatePurchaseOrderPDF(po: PurchaseOrder) {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  // Colors: Deep Navy (#071426), Primary Blue (#2878E5)
+  const primaryNavy = [7, 20, 38] as [number, number, number];
+  const primaryBlue = [40, 120, 229] as [number, number, number];
+  const slateGrey = [100, 116, 139] as [number, number, number];
+
+  // Header Bar
+  doc.setFillColor(...primaryNavy);
+  doc.rect(0, 0, 210, 24, 'F');
+
+  // Title in header
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('PROCUREAI', 15, 15);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('OFFICIAL PURCHASE ORDER', 140, 15);
+
+  // PO Details Block
+  doc.setTextColor(...primaryNavy);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text(`Purchase Order: ${po.po_number}`, 15, 36);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...slateGrey);
+  doc.text(`Issue Date: ${new Date(po.created_at).toLocaleDateString('en-IN')}`, 15, 42);
+  doc.text(`Status: ${po.status.toUpperCase()}`, 15, 47);
+  doc.text(`Payment Reference: ${po.payment_reference || 'PENDING CHECKOUT'}`, 15, 52);
+
+  // Buyer & Supplier Info Columns
+  // Buyer (Left)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...primaryNavy);
+  doc.text('BUYER / BILL TO:', 15, 62);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(51, 65, 85);
+  doc.text(po.organisation_name || 'Apex Tech Solutions Pvt Ltd', 15, 68);
+  doc.text('RMZ Ecospace, Outer Ring Road', 15, 73);
+  doc.text('Bengaluru, Karnataka 560103, India', 15, 78);
+  doc.text(`Attention: ${po.created_by_name || 'Procurement Team'}`, 15, 83);
+
+  // Supplier (Right)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...primaryNavy);
+  doc.text('SUPPLIER / VENDOR:', 120, 62);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(51, 65, 85);
+  doc.text(po.supplier_name, 120, 68);
+  doc.text('Verified Commercial Supplier', 120, 73);
+  doc.text('Terms: Net 30 / PayPal Express', 120, 78);
+  doc.text(`Expected Delivery: ${po.expected_delivery_date || 'Within 5 Business Days'}`, 120, 83);
+
+  // Divider Line
+  doc.setDrawColor(226, 232, 240);
+  doc.line(15, 88, 195, 88);
+
+  // Line items table
+  const tableData = po.items.map((item, idx) => [
+    (idx + 1).toString(),
+    item.product_name,
+    item.sku || 'N/A',
+    item.quantity.toString(),
+    `INR ${item.unit_price.toLocaleString('en-IN')}`,
+    `INR ${item.total_amount.toLocaleString('en-IN')}`
+  ]);
+
+  autoTable(doc, {
+    startY: 93,
+    head: [['#', 'Item Description', 'SKU', 'Qty', 'Unit Price', 'Total']],
+    body: tableData,
+    theme: 'striped',
+    headStyles: {
+      fillColor: primaryNavy,
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9
+    },
+    styles: {
+      fontSize: 8.5,
+      cellPadding: 3.5,
+      textColor: [30, 41, 59]
+    },
+    columnStyles: {
+      0: { cellWidth: 10, halign: 'center' },
+      1: { cellWidth: 75 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 15, halign: 'center' },
+      4: { cellWidth: 30, halign: 'right' },
+      5: { cellWidth: 30, halign: 'right' }
+    }
+  });
+
+  // Financial summary
+  const finalY = (doc as any).lastAutoTable.finalY + 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...slateGrey);
+
+  doc.text('Subtotal:', 130, finalY);
+  doc.text(`INR ${po.subtotal_amount.toLocaleString('en-IN')}`, 195, finalY, { align: 'right' });
+
+  doc.text('Applicable Tax (GST 18%):', 130, finalY + 6);
+  doc.text(`INR ${po.tax_amount.toLocaleString('en-IN')}`, 195, finalY + 6, { align: 'right' });
+
+  doc.text('Shipping & Handling:', 130, finalY + 12);
+  doc.text(`INR ${po.shipping_amount.toLocaleString('en-IN')}`, 195, finalY + 12, { align: 'right' });
+
+  doc.setDrawColor(...primaryNavy);
+  doc.line(130, finalY + 16, 195, finalY + 16);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...primaryBlue);
+  doc.text('Total Payable:', 130, finalY + 22);
+  doc.text(`INR ${po.total_amount.toLocaleString('en-IN')}`, 195, finalY + 22, { align: 'right' });
+
+  // Terms & Conditions block
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...primaryNavy);
+  doc.text('TERMS AND CONDITIONS:', 15, finalY + 32);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...slateGrey);
+  const terms = doc.splitTextToSize(
+    po.terms_and_conditions ||
+    '1. Goods supplied must strictly match BIFMA/ISO specifications. 2. Any damaged goods must be replaced within 48 hours. 3. Payment processed via verified PayPal developer settlement. 4. Generated by ProcureAI Autonomous Procurement Agent.',
+    180
+  );
+  doc.text(terms, 15, finalY + 38);
+
+  // Signatures
+  doc.line(15, finalY + 58, 65, finalY + 58);
+  doc.text('Authorized Buyer Signature', 15, finalY + 62);
+
+  doc.line(135, finalY + 58, 185, finalY + 58);
+  doc.text('Supplier Acceptance Signature', 135, finalY + 62);
+
+  // Footer
+  doc.setFontSize(7);
+  doc.setTextColor(150, 150, 150);
+  doc.text('ProcureAI Autonomous Platform — Tamper-evident verified document', 105, 290, { align: 'center' });
+
+  // Save PDF
+  doc.save(`${po.po_number}.pdf`);
+}
