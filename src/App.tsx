@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { AppLayout } from './components/layout/AppLayout';
+import { LandingPage } from './pages/landing/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { AIAgentPage } from './pages/procurement/AIAgentPage';
@@ -36,6 +37,27 @@ const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   return <AppLayout>{children}</AppLayout>;
 };
 
+const RootRouteHandler: React.FC = () => {
+  const [authenticated, setAuthenticated] = useState<boolean>(store.isAuthenticated());
+
+  useEffect(() => {
+    const unsub = store.subscribe(() => {
+      setAuthenticated(store.isAuthenticated());
+    });
+    return unsub;
+  }, []);
+
+  if (!authenticated) {
+    return <LandingPage />;
+  }
+
+  return (
+    <AppLayout>
+      <DashboardPage />
+    </AppLayout>
+  );
+};
+
 export function App() {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID || 'test';
 
@@ -50,9 +72,13 @@ export function App() {
     >
       <BrowserRouter>
         <Routes>
-          {/* Public Authentication Portals */}
+          {/* Public Landing & Authentication Portals */}
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signin" element={<Navigate to="/login" replace />} />
+
+          {/* Root Route: Landing for Visitors, Dashboard for Authenticated Users */}
+          <Route path="/" element={<RootRouteHandler />} />
 
           {/* Protected Application Workspace */}
           <Route
@@ -60,7 +86,7 @@ export function App() {
             element={
               <ProtectedLayout>
                 <Routes>
-                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/agent" element={<AIAgentPage />} />
                   <Route path="/catalogue" element={<CataloguePage />} />
                   <Route path="/suppliers" element={<SuppliersPage />} />

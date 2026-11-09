@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost' | 'paypal';
+  variant?: 'primary' | 'secondary' | 'violet' | 'outline' | 'danger' | 'ghost' | 'paypal';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
@@ -22,8 +22,9 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white font-medium border border-blue-700/80 shadow-subtle',
-    secondary: 'bg-ink-900 hover:bg-ink-800 text-white font-medium border border-ink-700 shadow-subtle',
+    primary: 'bg-blue-600 hover:bg-blue-500 text-white font-medium border border-blue-700/60 shadow-sm hover:shadow-blue-500/20 shadow-subtle',
+    secondary: 'bg-slate-900 hover:bg-slate-800 text-white font-medium border border-slate-700 shadow-subtle',
+    violet: 'bg-violet-600 hover:bg-violet-500 text-white font-medium border border-violet-700/60 shadow-sm hover:shadow-violet-500/20',
     outline: 'border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 bg-white shadow-subtle',
     danger: 'bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-subtle',
     ghost: 'hover:bg-slate-100 text-slate-600 hover:text-slate-900',
@@ -39,7 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center transition-[transform,background-color,border-color,color] duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.97] whitespace-nowrap',
+        'inline-flex items-center justify-center transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed select-none hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap',
         variantStyles[variant],
         sizeStyles[size],
         className

@@ -43,9 +43,25 @@ async function runTestSuite() {
 
   try {
     // -------------------------------------------------------------------------
-    // TEST 0: Multi-Portal Sign In & Role Authentication
+    // TEST 0A: ProcureAI 2.0 Landing Page
     // -------------------------------------------------------------------------
-    console.log(`\n--- Test 0: Multi-Portal Sign-In Page ---`);
+    console.log(`\n--- Test 0A: ProcureAI 2.0 Landing Page ---`);
+    await page.goto(`${TARGET_URL}/landing`, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.waitForTimeout(1000);
+
+    const heroHeading = await page.locator('h1').innerText();
+    assert(heroHeading.includes('Procurement, Powered by') || heroHeading.includes('Intelligence'), `Hero headline rendered: "${heroHeading}"`);
+
+    const startBtn = page.locator('button:has-text("Start Procurement")').first();
+    assert(await startBtn.isVisible(), `Primary CTA "Start Procurement" button visible`);
+
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, '00-landing-page.png') });
+    console.log(`  Screenshot saved: 00-landing-page.png`);
+
+    // -------------------------------------------------------------------------
+    // TEST 0B: Multi-Portal Sign In & Role Authentication
+    // -------------------------------------------------------------------------
+    console.log(`\n--- Test 0B: Multi-Portal Sign-In Page ---`);
     await page.goto(`${TARGET_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
     await page.waitForTimeout(1000);
 
@@ -186,6 +202,9 @@ async function runTestSuite() {
     const checkoutText = await page.locator('body').innerText();
     assert(checkoutText.includes('PayPal') || checkoutText.includes('Checkout') || checkoutText.includes('Settlement'), `PayPal checkout workspace initialized`);
 
+    const webhookConsole = await page.locator('text=PayPal Orders API v2 Webhook Event Simulator').count();
+    assert(webhookConsole > 0, `Interactive PayPal Webhook Event Simulator rendered`);
+
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '06-payments.png') });
     console.log(`  Screenshot saved: 06-payments.png`);
 
@@ -281,6 +300,10 @@ async function runTestSuite() {
     const buyerRoleButton = page.locator('button:has-text("Buyer")').first();
     await buyerRoleButton.click();
     await page.waitForTimeout(500);
+
+    // Verify Global Floating AI Copilot is present
+    const copilotBtn = page.locator('button[title="Open AI Procurement Copilot"]').first();
+    assert(await copilotBtn.isVisible(), `Global Floating AI Assistant button is active on workspace`);
 
     // 4. Test Sign Out to return to Login Portal
     const signOutBtn = page.locator('button[title="Sign out of portal"]').first();

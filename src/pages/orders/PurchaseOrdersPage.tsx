@@ -14,6 +14,7 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
 import { generatePurchaseOrderPDF } from '../../services/pdf/pdfService';
+import { OrderTrackingTimeline } from '../../components/orders/OrderTrackingTimeline';
 
 export const PurchaseOrdersPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -225,6 +226,9 @@ export const PurchaseOrdersPage: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* 8-Stage Real-Time Procurement Lifecycle Timeline */}
+            <OrderTrackingTimeline order={selectedOrder} />
 
             {/* Buyer and Supplier details */}
             <div className="grid grid-cols-2 gap-4">

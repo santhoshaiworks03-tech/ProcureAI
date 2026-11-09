@@ -2,7 +2,14 @@ import React, { useState, useMemo } from 'react';
 import {
   SlidersHorizontal,
   Search,
-  Building
+  Building,
+  CheckCircle2,
+  Zap,
+  ShieldCheck,
+  Truck,
+  ArrowRight,
+  TrendingDown,
+  X
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { Card } from '../../components/ui/Card';
@@ -14,6 +21,7 @@ import { DEFAULT_WEIGHTS, ScoringWeights } from '../../services/ai/aiService';
 export const SupplierIntelligencePage: React.FC = () => {
   const [weights, setWeights] = useState<ScoringWeights>({ ...DEFAULT_WEIGHTS });
   const [search, setSearch] = useState('');
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>(['sup-01', 'sup-02']);
 
   const suppliers = store.getSuppliers();
   const listings = store.getSupplierProducts();
@@ -217,7 +225,8 @@ export const SupplierIntelligencePage: React.FC = () => {
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200/80">
               <tr>
-                <th className="py-2.5 px-3.5 font-medium w-12 text-center">Rank</th>
+                <th className="py-2.5 px-3 font-medium w-8 text-center">Compare</th>
+                <th className="py-2.5 px-3 font-medium w-12 text-center">Rank</th>
                 <th className="py-2.5 px-3 font-medium">Supplier</th>
                 <th className="py-2.5 px-3 font-medium text-center">Price</th>
                 <th className="py-2.5 px-3 font-medium text-center">Stock</th>
@@ -229,50 +238,171 @@ export const SupplierIntelligencePage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredSuppliers.map((sup, idx) => (
-                <tr key={sup.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3 px-3.5 text-center font-mono font-medium text-slate-500 tabular-nums">
-                    #{idx + 1}
-                  </td>
-                  <td className="py-3 px-3">
-                    <span className="font-medium text-ink-950 block">{sup.company_name}</span>
-                    <span className="text-[11px] text-slate-500">{sup.business_category}</span>
-                  </td>
-                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
-                    {sup.priceScore}
-                  </td>
-                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
-                    {sup.availabilityScore}
-                  </td>
-                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
-                    {sup.deliveryScore}
-                  </td>
-                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
-                    {sup.reliabilityScore}%
-                  </td>
-                  <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
-                    {sup.qualityScore}%
-                  </td>
-                  <td className="py-3 px-3.5 text-right font-mono font-semibold text-ink-950 tabular-nums text-sm">
-                    {sup.compositeScore}
-                  </td>
-                  <td className="py-3 px-3.5 text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        window.location.href = `/agent?prompt=${encodeURIComponent(`Find optimal catalogue items from ${sup.company_name}`)}`;
-                      }}
-                    >
-                      Procure
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {filteredSuppliers.map((sup, idx) => {
+                const isCompared = selectedForComparison.includes(sup.id);
+                return (
+                  <tr key={sup.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-3 px-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={isCompared}
+                        onChange={() => {
+                          if (isCompared) {
+                            setSelectedForComparison(prev => prev.filter(id => id !== sup.id));
+                          } else {
+                            if (selectedForComparison.length >= 3) {
+                              setSelectedForComparison(prev => [...prev.slice(1), sup.id]);
+                            } else {
+                              setSelectedForComparison(prev => [...prev, sup.id]);
+                            }
+                          }
+                        }}
+                        className="rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
+                        title="Select for head-to-head comparison"
+                      />
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono font-medium text-slate-500 tabular-nums">
+                      #{idx + 1}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className="font-medium text-ink-950 block">{sup.company_name}</span>
+                      <span className="text-[11px] text-slate-500">{sup.business_category}</span>
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                      {sup.priceScore}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                      {sup.availabilityScore}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                      {sup.deliveryScore}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                      {sup.reliabilityScore}%
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-700 tabular-nums">
+                      {sup.qualityScore}%
+                    </td>
+                    <td className="py-3 px-3.5 text-right font-mono font-semibold text-ink-950 tabular-nums text-sm">
+                      {sup.compositeScore}
+                    </td>
+                    <td className="py-3 px-3.5 text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          window.location.href = `/agent?prompt=${encodeURIComponent(`Find optimal catalogue items from ${sup.company_name}`)}`;
+                        }}
+                      >
+                        Procure
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </Card>
+
+      {/* Head-to-Head Interactive Supplier Comparison Panel */}
+      {selectedForComparison.length >= 2 && (
+        <Card className="p-5 border-blue-200 bg-gradient-to-b from-blue-50/40 via-white to-white space-y-4">
+          <div className="flex items-center justify-between border-b border-blue-100 pb-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-blue-600" />
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Multi-Supplier Head-to-Head Comparison Matrix
+              </h3>
+              <Badge variant="info" size="sm">
+                {selectedForComparison.length} Vendors Selected
+              </Badge>
+            </div>
+            <button
+              onClick={() => setSelectedForComparison([])}
+              className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1"
+            >
+              <X className="w-3.5 h-3.5" /> Clear comparison
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {selectedForComparison.map(supId => {
+              const sup = scoredSuppliers.find(s => s.id === supId);
+              if (!sup) return null;
+
+              // Find best in price, delivery, reliability
+              const comparedSuppliers = scoredSuppliers.filter(s => selectedForComparison.includes(s.id));
+              const isBestPrice = comparedSuppliers.every(s => s.priceScore <= sup.priceScore);
+              const isFastest = comparedSuppliers.every(s => s.deliveryScore <= sup.deliveryScore);
+              const isMostReliable = comparedSuppliers.every(s => s.reliabilityScore <= sup.reliabilityScore);
+
+              return (
+                <div key={sup.id} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3 relative overflow-hidden">
+                  {/* Highlight Badges */}
+                  <div className="flex flex-wrap gap-1.5 min-h-[22px]">
+                    {isBestPrice && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                        <TrendingDown className="w-3 h-3" /> Best Value
+                      </span>
+                    )}
+                    {isFastest && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-800">
+                        <Truck className="w-3 h-3" /> Fastest Delivery
+                      </span>
+                    )}
+                    {isMostReliable && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800">
+                        <ShieldCheck className="w-3 h-3" /> Highest SLA
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">{sup.company_name}</h4>
+                    <p className="text-[11px] text-slate-500">{sup.business_category} • {sup.address.city}</p>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs space-y-1.5 font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-sans">Composite score:</span>
+                      <span className="font-bold text-blue-600">{sup.compositeScore}/100</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-sans">Avg lead time:</span>
+                      <span className="text-slate-800">{sup.avgLeadTime} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-sans">SLA reliability:</span>
+                      <span className="text-emerald-700 font-semibold">{sup.reliability_score}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-sans">Catalogue inventory:</span>
+                      <span className="text-slate-800">{sup.totalStock} units</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-sans">Payment pipeline:</span>
+                      <span className="text-slate-800">PayPal Orders v2</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      window.location.href = `/agent?prompt=${encodeURIComponent(`Prepare order quotation strictly from ${sup.company_name}`)}`;
+                    }}
+                    rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                  >
+                    Select {sup.company_name.split(' ')[0]}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };

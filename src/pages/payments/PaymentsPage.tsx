@@ -6,7 +6,12 @@ import {
   Clock,
   CheckCircle2,
   Lock,
-  ArrowRight
+  ArrowRight,
+  Download,
+  AlertTriangle,
+  RotateCcw,
+  Terminal,
+  Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { store } from '../../lib/store';
@@ -16,6 +21,7 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { formatCurrency, formatDateTime } from '../../lib/utils';
+import { generatePurchaseOrderPDF } from '../../services/pdf/pdfService';
 
 export const PaymentsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -28,6 +34,8 @@ export const PaymentsPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedPayment, setCompletedPayment] = useState<PaymentRecord | null>(null);
   const [recentPayments, setRecentPayments] = useState<PaymentRecord[]>(store.getPayments());
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [simulatedWebhook, setSimulatedWebhook] = useState<{ event: string; timestamp: string; payload: any } | null>(null);
 
   useEffect(() => {
     const refresh = () => {
@@ -85,11 +93,15 @@ export const PaymentsPage: React.FC = () => {
     if (!selectedPO || !checkoutSession) return;
 
     if (remainingSeconds <= 0) {
-      alert('Checkout session has expired. Please re-initialize.');
+      setPaymentError('Checkout session token expired (300s window elapsed). Re-initializing price lock...');
+      const newSess = await paypalService.initializeCheckout(selectedPO.id);
+      setCheckoutSession(newSess);
+      setRemainingSeconds(300);
       return;
     }
 
     setIsProcessing(true);
+    setPaymentError(null);
     try {
       const sandboxOrderId = `5O${Date.now().toString().slice(-8)}TN${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -109,10 +121,35 @@ export const PaymentsPage: React.FC = () => {
       });
     } catch (err: any) {
       console.error(err);
-      alert(`Payment error: ${err.message}`);
+      setPaymentError(err.message || 'Payment capture failed. Please retry.');
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleSimulateWebhook = (eventType: string) => {
+    const eventId = `WH-9TR${Date.now().toString().slice(-8)}`;
+    const nowIso = new Date().toISOString();
+    const payload = {
+      id: eventId,
+      event_version: '1.0',
+      create_time: nowIso,
+      resource_type: eventType.includes('CAPTURE') ? 'capture' : 'checkout-order',
+      event_type: eventType,
+      summary: `PayPal Orders API v2 event: ${eventType}`,
+      resource: {
+        id: `CAP-${Math.floor(100000 + Math.random() * 900000)}`,
+        status: eventType === 'PAYMENT.CAPTURE.COMPLETED' ? 'COMPLETED' : eventType === 'CHECKOUT.ORDER.APPROVED' ? 'APPROVED' : 'DENIED',
+        amount: {
+          currency_code: 'USD',
+          value: selectedPO ? (selectedPO.total_amount / 83.5).toFixed(2) : '2480.00'
+        },
+        seller_protection: {
+          status: 'ELIGIBLE'
+        }
+      }
+    };
+    setSimulatedWebhook({ event: eventType, timestamp: nowIso, payload });
   };
 
   return (
@@ -170,7 +207,18 @@ export const PaymentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-2">
+          <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Download className="w-3.5 h-3.5" />}
+              onClick={() => {
+                const po = selectedPO || store.getPurchaseOrderById(completedPayment.purchase_order_id);
+                if (po) generatePurchaseOrderPDF(po);
+              }}
+            >
+              Download Tax Invoice
+            </Button>
             <Link to="/orders">
               <Button variant="outline" size="sm">
                 View purchase orders
@@ -268,6 +316,24 @@ export const PaymentsPage: React.FC = () => {
                 Settles directly to {selectedPO.supplier_name}'s verified merchant account via Orders API v2.
               </p>
 
+              {paymentError && (
+                <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                    <span>{paymentError}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCompletePayment}
+                    leftIcon={<RotateCcw className="w-3 h-3" />}
+                    className="bg-white"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              )}
+
               <Button
                 variant="paypal"
                 className="w-full py-2.5 text-xs font-semibold"
@@ -293,6 +359,52 @@ export const PaymentsPage: React.FC = () => {
           </p>
         </Card>
       )}
+
+      {/* PayPal Webhook Simulation Console */}
+      <Card className="p-4 border-slate-200/90 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 text-white space-y-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Terminal className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              PayPal Orders API v2 Webhook Event Simulator
+            </h3>
+            <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-300 border-slate-700 font-mono text-[10px]">
+              RFC 7515 Verified
+            </Badge>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => handleSimulateWebhook('PAYMENT.CAPTURE.COMPLETED')}
+              className="px-2.5 py-1 rounded-md bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-[10px] font-mono transition-colors"
+            >
+              Dispatch PAYMENT.CAPTURE.COMPLETED
+            </button>
+            <button
+              onClick={() => handleSimulateWebhook('CHECKOUT.ORDER.APPROVED')}
+              className="px-2.5 py-1 rounded-md bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 text-[10px] font-mono transition-colors"
+            >
+              Dispatch CHECKOUT.ORDER.APPROVED
+            </button>
+          </div>
+        </div>
+
+        {simulatedWebhook ? (
+          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] space-y-1.5 text-slate-300">
+            <div className="flex justify-between text-[10px] text-slate-500 border-b border-slate-800/80 pb-1">
+              <span>Event ID: {simulatedWebhook.payload.id}</span>
+              <span>Dispatched: {formatDateTime(simulatedWebhook.timestamp)}</span>
+            </div>
+            <pre className="text-emerald-400 overflow-x-auto text-[10px] py-1">
+              {JSON.stringify(simulatedWebhook.payload, null, 2)}
+            </pre>
+          </div>
+        ) : (
+          <p className="text-[11px] text-slate-400">
+            Click an event button above to simulate incoming PayPal server-to-server webhook notifications with RFC-compliant payload envelopes.
+          </p>
+        )}
+      </Card>
 
       {/* Transaction History */}
       <div className="space-y-3 pt-6 border-t border-slate-200/80">

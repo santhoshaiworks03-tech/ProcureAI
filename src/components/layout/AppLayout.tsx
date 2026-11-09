@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { UserRole } from '../../types';
+import { FloatingAIAssistant } from '../ai/FloatingAIAssistant';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -297,6 +298,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
+
+        {/* Global Floating AI Assistant */}
+        <FloatingAIAssistant />
       </div>
     </div>
   );

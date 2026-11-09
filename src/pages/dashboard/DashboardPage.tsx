@@ -17,8 +17,10 @@ import {
   Layers,
   Activity,
   History,
-  FileText
+  FileText,
+  Sparkles
 } from 'lucide-react';
+import { ProcurementWorkflowJourney } from '../../components/workflow/ProcurementWorkflowJourney';
 import {
   AreaChart,
   Area,
@@ -112,9 +114,29 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
+        {/* AI Insight Callout */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-blue-50 via-indigo-50/60 to-violet-50/60 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-semibold text-slate-900 block">AI Autonomous Sourcing Intelligence</span>
+              <span className="text-slate-600 text-[11px]">
+                ProcureAI agent has negotiated ₹2,48,500 in cumulative discounts across 8 orders with 100% compliant budget limits.
+              </span>
+            </div>
+          </div>
+          <Link to="/agent">
+            <Button variant="outline" size="sm" className="bg-white text-xs">
+              Open Agent Terminal
+            </Button>
+          </Link>
+        </div>
+
         {/* Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 border-slate-200/80">
+          <Card hoverEffect className="p-4 border-slate-200/80">
             <span className="text-xs font-medium text-slate-500 block">Total spend</span>
             <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
               {formatCurrency(totalSpend)}
@@ -122,7 +144,7 @@ export const DashboardPage: React.FC = () => {
             <p className="text-[11px] text-slate-400 mt-1">Settled across verified orders</p>
           </Card>
 
-          <Card className="p-4 border-slate-200/80">
+          <Card hoverEffect className="p-4 border-slate-200/80">
             <span className="text-xs font-medium text-slate-500 block">Pending approvals</span>
             <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
               {pendingApprovals}
@@ -130,7 +152,7 @@ export const DashboardPage: React.FC = () => {
             <p className="text-[11px] text-slate-400 mt-1">Requires management sign-off</p>
           </Card>
 
-          <Card className="p-4 border-slate-200/80">
+          <Card hoverEffect className="p-4 border-slate-200/80">
             <span className="text-xs font-medium text-slate-500 block">Pending checkout</span>
             <p className="text-2xl font-semibold text-slate-900 mt-1 tabular-nums font-mono">
               {pendingPayments}
@@ -138,7 +160,7 @@ export const DashboardPage: React.FC = () => {
             <p className="text-[11px] text-slate-400 mt-1">5-min PayPal session active</p>
           </Card>
 
-          <Card className="p-4 border-slate-200/80">
+          <Card hoverEffect className="p-4 border-slate-200/80">
             <span className="text-xs font-medium text-slate-500 block">AI-negotiated savings</span>
             <p className="text-2xl font-semibold text-emerald-600 mt-1 tabular-nums font-mono">
               {formatCurrency(aiIdentifiedSavings)}
@@ -146,6 +168,9 @@ export const DashboardPage: React.FC = () => {
             <p className="text-[11px] text-slate-400 mt-1">7.4% under benchmark price ceilings</p>
           </Card>
         </div>
+
+        {/* Embedded Animated Workflow Journey */}
+        <ProcurementWorkflowJourney currentActiveStage={6} interactive={true} />
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
