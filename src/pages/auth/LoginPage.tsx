@@ -172,29 +172,35 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4EEE6] text-[#13110F] flex flex-col justify-between font-sans selection:bg-[#F2C8A8] selection:text-[#13110F]">
+    <div
+      className="min-h-screen relative flex flex-col justify-between font-sans selection:bg-[#F2C8A8] selection:text-[#13110F] bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: `url('/login-bg.jpg')` }}
+    >
+      {/* Cinematic Ambient Dark Vignette Overlay for Crisp Readability & Contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0C0E]/80 via-[#0B0C0E]/70 to-[#0B0C0E]/90 backdrop-blur-[2px] -z-10 pointer-events-none" />
+
       {/* Top Brand Header */}
-      <header className="bg-[#F4EEE6]/85 backdrop-blur-xl border-b border-[rgba(19,17,15,0.08)] px-6 sm:px-10 py-4 flex items-center justify-between">
+      <header className="bg-[#0B0C0E]/80 backdrop-blur-xl border-b border-white/10 px-6 sm:px-10 py-3.5 flex items-center justify-between z-20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-sm shadow-sm">
+          <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-sm shadow-md">
             P
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-tight text-[#13110F]">ProcureAI</span>
-              <span className="text-[10px] font-mono text-[#6B6560] bg-[#EDE6DC] px-1.5 py-0.5 rounded border border-[rgba(19,17,15,0.08)]">
+              <span className="font-bold text-sm tracking-tight text-[#FAF7F2]">ProcureAI</span>
+              <span className="text-[10px] font-mono text-[#F2C8A8] bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
                 v2.0
               </span>
             </div>
-            <p className="text-[11px] text-[#6B6560] hidden sm:block">
+            <p className="text-[11px] text-[#EDE6DC]/70 hidden sm:block">
               Autonomous AI Procurement & PayPal Orders v2 Settlement Platform
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE6DC] border border-[rgba(19,17,15,0.08)] text-[#13110F] text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3E5C31]"></span>
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#FAF7F2] text-[11px] backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#B4C7A6] animate-pulse"></span>
             <span>PayPal Sandbox Orders API v2</span>
           </div>
 
@@ -202,7 +208,7 @@ export const LoginPage: React.FC = () => {
             href="https://developer.paypal.com/dashboard/applications/sandbox"
             target="_blank"
             rel="noreferrer"
-            className="text-[#6B6560] hover:text-[#13110F] text-xs flex items-center gap-1 transition-colors"
+            className="text-[#EDE6DC]/75 hover:text-white text-xs flex items-center gap-1 transition-colors"
           >
             Developer Sandbox <ExternalLink className="w-3 h-3" />
           </a>
@@ -210,17 +216,18 @@ export const LoginPage: React.FC = () => {
       </header>
 
       {/* Main Authentication Workspace */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-4xl space-y-8">
+      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:py-6 z-10">
+        <div className="w-full max-w-4xl space-y-4">
           {/* Welcome Text */}
-          <div className="text-center space-y-2">
-            <Badge variant="neutral" size="sm" className="bg-[#EDE6DC] text-[#13110F] border-[rgba(19,17,15,0.08)]">
+          <div className="text-center space-y-1.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[#F2C8A8] border border-white/15 text-[11px] font-semibold shadow-sm">
+              <Sparkles className="w-3 h-3 text-[#F2C8A8]" />
               Role-Based Multi-Portal Authentication
-            </Badge>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13110F]">
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#FAF7F2] drop-shadow-sm">
               Sign In to Your ProcureAI Portal
             </h1>
-            <p className="text-xs sm:text-sm text-[#6B6560] max-w-xl mx-auto">
+            <p className="text-xs text-[#EDE6DC]/85 max-w-xl mx-auto leading-relaxed">
               Select your organization role below to access your tailored procurement terminal, supplier fulfillment hub, or platform governance control tower.
             </p>
           </div>
@@ -235,39 +242,43 @@ export const LoginPage: React.FC = () => {
                   key={r}
                   type="button"
                   onClick={() => handleSelectRole(r)}
-                  className={`text-left p-4 rounded-2xl border transition-all text-xs flex flex-col justify-between gap-3 active:scale-[0.98] ${
+                  className={`text-left p-3 rounded-xl border transition-all text-xs flex flex-col justify-between gap-2.5 active:scale-[0.98] ${
                     isSelected
-                      ? 'bg-white border-[#13110F] ring-2 ring-[#13110F] shadow-md'
-                      : 'bg-white/80 border-[rgba(19,17,15,0.08)] hover:border-[rgba(19,17,15,0.2)] hover:bg-white text-[#6B6560]'
+                      ? 'bg-[#1C1916]/95 backdrop-blur-2xl border-[#F2C8A8] ring-2 ring-[#F2C8A8]/60 text-white shadow-xl shadow-black/50'
+                      : 'bg-[#13110F]/75 backdrop-blur-xl border border-white/15 hover:border-white/30 hover:bg-[#13110F]/90 text-[#EDE6DC] shadow-lg'
                   }`}
                 >
                   <div className="flex items-start justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-semibold ${
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-semibold shadow-sm ${
                         isSelected
-                          ? 'bg-[#13110F] text-[#FAF7F2]'
-                          : 'bg-[#EDE6DC] text-[#13110F]'
+                          ? 'bg-[#F2C8A8] text-[#13110F]'
+                          : 'bg-white/10 text-white border border-white/15'
                       }`}>
-                        {r === 'buyer' && <Building2 className="w-4 h-4" />}
-                        {r === 'supplier' && <Truck className="w-4 h-4" />}
-                        {r === 'admin' && <ShieldCheck className="w-4 h-4" />}
+                        {r === 'buyer' && <Building2 className="w-3.5 h-3.5" />}
+                        {r === 'supplier' && <Truck className="w-3.5 h-3.5" />}
+                        {r === 'admin' && <ShieldCheck className="w-3.5 h-3.5" />}
                       </div>
                       <div>
-                        <p className="font-bold text-[#13110F] text-xs">{cfg.shortName}</p>
-                        <p className="text-[10px] text-[#6B6560] truncate max-w-[150px]">{cfg.entityName}</p>
+                        <p className="font-bold text-[#FAF7F2] text-xs">{cfg.shortName}</p>
+                        <p className="text-[10px] text-[#EDE6DC]/70 truncate max-w-[150px]">{cfg.entityName}</p>
                       </div>
                     </div>
 
                     {isSelected && (
-                      <CheckCircle2 className="w-4 h-4 text-[#13110F] flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#F2C8A8] flex-shrink-0" />
                     )}
                   </div>
 
-                  <div className="pt-2 border-t border-[rgba(19,17,15,0.06)] flex items-center justify-between text-[11px]">
-                    <span className="text-[#6B6560] truncate">{cfg.userProfile.name}</span>
-                    <Badge variant={cfg.badgeVariant} size="sm">
+                  <div className="pt-1.5 border-t border-white/10 flex items-center justify-between text-[11px]">
+                    <span className="text-[#EDE6DC]/75 truncate">{cfg.userProfile.name}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono capitalize ${
+                      isSelected
+                        ? 'bg-[#F2C8A8] text-[#13110F] font-bold'
+                        : 'bg-white/10 text-[#EDE6DC] border border-white/10'
+                    }`}>
                       {r}
-                    </Badge>
+                    </span>
                   </div>
                 </button>
               );
@@ -275,38 +286,38 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Active Portal Sign-In Card */}
-          <div className="bg-white border border-[rgba(19,17,15,0.08)] rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
+          <div className="bg-[#13110F]/85 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4 text-[#FAF7F2]">
             {/* Active Portal Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[rgba(19,17,15,0.08)] pb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5">
               <div className="flex items-center gap-3.5">
                 <img
                   src={currentConfig.userProfile.avatar}
                   alt={currentConfig.userProfile.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-[rgba(19,17,15,0.1)] shadow-sm"
+                  className="w-12 h-12 rounded-2xl object-cover border-2 border-[#F2C8A8]/60 shadow-md"
                 />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-[#13110F]">{currentConfig.portalName}</h2>
-                    <Badge variant={currentConfig.badgeVariant} size="sm">
+                    <h2 className="text-base font-bold text-[#FAF7F2]">{currentConfig.portalName}</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#B4C7A6]/20 text-[#B4C7A6] border border-[#B4C7A6]/40">
                       {currentConfig.badgeLabel}
-                    </Badge>
+                    </span>
                   </div>
-                  <p className="text-xs text-[#6B6560] mt-0.5">
+                  <p className="text-xs text-[#EDE6DC]/75 mt-0.5">
                     {currentConfig.userProfile.name} • {currentConfig.userProfile.title}
                   </p>
                 </div>
               </div>
 
               <div className="text-left sm:text-right">
-                <span className="text-[10px] font-mono text-[#8C847D] block uppercase tracking-wider">Authenticated Entity</span>
-                <span className="text-xs font-semibold text-[#13110F]">{currentConfig.entityName}</span>
+                <span className="text-[10px] font-mono text-[#EDE6DC]/60 block uppercase tracking-wider">Authenticated Entity</span>
+                <span className="text-xs font-semibold text-[#FAF7F2]">{currentConfig.entityName}</span>
               </div>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+              <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
                 <span>{errorMessage}</span>
               </div>
             )}
@@ -317,19 +328,19 @@ export const LoginPage: React.FC = () => {
               <form onSubmit={handleSignIn} className="lg:col-span-7 space-y-4">
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#13110F] flex items-center justify-between">
+                  <label className="text-xs font-medium text-[#FAF7F2] flex items-center justify-between">
                     <span>Authorized business email</span>
-                    <span className="text-[10px] text-[#8C847D]">Auto-filled demo account</span>
+                    <span className="text-[10px] text-[#EDE6DC]/60">Auto-filled demo account</span>
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-[#8C847D] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-[#EDE6DC]/50 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
                       placeholder="name@company.com"
-                      className="w-full pl-9 pr-3 py-2.5 bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-xl text-xs text-[#13110F] placeholder-[#8C847D] focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-[#1C1916]/85 border border-white/15 rounded-xl text-xs text-[#FAF7F2] placeholder-[#EDE6DC]/40 focus:outline-none focus:ring-1 focus:ring-[#F2C8A8] focus:border-[#F2C8A8] font-mono shadow-inner"
                     />
                   </div>
                 </div>
@@ -337,22 +348,22 @@ export const LoginPage: React.FC = () => {
                 {/* Password Input */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <label className="font-medium text-[#13110F]">Workstation password</label>
-                    <span className="text-[10px] text-[#8C847D]">Pre-configured sandbox</span>
+                    <label className="font-medium text-[#FAF7F2]">Workstation password</label>
+                    <span className="text-[10px] text-[#EDE6DC]/60">Pre-configured sandbox</span>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-[#8C847D] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-[#EDE6DC]/50 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
-                      className="w-full pl-9 pr-10 py-2.5 bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-xl text-xs text-[#13110F] placeholder-[#8C847D] focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] font-mono"
+                      className="w-full pl-9 pr-10 py-2.5 bg-[#1C1916]/85 border border-white/15 rounded-xl text-xs text-[#FAF7F2] placeholder-[#EDE6DC]/40 focus:outline-none focus:ring-1 focus:ring-[#F2C8A8] focus:border-[#F2C8A8] font-mono shadow-inner"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C847D] hover:text-[#13110F]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#EDE6DC]/50 hover:text-white"
                     >
                       {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
@@ -361,31 +372,30 @@ export const LoginPage: React.FC = () => {
 
                 {/* Remember & Options */}
                 <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-[#6B6560] select-none text-[11px]">
+                  <label className="flex items-center gap-2 cursor-pointer text-[#EDE6DC]/75 select-none text-[11px]">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={e => setRememberMe(e.target.checked)}
-                      className="rounded bg-[#FAF7F2] border-[rgba(19,17,15,0.2)] text-[#13110F] focus:ring-0"
+                      className="rounded bg-[#1C1916] border-white/20 text-[#F2C8A8] focus:ring-0"
                     />
                     <span>Remember workstation session</span>
                   </label>
-                  <span className="text-[11px] text-[#8C847D]">
+                  <span className="text-[11px] text-[#EDE6DC]/60">
                     Supabase PostgreSQL RLS
                   </span>
                 </div>
 
                 {/* Submit Button */}
                 <div className="pt-2">
-                  <Button
+                  <button
                     type="submit"
-                    variant="primary"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all rounded-xl"
+                    className="w-full py-2.5 px-4 bg-[#F2C8A8] text-[#13110F] hover:bg-[#ebbe9c] text-xs font-bold rounded-xl active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                        <span className="w-3.5 h-3.5 border-2 border-[#13110F]/30 border-t-[#13110F] rounded-full animate-spin"></span>
                         Authenticating {currentConfig.shortName}...
                       </span>
                     ) : (
@@ -393,90 +403,90 @@ export const LoginPage: React.FC = () => {
                         Sign In to {currentConfig.shortName} <ArrowRight className="w-3.5 h-3.5" />
                       </span>
                     )}
-                  </Button>
+                  </button>
                 </div>
               </form>
 
               {/* Right Column: Portal Scope Highlights */}
-              <div className="lg:col-span-5 bg-[#FAF7F2] p-5 rounded-2xl border border-[rgba(19,17,15,0.08)] space-y-3.5 flex flex-col justify-between">
+              <div className="lg:col-span-5 bg-white/[0.04] backdrop-blur-md p-5 rounded-2xl border border-white/10 space-y-3.5 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-[#13110F]" />
-                    <h3 className="text-xs font-semibold text-[#13110F]">Portal scope & authorizations</h3>
+                    <Sparkles className="w-3.5 h-3.5 text-[#F2C8A8]" />
+                    <h3 className="text-xs font-bold text-[#FAF7F2]">Portal scope & authorizations</h3>
                   </div>
 
-                  <p className="text-[11px] text-[#6B6560] leading-relaxed">
+                  <p className="text-[11px] text-[#EDE6DC]/75 leading-relaxed">
                     {currentConfig.portalSummary}
                   </p>
 
-                  <ul className="space-y-2 text-[11px] text-[#13110F]">
+                  <ul className="space-y-2 text-[11px] text-[#FAF7F2]">
                     {currentConfig.capabilities.map((cap, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#3E5C31] flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#B4C7A6] flex-shrink-0 mt-0.5" />
                         <span className="leading-snug">{cap}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-white border border-[rgba(19,17,15,0.08)] text-[10px] text-[#6B6560] flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] text-[#EDE6DC]/75 flex items-center justify-between">
                   <span>Audit Trail & Governance</span>
-                  <span className="font-semibold text-[#3E5C31]">Verified & Protected</span>
+                  <span className="font-semibold text-[#B4C7A6]">Verified & Protected</span>
                 </div>
               </div>
             </div>
 
             {/* Quick 1-Click Demo Login Bar */}
-            <div className="pt-4 border-t border-[rgba(19,17,15,0.08)] space-y-3">
+            <div className="pt-3 border-t border-white/10 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#6B6560] uppercase tracking-wider flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-[#13110F]" />
+                <span className="text-[11px] font-semibold text-[#EDE6DC]/85 uppercase tracking-wider flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-[#F2C8A8]" />
                   Instant 1-Click Evaluation Sign In (No typing required)
                 </span>
-                <span className="text-[10px] text-[#8C847D]">Hackathon Judges & Evaluators</span>
+                <span className="text-[10px] text-[#EDE6DC]/60">Hackathon Judges & Evaluators</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('buyer')}
-                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
+                  className="px-3 py-2 rounded-xl bg-[#1C1916]/85 border border-white/10 hover:border-[#F2C8A8] hover:bg-[#26221F] text-left text-xs transition-colors flex items-center justify-between group shadow-md"
                 >
                   <div>
-                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
+                    <span className="font-bold text-[#FAF7F2] group-hover:text-[#F2C8A8] block text-[11px] transition-colors">
                       🏢 1-Click: Priya Sharma
                     </span>
-                    <span className="text-[10px] text-[#6B6560]">Buyer · Apex Tech</span>
+                    <span className="text-[10px] text-[#EDE6DC]/60">Buyer · Apex Tech</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
+                  <ArrowRight className="w-3 h-3 text-[#EDE6DC]/40 group-hover:text-[#F2C8A8] transition-colors" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('supplier')}
-                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
+                  className="px-3 py-2 rounded-xl bg-[#1C1916]/85 border border-white/10 hover:border-[#F2C8A8] hover:bg-[#26221F] text-left text-xs transition-colors flex items-center justify-between group shadow-md"
                 >
                   <div>
-                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
+                    <span className="font-bold text-[#FAF7F2] group-hover:text-[#F2C8A8] block text-[11px] transition-colors">
                       🏭 1-Click: Vikramaditya
                     </span>
-                    <span className="text-[10px] text-[#6B6560]">Supplier · OmniOffice</span>
+                    <span className="text-[10px] text-[#EDE6DC]/60">Supplier · OmniOffice</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
+                  <ArrowRight className="w-3 h-3 text-[#EDE6DC]/40 group-hover:text-[#F2C8A8] transition-colors" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('admin')}
-                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
+                  className="px-3 py-2 rounded-xl bg-[#1C1916]/85 border border-white/10 hover:border-[#F2C8A8] hover:bg-[#26221F] text-left text-xs transition-colors flex items-center justify-between group shadow-md"
                 >
                   <div>
-                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
+                    <span className="font-bold text-[#FAF7F2] group-hover:text-[#F2C8A8] block text-[11px] transition-colors">
                       🛡️ 1-Click: Aditi Deshmukh
                     </span>
-                    <span className="text-[10px] text-[#6B6560]">Admin · ProcureAI Root</span>
+                    <span className="text-[10px] text-[#EDE6DC]/60">Admin · ProcureAI Root</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
+                  <ArrowRight className="w-3 h-3 text-[#EDE6DC]/40 group-hover:text-[#F2C8A8] transition-colors" />
                 </button>
               </div>
             </div>
@@ -485,7 +495,7 @@ export const LoginPage: React.FC = () => {
       </main>
 
       {/* Trust & Architecture Footer */}
-      <footer className="border-t border-[rgba(19,17,15,0.08)] bg-white px-6 sm:px-10 py-4 text-xs text-[#6B6560] flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="bg-[#0B0C0E]/80 backdrop-blur-xl border-t border-white/10 px-6 sm:px-10 py-4 text-xs text-[#EDE6DC]/70 flex flex-col sm:flex-row items-center justify-between gap-3 z-20">
         <div className="flex items-center gap-4 text-[11px]">
           <span>© 2026 ProcureAI</span>
           <span>•</span>
@@ -494,9 +504,9 @@ export const LoginPage: React.FC = () => {
           <span>Enterprise Edition</span>
         </div>
 
-        <div className="flex items-center gap-3 font-mono text-[10px] text-[#8C847D]">
-          <span className="flex items-center gap-1 text-[#3E5C31]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3E5C31]"></span>
+        <div className="flex items-center gap-3 font-mono text-[10px] text-[#EDE6DC]/75">
+          <span className="flex items-center gap-1 text-[#B4C7A6]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#B4C7A6]"></span>
             Supabase RLS Enforced
           </span>
           <span>•</span>
