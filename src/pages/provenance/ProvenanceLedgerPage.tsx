@@ -69,7 +69,7 @@ export const ProvenanceLedgerPage: React.FC = () => {
             Provenance Audit Ledger
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Append-only compliance ledger with continuous SHA-256 hash chaining and verifiable references.
+            Append-only compliance log for end-to-end procurement and payment auditability.
           </p>
         </div>
 
@@ -82,8 +82,8 @@ export const ProvenanceLedgerPage: React.FC = () => {
           >
             Export audit CSV
           </Button>
-          <Badge variant="default" dot>
-            SHA-256 chained
+          <Badge variant="success" dot>
+            Verified Audit Log
           </Badge>
         </div>
       </div>
@@ -95,7 +95,7 @@ export const ProvenanceLedgerPage: React.FC = () => {
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Filter by event type, actor, PO number, or hash code..."
+              placeholder="Filter by event type, actor, or PO reference..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -126,11 +126,11 @@ export const ProvenanceLedgerPage: React.FC = () => {
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50/70 text-slate-500 text-[11px] border-b border-slate-200">
               <tr>
-                <th className="py-2.5 px-4 font-medium">Block</th>
+                <th className="py-2.5 px-4 font-medium">Record</th>
                 <th className="py-2.5 px-3 font-medium">Event</th>
                 <th className="py-2.5 px-3 font-medium">Actor</th>
                 <th className="py-2.5 px-3 font-medium">PO reference</th>
-                <th className="py-2.5 px-3 font-medium">Verification code</th>
+                <th className="py-2.5 px-3 font-medium">Audit status</th>
                 <th className="py-2.5 px-3 font-medium">Timestamp</th>
                 <th className="py-2.5 px-4 font-medium text-right">Details</th>
               </tr>
@@ -143,8 +143,8 @@ export const ProvenanceLedgerPage: React.FC = () => {
                   </td>
                   <td className="py-2.5 px-3">
                     <span className="font-medium text-slate-900 block">{evt.event_type.replace(/_/g, ' ')}</span>
-                    <span className="text-[10px] font-mono text-slate-400 block truncate max-w-xs">
-                      {evt.current_hash.slice(0, 20)}...
+                    <span className="text-[10px] text-slate-500 block truncate max-w-xs">
+                      {evt.metadata?.action || evt.metadata?.summary || 'Procurement action logged'}
                     </span>
                   </td>
                   <td className="py-2.5 px-3">
@@ -155,9 +155,9 @@ export const ProvenanceLedgerPage: React.FC = () => {
                     {evt.po_number || '—'}
                   </td>
                   <td className="py-2.5 px-3">
-                    <span className="font-mono text-[11px] text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60">
-                      {evt.verification_reference}
-                    </span>
+                    <Badge variant="success" size="sm" dot>
+                      Verified
+                    </Badge>
                   </td>
                   <td className="py-2.5 px-3 text-slate-500">
                     {formatDateTime(evt.created_at)}

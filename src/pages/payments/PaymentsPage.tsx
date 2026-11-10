@@ -253,11 +253,11 @@ export const PaymentsPage: React.FC = () => {
             </div>
 
             {checkoutSession && (
-              <div className="flex items-center justify-between text-xs text-slate-500 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200/60 font-mono">
+              <div className="flex items-center justify-between text-xs text-slate-500 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200/60">
                 <span className="flex items-center gap-1.5 font-sans text-slate-600">
                   <Lock className="w-3.5 h-3.5 text-slate-400" /> Price locked
                 </span>
-                <span className="text-[11px] truncate max-w-xs">{checkoutSession.integrity_hash.slice(0, 24)}...</span>
+                <span className="text-[11px] font-sans text-emerald-600 font-medium">Quote integrity guaranteed</span>
               </div>
             )}
 

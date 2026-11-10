@@ -235,8 +235,8 @@ export const AIAgentPage: React.FC = () => {
                 <thead className="bg-slate-50/70 text-slate-500 text-[11px] border-b border-slate-100">
                   <tr>
                     <th className="py-2 px-3 font-medium">Item</th>
-                    <th className="py-2 px-3 font-medium">Matched SKU</th>
                     <th className="py-2 px-3 font-medium text-center">Quantity</th>
+                    <th className="py-2 px-3 font-medium text-right">Target Price</th>
                     <th className="py-2 px-3 font-medium">Specifications</th>
                   </tr>
                 </thead>
@@ -244,8 +244,8 @@ export const AIAgentPage: React.FC = () => {
                   {extractedPlan.items.map((item, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/40">
                       <td className="py-2.5 px-3 font-medium text-slate-900">{item.itemName}</td>
-                      <td className="py-2.5 px-3 font-mono text-slate-600">{item.sku || 'N/A'}</td>
-                      <td className="py-2.5 px-3 text-center font-medium text-slate-900 tabular-nums">{item.quantity}</td>
+                      <td className="py-2.5 px-3 text-center font-medium text-slate-900 tabular-nums">{item.quantity} units</td>
+                      <td className="py-2.5 px-3 text-right font-mono text-slate-700">{formatCurrency(item.targetUnitPrice || 0)}</td>
                       <td className="py-2.5 px-3 text-slate-500">
                         {item.specifications ? Object.entries(item.specifications).map(([k, v]) => `${k}: ${v}`).join(' • ') : 'Standard'}
                       </td>

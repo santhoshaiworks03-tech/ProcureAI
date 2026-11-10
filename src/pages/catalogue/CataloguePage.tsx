@@ -161,7 +161,7 @@ export const CataloguePage: React.FC = () => {
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-ink-950">Product catalogue</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Verified master catalogue with SKU and GTIN records across contracted suppliers
+            Verified master catalogue of commercial equipment across contracted suppliers
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -202,7 +202,7 @@ export const CataloguePage: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search by product name, SKU, GTIN, or brand"
+              placeholder="Search by product name, category, or brand"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white"
@@ -276,8 +276,8 @@ export const CataloguePage: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2.5 left-2.5">
-                    <span className="text-[10px] font-mono font-medium bg-ink-950/85 text-slate-100 px-2 py-0.5 rounded">
-                      {product.sku}
+                    <span className="text-[10px] font-medium bg-[#13110F]/85 backdrop-blur-sm text-[#FAF7F2] px-2.5 py-0.5 rounded-full capitalize">
+                      {product.category_name || product.brand}
                     </span>
                   </div>
                   <div className="absolute bottom-2.5 right-2.5">
@@ -341,7 +341,7 @@ export const CataloguePage: React.FC = () => {
           isOpen={Boolean(selectedProduct)}
           onClose={() => setSelectedProduct(null)}
           title={selectedProduct.name}
-          subtitle={`SKU: ${selectedProduct.sku} · GTIN: ${selectedProduct.gtin || 'N/A'} · Brand: ${selectedProduct.brand}`}
+          subtitle={`Brand: ${selectedProduct.brand} · ${selectedProduct.category_name || 'Commercial Grade'}`}
           maxWidth="lg"
         >
           <div className="space-y-4">
@@ -394,7 +394,7 @@ export const CataloguePage: React.FC = () => {
                         <tr key={listing.id} className="hover:bg-slate-50/70 transition-colors">
                           <td className="py-2.5 px-3">
                             <span className="font-medium text-ink-950 block">{listing.supplier_name}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">SKU: {listing.supplier_sku}</span>
+                            <span className="text-[10px] text-slate-400">Verified Supplier Partner</span>
                           </td>
                           <td className="py-2.5 px-3 text-right font-medium text-ink-950 tabular-nums">
                             {formatCurrency(listing.unit_price)}

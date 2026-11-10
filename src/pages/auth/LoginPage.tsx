@@ -56,12 +56,12 @@ const ROLE_PORTALS: Record<UserRole, RolePortalConfig> = {
       title: 'Head of Strategic Procurement',
       avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
     },
-    accentColor: 'blue',
+    accentColor: 'charcoal',
     portalSummary: 'Autonomous procurement agent, multi-supplier catalogue negotiation, budget threshold approvals, and 5-min time-locked PayPal checkout.',
     capabilities: [
       'Natural language AI procurement agent (Google Gemini 1.5 Pro)',
       'Algorithmic 5-dimension supplier scoring matrix',
-      'Dual-view catalogue with AG Grid Community 32',
+      'Dual-view catalogue with AG Grid Community',
       'Time-locked (300s) PayPal Orders API v2 settlement'
     ]
   },
@@ -71,19 +71,19 @@ const ROLE_PORTALS: Record<UserRole, RolePortalConfig> = {
     shortName: 'Supplier Portal',
     entityName: 'OmniOffice Direct Ltd',
     badgeLabel: 'Verified Supplier Partner',
-    badgeVariant: 'info',
+    badgeVariant: 'neutral',
     userProfile: {
       name: 'Vikramaditya Mehta',
       email: 'vikram@omniofficedirect.com',
       title: 'Commercial Director & Partner',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
     },
-    accentColor: 'emerald',
+    accentColor: 'sage',
     portalSummary: 'Incoming purchase order fulfillment, real-time stock replenishment, delivery tracking, and PayPal merchant gateway settlements.',
     capabilities: [
       'Interactive purchase order fulfillment & dispatch pipeline',
       'Instant catalogue stock replenishment (+25 stock controls)',
-      'PayPal Merchant Account integration (PPL-MERCH-OMNI-01)',
+      'PayPal Merchant Account integration & automated payouts',
       '98.4% on-time delivery & SLA performance rating'
     ]
   },
@@ -100,11 +100,11 @@ const ROLE_PORTALS: Record<UserRole, RolePortalConfig> = {
       title: 'Platform Chief Architect & Root Administrator',
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80'
     },
-    accentColor: 'indigo',
-    portalSummary: 'Multi-tenant control tower, supplier legal KYC and GSTIN compliance review, SHA-256 provenance audit ledger, and AI multi-provider configuration.',
+    accentColor: 'charcoal',
+    portalSummary: 'Multi-tenant control tower, supplier legal KYC and compliance review, immutable audit ledger, and AI multi-provider configuration.',
     capabilities: [
       'Supplier legal KYC, GSTIN & corporate tax ID verification queue',
-      'Live cryptographic SHA-256 block ledger explorer (#0001+)',
+      'Complete compliance audit trail & governance log',
       'Supabase PostgreSQL 28-table RLS health monitor',
       'Platform GMV oversight (₹1,24,50,000 settled volume)'
     ]
@@ -172,29 +172,29 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#F4EEE6] text-[#13110F] flex flex-col justify-between font-sans selection:bg-[#F2C8A8] selection:text-[#13110F]">
       {/* Top Brand Header */}
-      <header className="border-b border-slate-800/80 px-6 sm:px-10 py-4 flex items-center justify-between">
+      <header className="bg-[#F4EEE6]/85 backdrop-blur-xl border-b border-[rgba(19,17,15,0.08)] px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-sm shadow-blue-500/20">
+          <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-sm shadow-sm">
             P
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-tight text-white">ProcureAI</span>
-              <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/60">
-                v1.0
+              <span className="font-bold text-sm tracking-tight text-[#13110F]">ProcureAI</span>
+              <span className="text-[10px] font-mono text-[#6B6560] bg-[#EDE6DC] px-1.5 py-0.5 rounded border border-[rgba(19,17,15,0.08)]">
+                v2.0
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
+            <p className="text-[11px] text-[#6B6560] hidden sm:block">
               Autonomous AI Procurement & PayPal Orders v2 Settlement Platform
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/60 border border-slate-700/60 text-slate-300 text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE6DC] border border-[rgba(19,17,15,0.08)] text-[#13110F] text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3E5C31]"></span>
             <span>PayPal Sandbox Orders API v2</span>
           </div>
 
@@ -202,7 +202,7 @@ export const LoginPage: React.FC = () => {
             href="https://developer.paypal.com/dashboard/applications/sandbox"
             target="_blank"
             rel="noreferrer"
-            className="text-slate-400 hover:text-white text-xs flex items-center gap-1 transition-colors"
+            className="text-[#6B6560] hover:text-[#13110F] text-xs flex items-center gap-1 transition-colors"
           >
             Developer Sandbox <ExternalLink className="w-3 h-3" />
           </a>
@@ -214,13 +214,13 @@ export const LoginPage: React.FC = () => {
         <div className="w-full max-w-4xl space-y-8">
           {/* Welcome Text */}
           <div className="text-center space-y-2">
-            <Badge variant="neutral" size="sm" className="bg-slate-800/90 text-slate-300 border-slate-700">
+            <Badge variant="neutral" size="sm" className="bg-[#EDE6DC] text-[#13110F] border-[rgba(19,17,15,0.08)]">
               Role-Based Multi-Portal Authentication
             </Badge>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13110F]">
               Sign In to Your ProcureAI Portal
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+            <p className="text-xs sm:text-sm text-[#6B6560] max-w-xl mx-auto">
               Select your organization role below to access your tailored procurement terminal, supplier fulfillment hub, or platform governance control tower.
             </p>
           </div>
@@ -235,38 +235,36 @@ export const LoginPage: React.FC = () => {
                   key={r}
                   type="button"
                   onClick={() => handleSelectRole(r)}
-                  className={`text-left p-4 rounded-xl border transition-all text-xs flex flex-col justify-between gap-3 active:scale-[0.98] ${
+                  className={`text-left p-4 rounded-2xl border transition-all text-xs flex flex-col justify-between gap-3 active:scale-[0.98] ${
                     isSelected
-                      ? 'bg-slate-800/90 border-blue-500 ring-1 ring-blue-500/50 shadow-lg shadow-blue-500/5'
-                      : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 text-slate-300'
+                      ? 'bg-white border-[#13110F] ring-2 ring-[#13110F] shadow-md'
+                      : 'bg-white/80 border-[rgba(19,17,15,0.08)] hover:border-[rgba(19,17,15,0.2)] hover:bg-white text-[#6B6560]'
                   }`}
                 >
                   <div className="flex items-start justify-between w-full">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-semibold ${
-                        r === 'buyer'
-                          ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                          : r === 'supplier'
-                          ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-purple-600/20 text-purple-400 border border-purple-500/30'
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-semibold ${
+                        isSelected
+                          ? 'bg-[#13110F] text-[#FAF7F2]'
+                          : 'bg-[#EDE6DC] text-[#13110F]'
                       }`}>
-                        {r === 'buyer' && <Building2 className="w-3.5 h-3.5" />}
-                        {r === 'supplier' && <Truck className="w-3.5 h-3.5" />}
-                        {r === 'admin' && <ShieldCheck className="w-3.5 h-3.5" />}
+                        {r === 'buyer' && <Building2 className="w-4 h-4" />}
+                        {r === 'supplier' && <Truck className="w-4 h-4" />}
+                        {r === 'admin' && <ShieldCheck className="w-4 h-4" />}
                       </div>
                       <div>
-                        <p className="font-semibold text-white text-xs">{cfg.shortName}</p>
-                        <p className="text-[10px] text-slate-400 truncate max-w-[150px]">{cfg.entityName}</p>
+                        <p className="font-bold text-[#13110F] text-xs">{cfg.shortName}</p>
+                        <p className="text-[10px] text-[#6B6560] truncate max-w-[150px]">{cfg.entityName}</p>
                       </div>
                     </div>
 
                     {isSelected && (
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#13110F] flex-shrink-0" />
                     )}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 truncate">{cfg.userProfile.name}</span>
+                  <div className="pt-2 border-t border-[rgba(19,17,15,0.06)] flex items-center justify-between text-[11px]">
+                    <span className="text-[#6B6560] truncate">{cfg.userProfile.name}</span>
                     <Badge variant={cfg.badgeVariant} size="sm">
                       {r}
                     </Badge>
@@ -277,38 +275,38 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Active Portal Sign-In Card */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 backdrop-blur-sm">
+          <div className="bg-white border border-[rgba(19,17,15,0.08)] rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
             {/* Active Portal Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[rgba(19,17,15,0.08)] pb-5">
               <div className="flex items-center gap-3.5">
                 <img
                   src={currentConfig.userProfile.avatar}
                   alt={currentConfig.userProfile.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-slate-700 shadow-sm"
+                  className="w-12 h-12 rounded-xl object-cover border border-[rgba(19,17,15,0.1)] shadow-sm"
                 />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-semibold text-white">{currentConfig.portalName}</h2>
+                    <h2 className="text-base font-bold text-[#13110F]">{currentConfig.portalName}</h2>
                     <Badge variant={currentConfig.badgeVariant} size="sm">
                       {currentConfig.badgeLabel}
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-[#6B6560] mt-0.5">
                     {currentConfig.userProfile.name} • {currentConfig.userProfile.title}
                   </p>
                 </div>
               </div>
 
               <div className="text-left sm:text-right">
-                <span className="text-[10px] font-mono text-slate-500 block uppercase tracking-wider">Authenticated Entity</span>
-                <span className="text-xs font-semibold text-slate-200">{currentConfig.entityName}</span>
+                <span className="text-[10px] font-mono text-[#8C847D] block uppercase tracking-wider">Authenticated Entity</span>
+                <span className="text-xs font-semibold text-[#13110F]">{currentConfig.entityName}</span>
               </div>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
                 <span>{errorMessage}</span>
               </div>
             )}
@@ -319,19 +317,19 @@ export const LoginPage: React.FC = () => {
               <form onSubmit={handleSignIn} className="lg:col-span-7 space-y-4">
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
+                  <label className="text-xs font-medium text-[#13110F] flex items-center justify-between">
                     <span>Authorized business email</span>
-                    <span className="text-[10px] text-slate-500">Auto-filled demo account</span>
+                    <span className="text-[10px] text-[#8C847D]">Auto-filled demo account</span>
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-[#8C847D] absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
                       placeholder="name@company.com"
-                      className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-xl text-xs text-[#13110F] placeholder-[#8C847D] focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] font-mono"
                     />
                   </div>
                 </div>
@@ -339,22 +337,22 @@ export const LoginPage: React.FC = () => {
                 {/* Password Input */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <label className="font-medium text-slate-300">Workstation password</label>
-                    <span className="text-[10px] text-slate-500">Pre-configured sandbox</span>
+                    <label className="font-medium text-[#13110F]">Workstation password</label>
+                    <span className="text-[10px] text-[#8C847D]">Pre-configured sandbox</span>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-[#8C847D] absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
-                      className="w-full pl-9 pr-10 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                      className="w-full pl-9 pr-10 py-2.5 bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-xl text-xs text-[#13110F] placeholder-[#8C847D] focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C847D] hover:text-[#13110F]"
                     >
                       {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
@@ -363,16 +361,16 @@ export const LoginPage: React.FC = () => {
 
                 {/* Remember & Options */}
                 <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-slate-400 select-none text-[11px]">
+                  <label className="flex items-center gap-2 cursor-pointer text-[#6B6560] select-none text-[11px]">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={e => setRememberMe(e.target.checked)}
-                      className="rounded bg-slate-950 border-slate-800 text-blue-600 focus:ring-0"
+                      className="rounded bg-[#FAF7F2] border-[rgba(19,17,15,0.2)] text-[#13110F] focus:ring-0"
                     />
                     <span>Remember workstation session</span>
                   </label>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-[#8C847D]">
                     Supabase PostgreSQL RLS
                   </span>
                 </div>
@@ -383,7 +381,7 @@ export const LoginPage: React.FC = () => {
                     type="submit"
                     variant="primary"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-sm"
+                    className="w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all rounded-xl"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -400,85 +398,85 @@ export const LoginPage: React.FC = () => {
               </form>
 
               {/* Right Column: Portal Scope Highlights */}
-              <div className="lg:col-span-5 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-3.5 flex flex-col justify-between">
+              <div className="lg:col-span-5 bg-[#FAF7F2] p-5 rounded-2xl border border-[rgba(19,17,15,0.08)] space-y-3.5 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                    <h3 className="text-xs font-semibold text-slate-200">Portal scope & authorizations</h3>
+                    <Sparkles className="w-3.5 h-3.5 text-[#13110F]" />
+                    <h3 className="text-xs font-semibold text-[#13110F]">Portal scope & authorizations</h3>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[11px] text-[#6B6560] leading-relaxed">
                     {currentConfig.portalSummary}
                   </p>
 
-                  <ul className="space-y-2 text-[11px] text-slate-300">
+                  <ul className="space-y-2 text-[11px] text-[#13110F]">
                     {currentConfig.capabilities.map((cap, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#3E5C31] flex-shrink-0 mt-0.5" />
                         <span className="leading-snug">{cap}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-400 flex items-center justify-between">
-                  <span>Cryptographic block integrity</span>
-                  <span className="font-mono text-emerald-400">SHA-256 Chained</span>
+                <div className="p-2.5 rounded-xl bg-white border border-[rgba(19,17,15,0.08)] text-[10px] text-[#6B6560] flex items-center justify-between">
+                  <span>Audit Trail & Governance</span>
+                  <span className="font-semibold text-[#3E5C31]">Verified & Protected</span>
                 </div>
               </div>
             </div>
 
             {/* Quick 1-Click Demo Login Bar */}
-            <div className="pt-4 border-t border-slate-800 space-y-3">
+            <div className="pt-4 border-t border-[rgba(19,17,15,0.08)] space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <KeyRound className="w-3 h-3 text-slate-500" />
+                <span className="text-[11px] font-semibold text-[#6B6560] uppercase tracking-wider flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-[#13110F]" />
                   Instant 1-Click Evaluation Sign In (No typing required)
                 </span>
-                <span className="text-[10px] text-slate-500">Hackathon Judges & Evaluators</span>
+                <span className="text-[10px] text-[#8C847D]">Hackathon Judges & Evaluators</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('buyer')}
-                  className="px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-blue-500/50 hover:bg-blue-950/20 text-left text-xs transition-colors flex items-center justify-between group"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
                 >
                   <div>
-                    <span className="font-semibold text-slate-200 group-hover:text-blue-400 block text-[11px]">
+                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
                       🏢 1-Click: Priya Sharma
                     </span>
-                    <span className="text-[10px] text-slate-500">Buyer · Apex Tech</span>
+                    <span className="text-[10px] text-[#6B6560]">Buyer · Apex Tech</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-blue-400" />
+                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('supplier')}
-                  className="px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-950/20 text-left text-xs transition-colors flex items-center justify-between group"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
                 >
                   <div>
-                    <span className="font-semibold text-slate-200 group-hover:text-emerald-400 block text-[11px]">
+                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
                       🏭 1-Click: Vikramaditya
                     </span>
-                    <span className="text-[10px] text-slate-500">Supplier · OmniOffice</span>
+                    <span className="text-[10px] text-[#6B6560]">Supplier · OmniOffice</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-emerald-400" />
+                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDirectDemoLogin('admin')}
-                  className="px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-purple-500/50 hover:bg-purple-950/20 text-left text-xs transition-colors flex items-center justify-between group"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)] hover:border-[#13110F] hover:bg-white text-left text-xs transition-colors flex items-center justify-between group shadow-xs"
                 >
                   <div>
-                    <span className="font-semibold text-slate-200 group-hover:text-purple-400 block text-[11px]">
+                    <span className="font-semibold text-[#13110F] group-hover:text-[#13110F] block text-[11px]">
                       🛡️ 1-Click: Aditi Deshmukh
                     </span>
-                    <span className="text-[10px] text-slate-500">Admin · ProcureAI Root</span>
+                    <span className="text-[10px] text-[#6B6560]">Admin · ProcureAI Root</span>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-purple-400" />
+                  <ArrowRight className="w-3 h-3 text-[#8C847D] group-hover:text-[#13110F]" />
                 </button>
               </div>
             </div>
@@ -487,27 +485,26 @@ export const LoginPage: React.FC = () => {
       </main>
 
       {/* Trust & Architecture Footer */}
-      <footer className="border-t border-slate-800/80 px-6 sm:px-10 py-4 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-[rgba(19,17,15,0.08)] bg-white px-6 sm:px-10 py-4 text-xs text-[#6B6560] flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-4 text-[11px]">
           <span>© 2026 ProcureAI</span>
           <span>•</span>
           <span>PayPal AI Hackathon 2026</span>
           <span>•</span>
-          <span>Unslop Design System Craft</span>
+          <span>Enterprise Edition</span>
         </div>
 
-        <div className="flex items-center gap-3 font-mono text-[10px] text-slate-400">
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <div className="flex items-center gap-3 font-mono text-[10px] text-[#8C847D]">
+          <span className="flex items-center gap-1 text-[#3E5C31]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3E5C31]"></span>
             Supabase RLS Enforced
           </span>
           <span>•</span>
           <span>PayPal Orders API v2</span>
           <span>•</span>
-          <span>SHA-256 Provenance</span>
+          <span>Audit Provenance</span>
         </div>
       </footer>
     </div>
   );
 };
-

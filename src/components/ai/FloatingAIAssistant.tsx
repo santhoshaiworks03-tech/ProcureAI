@@ -87,7 +87,7 @@ export const FloatingAIAssistant: React.FC = () => {
             {
               id: `ast-${Date.now()}`,
               sender: 'assistant',
-              text: `I inspected our 6 product demand forecast models. There are currently ${forecasts.length} SKUs triggering urgent reorder alerts: ${forecasts.map(f => f.product_name).join(', ')}. Would you like me to prepare automated purchase orders?`,
+              text: `I inspected our 6 product demand forecast models. There are currently ${forecasts.length} catalogue items triggering urgent reorder alerts: ${forecasts.map(f => f.product_name).join(', ')}. Would you like me to prepare automated purchase orders?`,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
           ]);
@@ -147,47 +147,47 @@ export const FloatingAIAssistant: React.FC = () => {
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-violet-700 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 border border-blue-400/30"
+            className="group relative flex items-center gap-2 px-4 py-3 bg-[#13110F] text-[#FAF7F2] rounded-full shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 border border-[rgba(244,238,230,0.12)]"
             title="Open AI Procurement Copilot"
           >
             <div className="relative">
-              <Bot className="w-5 h-5 text-white" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <Bot className="w-5 h-5 text-[#F2C8A8]" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#B4C7A6] animate-ping"></span>
             </div>
             <span className="text-xs font-semibold tracking-wide hidden sm:inline">
               ProcureAI Copilot
             </span>
-            <Badge variant="neutral" size="sm" className="bg-white/20 text-white border-0 text-[10px] py-0 px-1.5">
+            <span className="bg-[#26221F] text-[#F2C8A8] border border-[rgba(242,200,168,0.25)] text-[10px] py-0 px-2 rounded-full font-mono">
               Gemini 1.5
-            </Badge>
+            </span>
           </button>
         )}
       </div>
 
       {/* Slide-Over Drawer Panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-full max-w-md h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-scaleIn">
+        <div className="fixed bottom-6 right-6 z-50 w-full max-w-md h-[580px] bg-[#FAF7F2] rounded-2xl shadow-2xl border border-[rgba(19,17,15,0.12)] flex flex-col overflow-hidden animate-scaleIn">
           {/* Header */}
-          <div className="px-4 py-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+          <div className="px-4 py-3.5 bg-[#13110F] text-[#FAF7F2] flex items-center justify-between border-b border-[rgba(244,238,230,0.08)]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-xs shadow-sm">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-bold">ProcureAI Autonomous Copilot</h4>
+                  <h4 className="text-xs font-bold text-[#FAF7F2]">ProcureAI Autonomous Copilot</h4>
                   <Badge variant="success" dot size="sm" className="text-[10px] py-0 px-1.5">
                     Online
                   </Badge>
                 </div>
-                <p className="text-[10px] text-slate-400">Google Gemini 1.5 Pro • Supabase RLS Integrated</p>
+                <p className="text-[10px] text-[#8C847D]">Google Gemini 1.5 Pro • Supabase RLS Integrated</p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-[#8C847D] hover:text-[#FAF7F2] p-1 rounded-lg hover:bg-white/10 transition-colors"
                 title="Close Copilot"
               >
                 <X className="w-4 h-4" />
@@ -196,14 +196,14 @@ export const FloatingAIAssistant: React.FC = () => {
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50 text-xs">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#FAF7F2] text-xs">
             {messages.map(msg => (
               <div
                 key={msg.id}
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'assistant' && (
-                  <div className="w-7 h-7 rounded-lg bg-blue-600/10 text-blue-600 border border-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#EDE6DC] text-[#13110F] border border-[rgba(19,17,15,0.08)] flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Bot className="w-3.5 h-3.5" />
                   </div>
                 )}
@@ -211,14 +211,14 @@ export const FloatingAIAssistant: React.FC = () => {
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-sm ${
                     msg.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none'
+                      ? 'bg-[#13110F] text-[#FAF7F2] rounded-br-none'
+                      : 'bg-white text-[#13110F] border border-[rgba(19,17,15,0.08)] rounded-bl-none'
                   }`}
                 >
                   <p>{msg.text}</p>
                   <span
                     className={`block text-[9px] mt-1 font-mono text-right ${
-                      msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400'
+                      msg.sender === 'user' ? 'text-[#FAF7F2]/60' : 'text-[#8C847D]'
                     }`}
                   >
                     {msg.timestamp}
@@ -228,8 +228,8 @@ export const FloatingAIAssistant: React.FC = () => {
             ))}
 
             {isTyping && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs py-1">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+              <div className="flex items-center gap-2 text-[#8C847D] text-xs py-1">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#13110F]" />
                 <span>AI Copilot is analyzing catalogue & supplier models...</span>
               </div>
             )}
@@ -237,13 +237,13 @@ export const FloatingAIAssistant: React.FC = () => {
           </div>
 
           {/* Suggested Quick Queries */}
-          <div className="px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+          <div className="px-3 py-2 bg-white border-t border-[rgba(19,17,15,0.08)] flex items-center gap-1.5 overflow-x-auto scrollbar-none">
             {SUGGESTED_QUERIES.map((q, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => handleSend(q)}
-                className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-[10px] text-slate-600 border border-slate-200/60 transition-colors"
+                className="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#FAF7F2] hover:bg-[#EDE6DC] text-[10px] text-[#13110F] border border-[rgba(19,17,15,0.08)] transition-colors"
               >
                 {q}
               </button>
@@ -256,14 +256,14 @@ export const FloatingAIAssistant: React.FC = () => {
               e.preventDefault();
               handleSend();
             }}
-            className="p-3 bg-white border-t border-slate-200 flex items-center gap-2"
+            className="p-3 bg-white border-t border-[rgba(19,17,15,0.08)] flex items-center gap-2"
           >
             <input
               type="text"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               placeholder="Ask copilot or specify items to purchase..."
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-xl px-3 py-2 text-xs text-[#13110F] placeholder-[#8C847D] focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F]"
             />
             <Button
               type="submit"

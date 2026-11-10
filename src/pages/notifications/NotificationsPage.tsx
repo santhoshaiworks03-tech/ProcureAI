@@ -34,7 +34,7 @@ export const NotificationsPage: React.FC = () => {
       case 'payment_success':
         return <CreditCard className="w-3.5 h-3.5 text-emerald-600" />;
       case 'approved':
-        return <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />;
+        return <CheckCircle2 className="w-3.5 h-3.5 text-[#3E5C31]" />;
       case 'approval_needed':
         return <Clock className="w-3.5 h-3.5 text-amber-600" />;
       case 'low_stock':
@@ -104,7 +104,7 @@ export const NotificationsPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-semibold text-ink-950">{notif.title}</h3>
                     {!notif.is_read && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 inline-block"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#13110F] inline-block"></span>
                     )}
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">{notif.message}</p>

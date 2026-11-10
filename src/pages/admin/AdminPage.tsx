@@ -89,7 +89,7 @@ export const AdminPage: React.FC = () => {
         <Card className="p-4 border-slate-200/80">
           <span className="text-xs text-slate-500 block">Purchase orders</span>
           <p className="text-xl font-semibold text-ink-950 mt-1 tabular-nums font-mono">{purchaseOrders.length} orders</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Tamper-evident hash logged</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Verified audit log recorded</p>
         </Card>
         <Card className="p-4 border-slate-200/80">
           <span className="text-xs text-slate-500 block">Payment pipeline</span>

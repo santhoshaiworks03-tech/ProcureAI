@@ -128,7 +128,7 @@ export const DemandForecastingPage: React.FC = () => {
       <Card className="overflow-hidden p-0 border border-slate-200/80">
         <div className="p-3.5 border-b border-slate-100">
           <h3 className="text-xs font-semibold text-ink-950">Inventory burn rate and model confidence</h3>
-          <p className="text-[11px] text-slate-500">Consumption velocity calculations per SKU</p>
+          <p className="text-[11px] text-slate-500">Consumption velocity calculations per catalogue item</p>
         </div>
 
         <div className="overflow-x-auto">
@@ -150,7 +150,6 @@ export const DemandForecastingPage: React.FC = () => {
                 <tr key={f.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-2.5 px-3.5">
                     <span className="font-medium text-ink-950 block">{f.product_name}</span>
-                    <span className="text-[10px] text-slate-400 font-mono">SKU: {f.product_id}</span>
                   </td>
                   <td className="py-2.5 px-3 text-slate-600">{f.category}</td>
                   <td className="py-2.5 px-3 text-center font-mono font-medium text-ink-950 tabular-nums">

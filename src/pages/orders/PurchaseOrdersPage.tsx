@@ -253,7 +253,6 @@ export const PurchaseOrdersPage: React.FC = () => {
                 <thead className="bg-slate-50/70 text-slate-500 text-[11px] border-b border-slate-200">
                   <tr>
                     <th className="py-2 px-3 font-medium">Description</th>
-                    <th className="py-2 px-3 font-medium">SKU</th>
                     <th className="py-2 px-3 font-medium text-center">Qty</th>
                     <th className="py-2 px-3 font-medium text-right">Unit price</th>
                     <th className="py-2 px-3 font-medium text-right">Total</th>
@@ -263,7 +262,6 @@ export const PurchaseOrdersPage: React.FC = () => {
                   {selectedOrder.items.map((line, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/40">
                       <td className="py-2 px-3 font-medium text-slate-900">{line.product_name}</td>
-                      <td className="py-2 px-3 font-mono text-slate-500">{line.sku || '—'}</td>
                       <td className="py-2 px-3 text-center font-medium text-slate-900 tabular-nums">{line.quantity}</td>
                       <td className="py-2 px-3 text-right text-slate-600 tabular-nums">{formatCurrency(line.unit_price)}</td>
                       <td className="py-2 px-3 text-right font-medium text-slate-900 tabular-nums">{formatCurrency(line.total_amount)}</td>

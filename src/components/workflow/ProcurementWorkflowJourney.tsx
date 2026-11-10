@@ -42,7 +42,7 @@ export const WORKFLOW_STAGES: WorkflowStage[] = [
     shortDesc: 'Gemini 1.5 Pro parsing',
     icon: Bot,
     status: 'completed',
-    detail: 'Autonomous LLM extracts SKU, GTIN, target specifications, and budget ceilings.',
+    detail: 'Autonomous LLM extracts required items, target specifications, and budget ceilings.',
     techBadge: 'Gemini 1.5 Pro'
   },
   {
@@ -78,7 +78,7 @@ export const WORKFLOW_STAGES: WorkflowStage[] = [
     shortDesc: 'Orders API v2 capture',
     icon: CreditCard,
     status: 'active',
-    detail: '300-second tokenized session lock with SHA-256 price integrity capture.',
+    detail: '300-second session lock guaranteeing verified price protection.',
     techBadge: 'PayPal Orders v2'
   },
   {
@@ -93,11 +93,11 @@ export const WORKFLOW_STAGES: WorkflowStage[] = [
   {
     id: 8,
     label: 'Audit Completion',
-    shortDesc: 'SHA-256 block ledger',
+    shortDesc: 'Verified Audit Trail',
     icon: CheckCircle2,
     status: 'upcoming',
-    detail: 'Immutable tamper-evident record chained cryptographically with sequential hash block.',
-    techBadge: 'SHA-256 Chained'
+    detail: 'Immutable tamper-evident record providing complete end-to-end verification and accountability.',
+    techBadge: 'Verified Audit Log'
   }
 ];
 

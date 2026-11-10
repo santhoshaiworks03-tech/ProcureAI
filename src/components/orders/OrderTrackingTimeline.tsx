@@ -168,7 +168,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({ or
                 key={stage.stageNumber}
                 className={`p-3.5 rounded-xl border transition-all ${
                   stage.isCurrent
-                    ? 'bg-blue-50/70 border-blue-300 ring-1 ring-blue-400 shadow-sm'
+                    ? 'bg-[#FAF7F2] border-[#13110F] ring-1 ring-[#13110F] shadow-sm'
                     : stage.isCompleted
                     ? 'bg-slate-50 border-slate-200/90 text-slate-800'
                     : 'bg-white border-slate-100 opacity-60 text-slate-400'
@@ -177,7 +177,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({ or
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                     stage.isCurrent
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[#13110F] text-[#FAF7F2]'
                       : stage.isCompleted
                       ? 'bg-emerald-100 text-emerald-700'
                       : 'bg-slate-100 text-slate-400'

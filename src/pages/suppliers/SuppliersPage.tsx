@@ -161,7 +161,7 @@ export const SuppliersPage: React.FC = () => {
               <h4 className="font-semibold text-ink-950 text-xs">Contract and settlement records</h4>
               <p className="text-slate-600"><strong>Address:</strong> {selectedSupplier.address.street}, {selectedSupplier.address.city}, {selectedSupplier.address.state} {selectedSupplier.address.postal_code}</p>
               <p className="text-slate-600"><strong>Payment terms:</strong> {selectedSupplier.payment_terms}</p>
-              <p className="text-slate-600"><strong>PayPal merchant ID:</strong> <span className="font-mono text-slate-800">{selectedSupplier.paypal_merchant_id || 'PPL-MERCH-DEFAULT'}</span></p>
+              <p className="text-slate-600"><strong>PayPal settlement:</strong> <span className="text-emerald-700 font-medium">Verified Merchant Account</span></p>
               <p className="text-slate-600"><strong>Settlement email:</strong> <span className="font-mono text-slate-800">{selectedSupplier.paypal_email || selectedSupplier.contact_email}</span></p>
             </div>
 

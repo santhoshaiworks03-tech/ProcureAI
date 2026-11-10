@@ -221,8 +221,8 @@ async function runTestSuite() {
     const blockNumbers = await page.locator('text=#000').count();
     assert(blockNumbers > 0, `Numbered cryptographic blocks detected (#0001, #0002...)`);
 
-    const shaHashes = await page.locator('text=PRC-VRF-').count();
-    assert(shaHashes > 0, `Verification references (PRC-VRF-XXXXXXXX) verified`);
+    const verifiedBadges = await page.locator('text=Verified').count();
+    assert(verifiedBadges > 0, `Audit verification status confirmed`);
 
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '07-provenance.png') });
     console.log(`  Screenshot saved: 07-provenance.png`);

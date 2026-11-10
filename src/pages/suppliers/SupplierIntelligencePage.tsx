@@ -101,7 +101,7 @@ export const SupplierIntelligencePage: React.FC = () => {
           </div>
           <button
             onClick={() => setWeights({ ...DEFAULT_WEIGHTS })}
-            className="text-[11px] text-blue-600 font-medium hover:underline"
+            className="text-[11px] text-[#13110F] font-semibold hover:underline"
           >
             Reset to standard (30 / 20 / 20 / 20 / 10)
           </button>
@@ -257,7 +257,7 @@ export const SupplierIntelligencePage: React.FC = () => {
                             }
                           }
                         }}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
+                        className="rounded border-slate-300 text-[#13110F] focus:ring-0 cursor-pointer"
                         title="Select for head-to-head comparison"
                       />
                     </td>
@@ -307,14 +307,14 @@ export const SupplierIntelligencePage: React.FC = () => {
 
       {/* Head-to-Head Interactive Supplier Comparison Panel */}
       {selectedForComparison.length >= 2 && (
-        <Card className="p-5 border-blue-200 bg-gradient-to-b from-blue-50/40 via-white to-white space-y-4">
-          <div className="flex items-center justify-between border-b border-blue-100 pb-3">
+        <Card className="p-5 border-[rgba(19,17,15,0.12)] bg-[#FAF7F2] space-y-4">
+          <div className="flex items-center justify-between border-b border-[rgba(19,17,15,0.08)] pb-3">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-blue-600" />
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <Zap className="w-4 h-4 text-[#13110F]" />
+              <h3 className="text-xs font-bold text-[#13110F] uppercase tracking-wider">
                 Multi-Supplier Head-to-Head Comparison Matrix
               </h3>
-              <Badge variant="info" size="sm">
+              <Badge variant="neutral" size="sm">
                 {selectedForComparison.length} Vendors Selected
               </Badge>
             </div>
@@ -338,21 +338,21 @@ export const SupplierIntelligencePage: React.FC = () => {
               const isMostReliable = comparedSuppliers.every(s => s.reliabilityScore <= sup.reliabilityScore);
 
               return (
-                <div key={sup.id} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3 relative overflow-hidden">
+                <div key={sup.id} className="p-4 rounded-xl border border-[rgba(19,17,15,0.08)] bg-white shadow-sm space-y-3 relative overflow-hidden">
                   {/* Highlight Badges */}
                   <div className="flex flex-wrap gap-1.5 min-h-[22px]">
                     {isBestPrice && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#B4C7A6]/30 text-[#3E5C31] border border-[#B4C7A6]">
                         <TrendingDown className="w-3 h-3" /> Best Value
                       </span>
                     )}
                     {isFastest && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#EDE6DC] text-[#13110F] border border-[rgba(19,17,15,0.1)]">
                         <Truck className="w-3 h-3" /> Fastest Delivery
                       </span>
                     )}
                     {isMostReliable && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#F2C8A8]/30 text-[#13110F] border border-[#F2C8A8]">
                         <ShieldCheck className="w-3 h-3" /> Highest SLA
                       </span>
                     )}
@@ -366,7 +366,7 @@ export const SupplierIntelligencePage: React.FC = () => {
                   <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs space-y-1.5 font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-500 font-sans">Composite score:</span>
-                      <span className="font-bold text-blue-600">{sup.compositeScore}/100</span>
+                      <span className="font-bold text-[#13110F]">{sup.compositeScore}/100</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500 font-sans">Avg lead time:</span>

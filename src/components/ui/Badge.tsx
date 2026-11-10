@@ -16,30 +16,30 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-slate-100 text-slate-700 border-slate-200/80',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-200/80',
-    success: 'bg-emerald-50/80 text-emerald-800 border-emerald-200/60',
-    warning: 'bg-amber-50/80 text-amber-800 border-amber-200/60',
-    danger: 'bg-rose-50/80 text-rose-800 border-rose-200/60',
-    info: 'bg-blue-50/80 text-blue-800 border-blue-200/60',
-    outline: 'bg-transparent text-slate-600 border-slate-200',
-    provisional: 'bg-slate-100 text-slate-600 border-slate-200'
+    default: 'bg-[#EDE6DC] text-[#13110F] border-[rgba(19,17,15,0.08)]',
+    neutral: 'bg-[#EDE6DC] text-[#6B6560] border-[rgba(19,17,15,0.08)]',
+    success: 'bg-[rgba(180,199,166,0.22)] text-[#3E5C31] border-[rgba(180,199,166,0.6)]',
+    warning: 'bg-[rgba(217,119,6,0.10)] text-[#92400E] border-[rgba(217,119,6,0.25)]',
+    danger: 'bg-[rgba(190,18,60,0.08)] text-[#9F1239] border-[rgba(190,18,60,0.20)]',
+    info: 'bg-[rgba(242,200,168,0.22)] text-[#8C522A] border-[rgba(242,200,168,0.6)]',
+    outline: 'bg-transparent text-[#6B6560] border-[rgba(19,17,15,0.12)]',
+    provisional: 'bg-[#EDE6DC] text-[#6B6560] border-[rgba(19,17,15,0.08)]'
   };
 
   const dotColors = {
-    default: 'bg-slate-400',
-    neutral: 'bg-slate-400',
-    success: 'bg-emerald-600',
-    warning: 'bg-amber-500',
-    danger: 'bg-rose-600',
-    info: 'bg-blue-600',
-    outline: 'bg-slate-400',
-    provisional: 'bg-slate-400'
+    default: 'bg-[#13110F]',
+    neutral: 'bg-[#6B6560]',
+    success: 'bg-[#4D6B3E]',
+    warning: 'bg-[#D97706]',
+    danger: 'bg-[#BE123C]',
+    info: 'bg-[#C27D4E]',
+    outline: 'bg-[#6B6560]',
+    provisional: 'bg-[#8C847D]'
   };
 
   const sizeStyles = {
-    sm: 'text-[11px] px-2 py-0.5 rounded-md gap-1.5',
-    md: 'text-xs px-2.5 py-1 rounded-md gap-1.5'
+    sm: 'text-[11px] px-2.5 py-0.5 rounded-full gap-1.5',
+    md: 'text-xs px-3 py-1 rounded-full gap-1.5'
   };
 
   return (

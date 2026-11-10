@@ -9,15 +9,15 @@
   --ag-font-family: inherit;
   --ag-font-size: 12px;
   --ag-background-color: #ffffff;
-  --ag-header-background-color: #f8fafc;
-  --ag-header-foreground-color: #475569;
-  --ag-border-color: #e2e8f0;
-  --ag-row-hover-color: #f8fafc;
-  --ag-selected-row-background-color: #eff6ff;
+  --ag-header-background-color: #FAF7F2;
+  --ag-header-foreground-color: #6B6560;
+  --ag-border-color: rgba(19, 17, 15, 0.08);
+  --ag-row-hover-color: #FAF7F2;
+  --ag-selected-row-background-color: #EDE6DC;
   --ag-header-column-separator-display: block;
-  --ag-header-column-separator-color: #e2e8f0;
+  --ag-header-column-separator-color: rgba(19, 17, 15, 0.08);
   --ag-header-column-separator-height: 50%;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -28,7 +28,7 @@
   }
 
   body {
-    @apply bg-[#F5F8FC] text-slate-800 font-sans antialiased;
+    @apply bg-[#F4EEE6] text-[#13110F] font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
