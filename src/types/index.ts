@@ -371,3 +371,41 @@ export interface AIAgentChatMessage {
   }[];
 }
 
+export interface SupplierRFQ {
+  id: string;
+  rfq_number: string;
+  organisation_id: string;
+  organisation_name: string;
+  title: string;
+  items: {
+    product_id: string;
+    product_name: string;
+    quantity: number;
+    target_price: number;
+    specifications?: string;
+  }[];
+  max_budget: number;
+  delivery_deadline: string;
+  delivery_location: string;
+  status: 'pending' | 'quoted' | 'rejected' | 'accepted';
+  created_at: string;
+}
+
+export interface SupplierQuotation {
+  id: string;
+  rfq_id: string;
+  rfq_number: string;
+  supplier_id: string;
+  supplier_name: string;
+  quoted_amount: number;
+  tax_amount: number;
+  shipping_amount: number;
+  total_amount: number;
+  delivery_days: number;
+  status: 'submitted' | 'accepted' | 'declined' | 'under_review';
+  valid_until: string;
+  notes?: string;
+  created_at: string;
+}
+
+

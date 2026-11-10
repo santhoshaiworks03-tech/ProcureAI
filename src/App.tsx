@@ -5,6 +5,10 @@ import { AppLayout } from './components/layout/AppLayout';
 import { LandingPage } from './pages/landing/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
+import { BuyerDashboard } from './pages/dashboard/BuyerDashboard';
+import { SupplierDashboard } from './pages/dashboard/SupplierDashboard';
+import { AdminDashboard } from './pages/dashboard/AdminDashboard';
+import { RoleProtectedRoute } from './components/auth/RoleProtectedRoute';
 import { AIAgentPage } from './pages/procurement/AIAgentPage';
 import { CataloguePage } from './pages/catalogue/CataloguePage';
 import { SuppliersPage } from './pages/suppliers/SuppliersPage';
@@ -70,20 +74,136 @@ export function App() {
 
           {/* Protected Application Workspace with Persistent Shared AppLayout */}
           <Route element={<ProtectedLayout />}>
+            {/* Central role router: evaluates user role and renders corresponding dashboard */}
             <Route path="/" element={<DashboardPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/agent" element={<AIAgentPage />} />
-            <Route path="/catalogue" element={<CataloguePage />} />
-            <Route path="/suppliers" element={<SuppliersPage />} />
-            <Route path="/intelligence" element={<SupplierIntelligencePage />} />
-            <Route path="/forecasting" element={<DemandForecastingPage />} />
-            <Route path="/orders" element={<PurchaseOrdersPage />} />
-            <Route path="/approvals" element={<ApprovalsPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
-            <Route path="/provenance" element={<ProvenanceLedgerPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
+
+            {/* Role-Specific Protected Dedicated Dashboard Routes */}
+            <Route
+              path="/buyer/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <BuyerDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route path="/buyer" element={<Navigate to="/buyer/dashboard" replace />} />
+
+            <Route
+              path="/supplier/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={['supplier']}>
+                  <SupplierDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route path="/supplier" element={<Navigate to="/supplier/dashboard" replace />} />
+
+            <Route
+              path="/admin/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+
+            {/* Buyer & Admin Enterprise Purchasing Workflows */}
+            <Route
+              path="/agent"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <AIAgentPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/catalogue"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <CataloguePage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/suppliers"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <SuppliersPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/intelligence"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <SupplierIntelligencePage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/forecasting"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <DemandForecastingPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <PurchaseOrdersPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/approvals"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <ApprovalsPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/payments"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <PaymentsPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/provenance"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <ProvenanceLedgerPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                  <AnalyticsPage />
+                </RoleProtectedRoute>
+              }
+            />
+
+            {/* Shared Notifications */}
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+
+            {/* Admin Platform Settings */}
+            <Route
+              path="/admin"
+              element={
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <AdminPage />
+                </RoleProtectedRoute>
+              }
+            />
+
+            {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

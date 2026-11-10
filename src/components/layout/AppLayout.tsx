@@ -25,7 +25,9 @@ import {
   LogOut,
   Menu,
   X,
-  Sparkles
+  Sparkles,
+  Layers,
+  Activity
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { UserRole } from '../../types';
@@ -63,28 +65,81 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const handleRoleChange = (newRole: UserRole) => {
     store.setRole(newRole);
     setActiveRole(newRole);
+    navigate(store.getDashboardPath(newRole));
   };
 
-  const navItems = [
-    { label: 'Overview', path: '/', icon: LayoutDashboard },
-    { label: 'AI Procurement', path: '/agent', icon: Bot },
-    { label: 'Product Catalogue', path: '/catalogue', icon: Package },
-    { label: 'Suppliers', path: '/suppliers', icon: Truck },
-    { label: 'Supplier Intelligence', path: '/intelligence', icon: SlidersHorizontal },
-    { label: 'Demand Forecasting', path: '/forecasting', icon: TrendingUp },
-    { label: 'Purchase Orders', path: '/orders', icon: FileText },
-    {
-      label: 'Approvals',
-      path: '/approvals',
-      icon: CheckSquare,
-      badge: store.getApprovalRequests().filter(a => a.status === 'pending').length
-    },
-    { label: 'Payments & Checkout', path: '/payments', icon: CreditCard },
-    { label: 'Provenance Ledger', path: '/provenance', icon: History },
-    { label: 'Analytics & Reports', path: '/analytics', icon: BarChart3 },
-    { label: 'Notifications', path: '/notifications', icon: Bell, badge: notificationsCount },
-    { label: 'Administration', path: '/admin', icon: Settings }
-  ];
+  let navItems: { label: string; path: string; icon: any; badge?: number }[] = [];
+
+  if (activeRole === 'supplier') {
+    navItems = [
+      { label: 'Overview', path: '/supplier/dashboard', icon: LayoutDashboard },
+      { label: 'Business Profile', path: '/supplier/dashboard?tab=profile', icon: Building2 },
+      { label: 'Verification & Docs', path: '/supplier/dashboard?tab=verification', icon: ShieldCheck },
+      { label: 'Product Management', path: '/supplier/dashboard?tab=products', icon: Package },
+      { label: 'Inventory Management', path: '/supplier/dashboard?tab=inventory', icon: Layers },
+      {
+        label: 'RFQ Management',
+        path: '/supplier/dashboard?tab=rfqs',
+        icon: FileText,
+        badge: store.getSupplierRfqs().filter(r => r.status === 'pending').length
+      },
+      { label: 'Quotations', path: '/supplier/dashboard?tab=quotations', icon: CheckSquare },
+      {
+        label: 'Purchase Orders',
+        path: '/supplier/dashboard?tab=orders',
+        icon: FileText,
+        badge: store.getPurchaseOrders().filter(po => po.supplier_name.toLowerCase().includes('omni')).length
+      },
+      { label: 'Order Fulfilment', path: '/supplier/dashboard?tab=fulfilment', icon: Truck },
+      { label: 'Payments & Transactions', path: '/supplier/dashboard?tab=payments', icon: CreditCard },
+      { label: 'Performance Analytics', path: '/supplier/dashboard?tab=analytics', icon: BarChart3 },
+      { label: 'Notifications', path: '/notifications', icon: Bell, badge: notificationsCount }
+    ];
+  } else if (activeRole === 'admin') {
+    navItems = [
+      { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+      { label: 'User Management', path: '/admin/dashboard?tab=users', icon: UserCheck },
+      { label: 'Buyer Organisations', path: '/admin/dashboard?tab=organisations', icon: Building2 },
+      {
+        label: 'Supplier Verification',
+        path: '/admin/dashboard?tab=verifications',
+        icon: ShieldCheck,
+        badge: store.getSuppliers().filter(s => s.verification_status === 'pending' || s.is_provisional).length
+      },
+      { label: 'Master Catalogue', path: '/admin/dashboard?tab=catalogue', icon: Package },
+      { label: 'Procurement Monitor', path: '/admin/dashboard?tab=procurement', icon: Bot },
+      { label: 'PayPal Settlement', path: '/admin/dashboard?tab=payments', icon: CreditCard },
+      { label: 'AI Agent Governance', path: '/admin/dashboard?tab=ai', icon: Sparkles },
+      { label: 'Demand Forecasting', path: '/forecasting', icon: TrendingUp },
+      { label: 'Supplier Intelligence', path: '/intelligence', icon: SlidersHorizontal },
+      { label: 'Provenance Ledger', path: '/provenance', icon: History },
+      { label: 'Analytics & Reports', path: '/analytics', icon: BarChart3 },
+      { label: 'System Health', path: '/admin/dashboard?tab=health', icon: Activity },
+      { label: 'Platform Settings', path: '/admin', icon: Settings }
+    ];
+  } else {
+    // Buyer
+    navItems = [
+      { label: 'Overview', path: '/buyer/dashboard', icon: LayoutDashboard },
+      { label: 'AI Procurement', path: '/agent', icon: Bot },
+      { label: 'Product Catalogue', path: '/catalogue', icon: Package },
+      { label: 'Suppliers', path: '/suppliers', icon: Truck },
+      { label: 'Supplier Intelligence', path: '/intelligence', icon: SlidersHorizontal },
+      { label: 'Demand Forecasting', path: '/forecasting', icon: TrendingUp },
+      { label: 'Purchase Orders', path: '/orders', icon: FileText },
+      {
+        label: 'Approvals',
+        path: '/approvals',
+        icon: CheckSquare,
+        badge: store.getApprovalRequests().filter(a => a.status === 'pending').length
+      },
+      { label: 'Payments & Checkout', path: '/payments', icon: CreditCard },
+      { label: 'Provenance Ledger', path: '/provenance', icon: History },
+      { label: 'Analytics & Reports', path: '/analytics', icon: BarChart3 },
+      { label: 'Notifications', path: '/notifications', icon: Bell, badge: notificationsCount },
+      { label: 'Administration', path: '/admin/dashboard', icon: Settings }
+    ];
+  }
 
   const currentUser = store.getCurrentUser();
   const org = store.getActiveOrganisation();
@@ -102,7 +157,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       >
         {/* Brand Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-[rgba(244,238,230,0.08)] flex-shrink-0">
-          <Link to="/" className="flex items-center gap-2.5 overflow-hidden group">
+          <Link to={store.getDashboardPath(activeRole)} className="flex items-center gap-2.5 overflow-hidden group">
             <motion.div
               whileHover={{ rotate: 10, scale: 1.08 }}
               className="w-7 h-7 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm"
@@ -185,7 +240,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           className="flex-1 overflow-y-auto px-2.5 py-2 space-y-1 relative scrollbar-thin scrollbar-thumb-[#26221F]"
         >
           {navItems.map(item => {
-            const isActive = location.pathname === item.path;
+            const currentFull = location.pathname + location.search;
+            const isActive = item.path.includes('?')
+              ? currentFull === item.path || (location.pathname === item.path.split('?')[0] && !location.search && item.path.includes('overview'))
+              : location.pathname === item.path;
             const isHovered = hoveredPath === item.path;
 
             return (
@@ -376,7 +434,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
               <nav className="flex-1 overflow-y-auto p-3 space-y-1">
                 {navItems.map(item => {
-                  const isActive = location.pathname === item.path;
+                  const currentFull = location.pathname + location.search;
+                  const isActive = item.path.includes('?')
+                    ? currentFull === item.path || (location.pathname === item.path.split('?')[0] && !location.search && item.path.includes('overview'))
+                    : location.pathname === item.path;
                   return (
                     <Link
                       key={item.path}

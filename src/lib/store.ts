@@ -13,7 +13,9 @@ import {
   ProvenanceEvent,
   DemandForecast,
   NotificationItem,
-  UserRole
+  UserRole,
+  SupplierRFQ,
+  SupplierQuotation
 } from '../types';
 
 import {
@@ -28,6 +30,98 @@ import {
   SEED_PROVENANCE_EVENTS,
   SEED_NOTIFICATIONS
 } from './seedData';
+
+const INITIAL_RFQS: SupplierRFQ[] = [
+  {
+    id: 'rfq-01',
+    rfq_number: 'RFQ-2024-001',
+    organisation_id: 'org-01',
+    organisation_name: 'Apex Tech Solutions Pvt Ltd',
+    title: 'Q1 Executive Workstations & Ergonomic Seating',
+    items: [
+      {
+        product_id: 'prod-01',
+        product_name: 'AeroPro Ergonomic High-Back Mesh Chair',
+        quantity: 25,
+        target_price: 15000,
+        specifications: '3D adjustable armrests, lumbar support, breathable mesh, black'
+      },
+      {
+        product_id: 'prod-02',
+        product_name: 'Dual-Motor Electric Standing Desk (140x70cm)',
+        quantity: 10,
+        target_price: 32000,
+        specifications: 'Memory keypad, anti-collision sensor, walnut top'
+      }
+    ],
+    max_budget: 700000,
+    delivery_deadline: '2026-03-25',
+    delivery_location: 'Apex Tech Park, Tower B, Whitefield, Bengaluru',
+    status: 'quoted',
+    created_at: '2026-03-01T10:00:00Z'
+  },
+  {
+    id: 'rfq-02',
+    rfq_number: 'RFQ-2024-002',
+    organisation_id: 'org-01',
+    organisation_name: 'Apex Tech Solutions Pvt Ltd',
+    title: 'Executive Boardroom Conference Setup',
+    items: [
+      {
+        product_id: 'prod-04',
+        product_name: 'Conference Table with Integrated Power Module (10-Person)',
+        quantity: 2,
+        target_price: 85000,
+        specifications: 'Cable management troughs, pop-up HDMI/Type-C ports, oak finish'
+      }
+    ],
+    max_budget: 180000,
+    delivery_deadline: '2026-03-28',
+    delivery_location: 'Apex Tech HQ, 4th Floor, Bengaluru',
+    status: 'pending',
+    created_at: '2026-03-05T14:30:00Z'
+  },
+  {
+    id: 'rfq-03',
+    rfq_number: 'RFQ-2024-003',
+    organisation_id: 'org-02',
+    organisation_name: 'CloudScale Dynamics',
+    title: 'Storage & Pedestal Units for Engineering Lab',
+    items: [
+      {
+        product_id: 'prod-03',
+        product_name: 'Heavy-Duty 3-Drawer Steel Mobile Pedestal',
+        quantity: 30,
+        target_price: 8000,
+        specifications: 'Centralized key lock, anti-tilt caster, matte charcoal'
+      }
+    ],
+    max_budget: 250000,
+    delivery_deadline: '2026-04-02',
+    delivery_location: 'Electronic City Phase 1, Bengaluru',
+    status: 'pending',
+    created_at: '2026-03-08T09:15:00Z'
+  }
+];
+
+const INITIAL_QUOTATIONS: SupplierQuotation[] = [
+  {
+    id: 'qt-01',
+    rfq_id: 'rfq-01',
+    rfq_number: 'RFQ-2024-001',
+    supplier_id: 'sup-01',
+    supplier_name: 'OmniOffice Direct Ltd',
+    quoted_amount: 695000,
+    tax_amount: 125100,
+    shipping_amount: 12500,
+    total_amount: 832600,
+    delivery_days: 3,
+    status: 'accepted',
+    valid_until: '2026-03-20',
+    notes: 'Includes white-glove assembly, 5-year commercial warranty and free spare casters.',
+    created_at: '2026-03-02T11:20:00Z'
+  }
+];
 
 // Helper to calculate SHA-256 hex string in browser
 export async function calculateSha256(message: string): Promise<string> {
@@ -54,6 +148,8 @@ class ReactiveDataStore {
   private provenanceEvents: ProvenanceEvent[];
   private demandForecasts: DemandForecast[];
   private notifications: NotificationItem[];
+  private rfqs: SupplierRFQ[];
+  private quotations: SupplierQuotation[];
   private listeners: Set<() => void> = new Set();
 
   constructor() {
@@ -71,6 +167,8 @@ class ReactiveDataStore {
     this.demandForecasts = this.load('procureai_demand_forecasts', SEED_DEMAND_FORECASTS);
     this.provenanceEvents = this.load('procureai_provenance_events', SEED_PROVENANCE_EVENTS);
     this.notifications = this.load('procureai_notifications', SEED_NOTIFICATIONS);
+    this.rfqs = this.load('procureai_rfqs', INITIAL_RFQS);
+    this.quotations = this.load('procureai_quotations', INITIAL_QUOTATIONS);
     this.checkoutSessions = this.load('procureai_checkout_sessions', []);
     this.payments = this.load('procureai_payments', []);
     this.approvalRequests = this.load('procureai_approval_requests', this.generateInitialApprovals());
@@ -136,18 +234,38 @@ class ReactiveDataStore {
     return this.isAuthenticatedUser;
   }
 
-  public login(role: UserRole, email?: string): void {
+  public getDashboardPath(role?: UserRole): string {
+    const r = role || this.currentRole;
+    if (r === 'supplier') return '/supplier/dashboard';
+    if (r === 'admin') return '/admin/dashboard';
+    return '/buyer/dashboard';
+  }
+
+  public login(role?: UserRole, email?: string): UserRole {
     this.isAuthenticatedUser = true;
     localStorage.setItem('procureai_authenticated', 'true');
-    this.setRole(role);
+    let effectiveRole: UserRole = role || 'buyer';
+
     if (email) {
       const match = this.profiles.find(p => p.email.toLowerCase() === email.toLowerCase());
       if (match) {
         this.currentProfileId = match.id;
+        effectiveRole = match.role;
         localStorage.setItem('procureai_active_profile', match.id);
       }
     }
+
+    this.currentRole = effectiveRole;
+    localStorage.setItem('procureai_active_role', effectiveRole);
+    if (!this.currentProfileId) {
+      if (effectiveRole === 'buyer') this.currentProfileId = 'usr-buyer-01';
+      else if (effectiveRole === 'supplier') this.currentProfileId = 'usr-supplier-01';
+      else if (effectiveRole === 'admin') this.currentProfileId = 'usr-admin-01';
+      localStorage.setItem('procureai_active_profile', this.currentProfileId);
+    }
+
     this.notify();
+    return effectiveRole;
   }
 
   public logout(): void {
@@ -164,6 +282,21 @@ class ReactiveDataStore {
     return { ...SEED_PROFILES[0], role: this.currentRole };
   }
 
+  public getAllProfiles(): Profile[] {
+    return [...this.profiles];
+  }
+
+  public getAllOrganisations(): Organisation[] {
+    return [...this.organisations];
+  }
+
+  public toggleProfileStatus(profileId: string): void {
+    this.profiles = this.profiles.map(p =>
+      p.id === profileId ? { ...p, is_active: !p.is_active } : p
+    );
+    this.save('procureai_profiles', this.profiles);
+  }
+
   public setRole(role: UserRole) {
     this.currentRole = role;
     this.isAuthenticatedUser = true;
@@ -178,6 +311,59 @@ class ReactiveDataStore {
 
   public getActiveOrganisation(): Organisation {
     return this.organisations[0];
+  }
+
+  // --- Supplier RFQ & Quotation Management ---
+  public getSupplierRfqs(supplierId?: string): SupplierRFQ[] {
+    return [...this.rfqs];
+  }
+
+  public getSupplierQuotations(supplierId?: string): SupplierQuotation[] {
+    if (supplierId) {
+      return this.quotations.filter(q => q.supplier_id === supplierId);
+    }
+    return [...this.quotations];
+  }
+
+  public submitSupplierQuotation(data: Omit<SupplierQuotation, 'id' | 'created_at'>): SupplierQuotation {
+    const newQuote: SupplierQuotation = {
+      ...data,
+      id: `qt-${Date.now()}`,
+      created_at: new Date().toISOString()
+    };
+    this.quotations.unshift(newQuote);
+    this.save('procureai_quotations', this.quotations);
+
+    // Update RFQ status to quoted
+    this.rfqs = this.rfqs.map(r => (r.id === data.rfq_id ? { ...r, status: 'quoted' } : r));
+    this.save('procureai_rfqs', this.rfqs);
+
+    this.appendProvenanceEvent({
+      event_type: 'SUPPLIER_QUOTATION_SUBMITTED',
+      actor_name: this.getCurrentUser().full_name,
+      actor_role: 'supplier',
+      metadata: {
+        rfqNumber: data.rfq_number,
+        totalAmount: data.total_amount,
+        deliveryDays: data.delivery_days
+      }
+    });
+
+    return newQuote;
+  }
+
+  public rejectSupplierRfq(rfqId: string, reason?: string): void {
+    this.rfqs = this.rfqs.map(r => (r.id === rfqId ? { ...r, status: 'rejected' } : r));
+    this.save('procureai_rfqs', this.rfqs);
+  }
+
+  public updateSupplierListingDetails(listingId: string, updates: Partial<SupplierProduct>): void {
+    this.supplierProducts = this.supplierProducts.map(sp =>
+      sp.id === listingId
+        ? { ...sp, ...updates, last_updated: new Date().toISOString() }
+        : sp
+    );
+    this.save('procureai_supplier_products', this.supplierProducts);
   }
 
   // --- Products & Categories ---

@@ -150,11 +150,13 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    // Simulated authentic authentication handshake
+    // Simulated authentic authentication handshake with backend profile role verification
     setTimeout(() => {
-      store.login(selectedRole, email.trim());
+      const verifiedRole = store.login(selectedRole, email.trim());
       setIsSubmitting(false);
-      navigate(redirectTarget, { replace: true });
+      const targetDashboard = store.getDashboardPath(verifiedRole);
+      const isCustomRedirect = redirectTarget && redirectTarget !== '/' && redirectTarget !== '/dashboard';
+      navigate(isCustomRedirect ? redirectTarget : targetDashboard, { replace: true });
     }, 250);
   };
 
@@ -165,9 +167,10 @@ export const LoginPage: React.FC = () => {
     setEmail(config.userProfile.email);
 
     setTimeout(() => {
-      store.login(role, config.userProfile.email);
+      const verifiedRole = store.login(role, config.userProfile.email);
       setIsSubmitting(false);
-      navigate(redirectTarget, { replace: true });
+      const targetDashboard = store.getDashboardPath(verifiedRole);
+      navigate(targetDashboard, { replace: true });
     }, 150);
   };
 
