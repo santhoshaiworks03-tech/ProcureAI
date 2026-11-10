@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import {
   Bot,
   Building2,
@@ -19,20 +20,32 @@ import {
   Package,
   DollarSign,
   Activity,
-  FileCheck
+  FileCheck,
+  Zap
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { ProcurementWorkflowJourney } from '../../components/workflow/ProcurementWorkflowJourney';
+import { BrandRevealOpeningScreen } from '../../components/brand/BrandRevealOpeningScreen';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'agent' | 'suppliers' | 'paypal' | 'provenance'>('agent');
+  const [showOpeningScreen, setShowOpeningScreen] = useState(true);
 
   return (
     <div className="min-h-screen bg-[#F4EEE6] text-[#13110F] font-sans selection:bg-[#F2C8A8] selection:text-[#13110F]">
+      {/* Opening Screen Brand Reveal (2x Speed) */}
+      <AnimatePresence>
+        {showOpeningScreen && (
+          <BrandRevealOpeningScreen
+            pageTitle="Landing Page"
+            onComplete={() => setShowOpeningScreen(false)}
+          />
+        )}
+      </AnimatePresence>
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 bg-[#F4EEE6]/85 backdrop-blur-xl border-b border-[rgba(19,17,15,0.08)] px-6 sm:px-12 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -58,6 +71,14 @@ export const LandingPage: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowOpeningScreen(true)}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#EDE6DC] hover:bg-[#E2D8CC] text-xs font-semibold text-[#13110F] border border-[rgba(19,17,15,0.08)] transition-all hover:scale-105 active:scale-95 shadow-subtle"
+            title="Watch Brand Reveal Video (2x Speed)"
+          >
+            <Zap className="w-3.5 h-3.5 text-[#BE123C] fill-current" />
+            <span>Brand Reveal (2x)</span>
+          </button>
           <Link to="/login">
             <Button variant="outline" size="sm">
               Sign In
