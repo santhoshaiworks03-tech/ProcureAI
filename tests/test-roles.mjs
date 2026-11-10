@@ -162,7 +162,7 @@ async function run() {
     check(await page.locator('text=Platform User Directory & Role Governance').first().isVisible(), 'Admin: User Directory visible');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-admin-dashboard.png') });
 
-    // Verify Admin Buyer Organisations menu (the user reported issue)
+    // Verify Buyer Organisations menu (the user reported issue)
     console.log('\n--- 6B. Testing Admin Buyer Organisations Menu ---');
     await page.goto(`${TARGET_URL}/admin/dashboard?tab=organisations`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
@@ -171,6 +171,86 @@ async function run() {
     check(await page.locator('text=Multi-Tenant Buyer Organisations Directory').isVisible(), 'Buyer Organisations Directory table rendered');
     check(await page.locator('text=Apex Tech Solutions Pvt Ltd').first().isVisible(), 'Seeded enterprise tenant visible in table');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-admin-buyer-organisations.png') });
+
+    // 7. Test Notifications Dropdown Box Across Roles
+    console.log('\n--- 7. Testing Notification Dropdown Box (No Sidebar Menu & Click Directs to Process) ---');
+    
+    // 7A: Check Admin Sidebar has NO Notifications Menu
+    const adminNavNotifications = await page.locator('nav a:has-text("Notifications")').count();
+    check(adminNavNotifications === 0, 'Admin sidebar navigation has NO Notifications separate menu');
+
+    // 7B: Check Admin Bell Icon & Dropdown Box
+    const bellBtn = page.locator('button[title="Notifications"]');
+    check(await bellBtn.isVisible(), 'Header notification bell button is visible');
+    await bellBtn.click();
+    await page.waitForTimeout(600);
+    check(await page.locator('text=Notifications').first().isVisible(), 'Notification dropdown box opened under bell');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-admin-notification-box.png') });
+
+    // Click an Admin notification item (Supplier KYC or Platform Volume)
+    const adminNotifItem = page.locator('p:has-text("Supplier KYC Review Pending")').first();
+    if (await adminNotifItem.isVisible()) {
+      await adminNotifItem.click();
+      await page.waitForTimeout(1000);
+      const afterClickUrl = page.url();
+      check(afterClickUrl.includes('tab=verifications'), `Admin notification click navigated to verifications process: ${afterClickUrl}`);
+    }
+
+    // 7C: Test Buyer Notifications Dropdown & Mark Read
+    console.log('\n--- 7C. Testing Buyer Notifications Dropdown Box ---');
+    await page.goto(`${TARGET_URL}/login`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+    await page.locator('button[type="button"]:has-text("Buyer Portal")').click();
+    await page.waitForTimeout(300);
+    await page.locator('button[type="submit"]').click();
+    await page.waitForNavigation({ timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(1200);
+
+    const buyerNavNotifications = await page.locator('nav a:has-text("Notifications")').count();
+    check(buyerNavNotifications === 0, 'Buyer sidebar navigation has NO Notifications separate menu');
+
+    // Open Buyer notification box
+    await page.locator('button[title="Notifications"]').click();
+    await page.waitForTimeout(600);
+    check(await page.locator('text=Notifications').first().isVisible(), 'Buyer notification dropdown box opened');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-buyer-notification-box.png') });
+
+    // Click Buyer Payment notification
+    const buyerPaymentNotif = page.locator('p:has-text("Payment Completed via PayPal")').first();
+    if (await buyerPaymentNotif.isVisible()) {
+      await buyerPaymentNotif.click();
+      await page.waitForTimeout(1000);
+      const buyerAfterClickUrl = page.url();
+      check(buyerAfterClickUrl.includes('/payments'), `Buyer notification click navigated to payments process: ${buyerAfterClickUrl}`);
+    }
+
+    // 7D: Test Supplier Notifications Dropdown & Mark Read
+    console.log('\n--- 7D. Testing Supplier Notifications Dropdown Box ---');
+    await page.goto(`${TARGET_URL}/login`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+    await page.locator('button[type="button"]:has-text("Supplier Portal")').click();
+    await page.waitForTimeout(300);
+    await page.locator('button[type="submit"]').click();
+    await page.waitForNavigation({ timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(1200);
+
+    const supplierNavNotifications = await page.locator('nav a:has-text("Notifications")').count();
+    check(supplierNavNotifications === 0, 'Supplier sidebar navigation has NO Notifications separate menu');
+
+    // Open Supplier notification box
+    await page.locator('button[title="Notifications"]').click();
+    await page.waitForTimeout(600);
+    check(await page.locator('text=Notifications').first().isVisible(), 'Supplier notification dropdown box opened');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-supplier-notification-box.png') });
+
+    // Click Supplier RFQ notification
+    const supplierRfqNotif = page.locator('p:has-text("New RFQ Received")').first();
+    if (await supplierRfqNotif.isVisible()) {
+      await supplierRfqNotif.click();
+      await page.waitForTimeout(1000);
+      const supplierAfterClickUrl = page.url();
+      check(supplierAfterClickUrl.includes('tab=rfqs'), `Supplier notification click navigated to RFQ process: ${supplierAfterClickUrl}`);
+    }
 
     console.log(`\n======================================================`);
     console.log(`  Tests Completed: ${passed} PASSED, ${failed} FAILED`);

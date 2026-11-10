@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,10 +27,13 @@ import {
   X,
   Sparkles,
   Layers,
-  Activity
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
 import { store } from '../../lib/store';
-import { UserRole } from '../../types';
+import { UserRole, NotificationItem } from '../../types';
 import { FloatingAIAssistant } from '../ai/FloatingAIAssistant';
 
 interface AppLayoutProps {
@@ -42,26 +45,113 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [activeRole, setActiveRole] = useState<UserRole>(store.getCurrentUser().role);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(store.getNotifications());
   const [notificationsCount, setNotificationsCount] = useState(
     store.getNotifications().filter(n => !n.is_read).length
   );
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
       setActiveRole(store.getCurrentUser().role);
-      setNotificationsCount(store.getNotifications().filter(n => !n.is_read).length);
+      const currentNotifs = store.getNotifications();
+      setNotifications(currentNotifs);
+      setNotificationsCount(currentNotifs.filter(n => !n.is_read).length);
     });
     return unsubscribe;
   }, []);
 
-  // Close mobile drawer on route change
+  // Close notifications box on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile drawer and notification popover on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setIsNotificationsOpen(false);
   }, [location.pathname]);
 
+  const getNotificationIcon = (type: NotificationItem['type']) => {
+    switch (type) {
+      case 'payment_success':
+        return <CreditCard className="w-4 h-4 text-emerald-600" />;
+      case 'payment_failed':
+        return <CreditCard className="w-4 h-4 text-rose-600" />;
+      case 'approved':
+      case 'approval_needed':
+        return <CheckSquare className="w-4 h-4 text-[#9C5A2B]" />;
+      case 'low_stock':
+        return <AlertTriangle className="w-4 h-4 text-amber-600" />;
+      case 'rfq':
+        return <FileText className="w-4 h-4 text-blue-600" />;
+      case 'order_dispatched':
+        return <Truck className="w-4 h-4 text-indigo-600" />;
+      case 'ai_completed':
+        return <Sparkles className="w-4 h-4 text-purple-600" />;
+      default:
+        return <Bell className="w-4 h-4 text-[#6B6560]" />;
+    }
+  };
+
+  const formatNotificationTime = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const handleNotificationClick = (notif: NotificationItem) => {
+    // 1. Mark as read
+    store.markNotificationAsRead(notif.id);
+    const updated = store.getNotifications();
+    setNotifications(updated);
+    setNotificationsCount(updated.filter(n => !n.is_read).length);
+
+    // 2. Close dropdown box
+    setIsNotificationsOpen(false);
+
+    // 3. Direct to respective process or operation
+    if (notif.link_url) {
+      navigate(notif.link_url);
+      return;
+    }
+
+    if (activeRole === 'supplier') {
+      if (notif.type === 'rfq') navigate('/supplier/dashboard?tab=rfqs');
+      else if (notif.type === 'order_dispatched') navigate('/supplier/dashboard?tab=fulfilment');
+      else if (notif.type === 'payment_success') navigate('/supplier/dashboard?tab=payments');
+      else navigate('/supplier/dashboard');
+    } else if (activeRole === 'admin') {
+      if (notif.type === 'approval_needed') navigate('/admin/dashboard?tab=verifications');
+      else if (notif.type === 'approved') navigate('/admin/dashboard?tab=organisations');
+      else if (notif.type === 'payment_success') navigate('/admin/dashboard?tab=payments');
+      else navigate('/admin/dashboard');
+    } else {
+      if (notif.type === 'payment_success') navigate('/payments');
+      else if (notif.type === 'approved' || notif.type === 'approval_needed') navigate('/approvals');
+      else if (notif.type === 'low_stock') navigate('/forecasting');
+      else navigate('/orders');
+    }
+  };
 
   let navItems: { label: string; path: string; icon: any; badge?: number }[] = [];
 
@@ -87,8 +177,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       },
       { label: 'Order Fulfilment', path: '/supplier/dashboard?tab=fulfilment', icon: Truck },
       { label: 'Payments & Transactions', path: '/supplier/dashboard?tab=payments', icon: CreditCard },
-      { label: 'Performance Analytics', path: '/supplier/dashboard?tab=analytics', icon: BarChart3 },
-      { label: 'Notifications', path: '/notifications', icon: Bell, badge: notificationsCount }
+      { label: 'Performance Analytics', path: '/supplier/dashboard?tab=analytics', icon: BarChart3 }
     ];
   } else if (activeRole === 'admin') {
     navItems = [
@@ -131,7 +220,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       { label: 'Payments & Checkout', path: '/payments', icon: CreditCard },
       { label: 'Provenance Ledger', path: '/provenance', icon: History },
       { label: 'Analytics & Reports', path: '/analytics', icon: BarChart3 },
-      { label: 'Notifications', path: '/notifications', icon: Bell, badge: notificationsCount },
       { label: 'Administration', path: '/admin/dashboard', icon: Settings }
     ];
   }
@@ -571,17 +659,124 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <LogOut className="w-4 h-4" strokeWidth={1.5} />
             </button>
 
-            {/* Notifications */}
-            <Link
-              to="/notifications"
-              className="relative p-1.5 rounded-lg text-[#6B6560] hover:text-[#13110F] hover:bg-[#EDE6DC] transition-colors"
-              title="Notifications"
-            >
-              <Bell className="w-4 h-4" strokeWidth={1.5} />
-              {notificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-[#BE123C] rounded-full animate-pulse"></span>
-              )}
-            </Link>
+            {/* Notification Menu Bell & Interactive Dropdown Box */}
+            <div className="relative" ref={notificationRef}>
+              <button
+                onClick={() => {
+                  setNotifications(store.getNotifications());
+                  setIsNotificationsOpen(!isNotificationsOpen);
+                }}
+                className={`relative p-2 rounded-xl transition-all ${
+                  isNotificationsOpen
+                    ? 'bg-[#13110F] text-[#FAF7F2] shadow-sm'
+                    : 'text-[#6B6560] hover:text-[#13110F] hover:bg-[#EDE6DC]'
+                }`}
+                title="Notifications"
+                aria-label="Open notifications box"
+              >
+                <Bell className="w-4 h-4" strokeWidth={1.75} />
+                {notificationsCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-[#BE123C] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#F4EEE6] shadow-sm animate-pulse">
+                    {notificationsCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Popover Box Under The Bell */}
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+                    className="absolute right-0 top-full mt-2 w-[340px] sm:w-[420px] bg-[#FAF7F2] border border-[rgba(19,17,15,0.12)] rounded-2xl shadow-2xl z-50 overflow-hidden font-sans select-none"
+                  >
+                    {/* Popover Header */}
+                    <div className="px-4 py-3 bg-[#13110F] text-[#FAF7F2] flex items-center justify-between border-b border-[rgba(244,238,230,0.1)]">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-4 h-4 text-[#F2C8A8]" />
+                        <span className="text-xs font-bold tracking-tight">Notifications</span>
+                        {notificationsCount > 0 && (
+                          <span className="px-1.5 py-0.5 bg-[#F2C8A8]/20 text-[#F2C8A8] text-[10px] font-mono font-semibold rounded-md border border-[#F2C8A8]/30">
+                            {notificationsCount} new
+                          </span>
+                        )}
+                      </div>
+                      {notificationsCount > 0 && (
+                        <button
+                          onClick={() => {
+                            store.markAllNotificationsAsRead();
+                            const currentNotifs = store.getNotifications();
+                            setNotifications(currentNotifs);
+                            setNotificationsCount(0);
+                          }}
+                          className="text-[11px] text-[#EDE6DC]/85 hover:text-[#F2C8A8] transition-colors flex items-center gap-1 font-medium hover:underline"
+                        >
+                          <CheckCircle2 className="w-3 h-3 text-[#B4C7A6]" />
+                          Mark all as read
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Notification Items List */}
+                    <div className="max-h-[380px] overflow-y-auto divide-y divide-[rgba(19,17,15,0.06)] bg-[#FAF7F2]">
+                      {notifications.length === 0 ? (
+                        <div className="p-8 text-center space-y-2">
+                          <div className="w-10 h-10 rounded-full bg-[#EDE6DC] flex items-center justify-center mx-auto text-[#6B6560]">
+                            <CheckCircle2 className="w-5 h-5 text-[#3E5C31]" />
+                          </div>
+                          <p className="text-xs font-semibold text-[#13110F]">All caught up!</p>
+                          <p className="text-[11px] text-[#8C847D]">No pending notifications for your portal.</p>
+                        </div>
+                      ) : (
+                        notifications.map(n => (
+                          <div
+                            key={n.id}
+                            onClick={() => handleNotificationClick(n)}
+                            className={`p-3.5 transition-colors cursor-pointer flex items-start gap-3 text-left group hover:bg-[#EDE6DC]/70 ${
+                              !n.is_read ? 'bg-[#F2C8A8]/12 font-medium' : 'bg-transparent opacity-85'
+                            }`}
+                          >
+                            {/* Type Icon */}
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
+                              !n.is_read
+                                ? 'bg-[#13110F] text-[#F2C8A8]'
+                                : 'bg-[#EDE6DC] text-[#6B6560]'
+                            }`}>
+                              {getNotificationIcon(n.type)}
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1">
+                                <p className={`text-xs truncate tracking-tight ${!n.is_read ? 'font-bold text-[#13110F]' : 'font-medium text-[#4A4540]'}`}>
+                                  {n.title}
+                                </p>
+                                {!n.is_read && (
+                                  <span className="w-2 h-2 rounded-full bg-[#BE123C] flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-[11px] text-[#6B6560] line-clamp-2 mt-0.5 leading-snug">
+                                {n.message}
+                              </p>
+                              <div className="flex items-center justify-between mt-2 text-[10px]">
+                                <span className="text-[#8C847D] font-mono">
+                                  {formatNotificationTime(n.created_at)}
+                                </span>
+                                <span className="inline-flex items-center gap-1 font-semibold text-[#13110F] group-hover:text-[#9C5A2B] group-hover:translate-x-0.5 transition-all">
+                                  Go to process <ArrowRight className="w-2.5 h-2.5" />
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* PayPal Sandbox External Link */}
             <a

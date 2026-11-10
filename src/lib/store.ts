@@ -167,7 +167,10 @@ class ReactiveDataStore {
     this.purchaseOrders = this.load('procureai_purchase_orders', SEED_PURCHASE_ORDERS);
     this.demandForecasts = this.load('procureai_demand_forecasts', SEED_DEMAND_FORECASTS);
     this.provenanceEvents = this.load('procureai_provenance_events', SEED_PROVENANCE_EVENTS);
-    this.notifications = this.load('procureai_notifications', SEED_NOTIFICATIONS);
+    const loadedNotifs: NotificationItem[] = this.load('procureai_notifications', SEED_NOTIFICATIONS);
+    const existingNotifIds = new Set(loadedNotifs.map(n => n.id));
+    const missingNotifs = SEED_NOTIFICATIONS.filter(s => !existingNotifIds.has(s.id));
+    this.notifications = missingNotifs.length > 0 ? [...loadedNotifs, ...missingNotifs] : loadedNotifs;
     this.rfqs = this.load('procureai_rfqs', INITIAL_RFQS);
     this.quotations = this.load('procureai_quotations', INITIAL_QUOTATIONS);
     this.checkoutSessions = this.load('procureai_checkout_sessions', []);
@@ -905,18 +908,36 @@ class ReactiveDataStore {
   }
 
   // --- Notifications ---
-  public getNotifications(): NotificationItem[] {
-    return [...this.notifications];
+  public getNotifications(profileId?: string): NotificationItem[] {
+    const targetId = profileId || this.currentProfileId;
+    if (targetId) {
+      const scoped = this.notifications.filter(n => n.recipient_profile_id === targetId);
+      if (scoped.length > 0) {
+        return [...scoped].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+    }
+    const currentRole = this.getCurrentUser().role;
+    const rolePrefix = currentRole === 'buyer' ? 'usr-buyer' : currentRole === 'supplier' ? 'usr-supplier' : 'usr-admin';
+    const roleScoped = this.notifications.filter(n => n.recipient_profile_id.startsWith(rolePrefix));
+    if (roleScoped.length > 0) {
+      return [...roleScoped].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    return [...this.notifications].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
   public markNotificationAsRead(id: string) {
     this.notifications = this.notifications.map(n => (n.id === id ? { ...n, is_read: true } : n));
     this.save('procureai_notifications', this.notifications);
+    this.notify();
   }
 
-  public markAllNotificationsAsRead() {
-    this.notifications = this.notifications.map(n => ({ ...n, is_read: true }));
+  public markAllNotificationsAsRead(profileId?: string) {
+    const targetId = profileId || this.currentProfileId;
+    this.notifications = this.notifications.map(n =>
+      !targetId || n.recipient_profile_id === targetId ? { ...n, is_read: true } : n
+    );
     this.save('procureai_notifications', this.notifications);
+    this.notify();
   }
 
   // --- Reset to Initial State ---

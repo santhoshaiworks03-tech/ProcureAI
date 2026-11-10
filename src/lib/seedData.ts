@@ -1386,13 +1386,14 @@ export const SEED_PROVENANCE_EVENTS: ProvenanceEvent[] = [
 ];
 
 export const SEED_NOTIFICATIONS: NotificationItem[] = [
+  // Buyer Notifications
   {
     id: 'notif-01',
     recipient_profile_id: 'usr-buyer-01',
     title: 'Payment Completed via PayPal',
     message: 'Purchase Order PO-2024-0891 (₹3,90,110) has been successfully captured and confirmed.',
     type: 'payment_success',
-    link_url: '/orders',
+    link_url: '/payments',
     is_read: false,
     created_at: '2024-03-05T11:20:00Z'
   },
@@ -1415,6 +1416,70 @@ export const SEED_NOTIFICATIONS: NotificationItem[] = [
     link_url: '/forecasting',
     is_read: false,
     created_at: '2024-03-08T08:00:00Z'
+  },
+
+  // Supplier Notifications
+  {
+    id: 'notif-04',
+    recipient_profile_id: 'usr-supplier-01',
+    title: 'New RFQ Received from Apex Tech',
+    message: 'Request for Quotation RFQ-2024-001 (50x Ergonomic Workstation Chairs, ₹2,50,000 budget cap).',
+    type: 'rfq',
+    link_url: '/supplier/dashboard?tab=rfqs',
+    is_read: false,
+    created_at: '2024-03-08T09:15:00Z'
+  },
+  {
+    id: 'notif-05',
+    recipient_profile_id: 'usr-supplier-01',
+    title: 'Purchase Order Awaiting Dispatch',
+    message: 'Commercial Order PO-2024-0891 confirmed by buyer. Ready for BlueDart courier dispatch.',
+    type: 'order_dispatched',
+    link_url: '/supplier/dashboard?tab=fulfilment',
+    is_read: false,
+    created_at: '2024-03-08T10:30:00Z'
+  },
+  {
+    id: 'notif-06',
+    recipient_profile_id: 'usr-supplier-01',
+    title: 'PayPal Settlement Captured',
+    message: '₹3,90,110 captured via PayPal Orders v2 and credited to merchant account sb-omnioffice.',
+    type: 'payment_success',
+    link_url: '/supplier/dashboard?tab=payments',
+    is_read: true,
+    created_at: '2024-03-07T14:45:00Z'
+  },
+
+  // Admin Notifications
+  {
+    id: 'notif-07',
+    recipient_profile_id: 'usr-admin-01',
+    title: 'Supplier KYC Review Pending',
+    message: 'OmniOffice Direct Ltd has submitted updated GSTIN and Corporate PAN for verification review.',
+    type: 'approval_needed',
+    link_url: '/admin/dashboard?tab=verifications',
+    is_read: false,
+    created_at: '2024-03-08T11:00:00Z'
+  },
+  {
+    id: 'notif-08',
+    recipient_profile_id: 'usr-admin-01',
+    title: 'Platform Procurement Volume Milestone',
+    message: 'Global purchase order throughput exceeded ₹1,24,50,000 across 5 registered buyer enterprises.',
+    type: 'approved',
+    link_url: '/admin/dashboard?tab=procurement',
+    is_read: false,
+    created_at: '2024-03-08T12:00:00Z'
+  },
+  {
+    id: 'notif-09',
+    recipient_profile_id: 'usr-admin-01',
+    title: 'Supabase PostgreSQL Health Status',
+    message: 'All 28 tables reporting 100% RLS compliance. API latency steady at 180ms.',
+    type: 'ai_completed',
+    link_url: '/admin/dashboard?tab=health',
+    is_read: true,
+    created_at: '2024-03-08T13:00:00Z'
   }
 ];
 

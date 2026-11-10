@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { AppLayout } from './components/layout/AppLayout';
 import { LandingPage } from './pages/landing/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
-import { DashboardPage } from './pages/dashboard/DashboardPage';
-import { BuyerDashboard } from './pages/dashboard/BuyerDashboard';
-import { SupplierDashboard } from './pages/dashboard/SupplierDashboard';
-import { AdminDashboard } from './pages/dashboard/AdminDashboard';
 import { RoleProtectedRoute } from './components/auth/RoleProtectedRoute';
-import { AIAgentPage } from './pages/procurement/AIAgentPage';
-import { CataloguePage } from './pages/catalogue/CataloguePage';
-import { SuppliersPage } from './pages/suppliers/SuppliersPage';
-import { SupplierIntelligencePage } from './pages/suppliers/SupplierIntelligencePage';
-import { DemandForecastingPage } from './pages/forecasting/DemandForecastingPage';
-import { PurchaseOrdersPage } from './pages/orders/PurchaseOrdersPage';
-import { ApprovalsPage } from './pages/approvals/ApprovalsPage';
-import { PaymentsPage } from './pages/payments/PaymentsPage';
-import { ProvenanceLedgerPage } from './pages/provenance/ProvenanceLedgerPage';
-import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
-import { NotificationsPage } from './pages/notifications/NotificationsPage';
-import { AdminPage } from './pages/admin/AdminPage';
 import { store } from './lib/store';
+
+// Lazy loaded page components for fast initial bundle and instant page transitions
+const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const BuyerDashboard = lazy(() => import('./pages/dashboard/BuyerDashboard').then(m => ({ default: m.BuyerDashboard })));
+const SupplierDashboard = lazy(() => import('./pages/dashboard/SupplierDashboard').then(m => ({ default: m.SupplierDashboard })));
+const AdminDashboard = lazy(() => import('./pages/dashboard/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AIAgentPage = lazy(() => import('./pages/procurement/AIAgentPage').then(m => ({ default: m.AIAgentPage })));
+const CataloguePage = lazy(() => import('./pages/catalogue/CataloguePage').then(m => ({ default: m.CataloguePage })));
+const SuppliersPage = lazy(() => import('./pages/suppliers/SuppliersPage').then(m => ({ default: m.SuppliersPage })));
+const SupplierIntelligencePage = lazy(() => import('./pages/suppliers/SupplierIntelligencePage').then(m => ({ default: m.SupplierIntelligencePage })));
+const DemandForecastingPage = lazy(() => import('./pages/forecasting/DemandForecastingPage').then(m => ({ default: m.DemandForecastingPage })));
+const PurchaseOrdersPage = lazy(() => import('./pages/orders/PurchaseOrdersPage').then(m => ({ default: m.PurchaseOrdersPage })));
+const ApprovalsPage = lazy(() => import('./pages/approvals/ApprovalsPage').then(m => ({ default: m.ApprovalsPage })));
+const PaymentsPage = lazy(() => import('./pages/payments/PaymentsPage').then(m => ({ default: m.PaymentsPage })));
+const ProvenanceLedgerPage = lazy(() => import('./pages/provenance/ProvenanceLedgerPage').then(m => ({ default: m.ProvenanceLedgerPage })));
+const AnalyticsPage = lazy(() => import('./pages/analytics/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const AdminPage = lazy(() => import('./pages/admin/AdminPage').then(m => ({ default: m.AdminPage })));
 
 /**
  * Persistent Protected Layout with React Router <Outlet />
@@ -48,7 +50,18 @@ const ProtectedLayout: React.FC = () => {
 
   return (
     <AppLayout>
-      <Outlet />
+      <Suspense
+        fallback={
+          <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+            <div className="flex flex-col items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full border-2 border-[#13110F]/20 border-t-[#13110F] animate-spin" />
+              <span className="text-[11px] font-mono text-[#8C847D]">Loading view...</span>
+            </div>
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
     </AppLayout>
   );
 };
