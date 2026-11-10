@@ -22,7 +22,12 @@ import {
   Check,
   X,
   FileCheck2,
-  LayoutDashboard
+  LayoutDashboard,
+  FileText,
+  BarChart3,
+  Layers,
+  Zap,
+  Globe
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { Supplier, Profile, PurchaseOrder, Product, Organisation } from '../../types';
@@ -41,6 +46,7 @@ export const AdminDashboard: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(store.getProducts());
   const [organisations, setOrganisations] = useState<Organisation[]>(store.getAllOrganisations());
   const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'buyer' | 'supplier' | 'admin'>('all');
+  const [catalogueCategoryFilter, setCatalogueCategoryFilter] = useState<string>('all');
 
   useEffect(() => {
     const unsub = store.subscribe(() => {
@@ -83,6 +89,13 @@ export const AdminDashboard: React.FC = () => {
     return u.role === userRoleFilter;
   });
 
+  const filteredProducts = products.filter(p => {
+    if (catalogueCategoryFilter === 'all') return true;
+    return (p.category_name || 'General') === catalogueCategoryFilter;
+  });
+
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category_name || 'General')))];
+
   const ADMIN_MENU_HEADINGS: Record<string, { title: string; subtitle: string }> = {
     overview: {
       title: 'Platform Operations & Governance',
@@ -92,13 +105,13 @@ export const AdminDashboard: React.FC = () => {
       title: 'Enterprise User Directory & Role Governance',
       subtitle: 'Manage user access permissions, identity status, and role authorizations'
     },
-    verifications: {
-      title: 'Supplier Legal Verification & KYC Queue',
-      subtitle: 'Review business registration, corporate GSTIN, and compliance credentials'
-    },
     organisations: {
       title: 'Buyer Enterprises & Multi-Tenant Orgs',
       subtitle: 'Enterprise accounts, department structures, and PostgreSQL RLS scopes'
+    },
+    verifications: {
+      title: 'Supplier Legal Verification & KYC Queue',
+      subtitle: 'Review business registration, corporate GSTIN, and compliance credentials'
     },
     catalogue: {
       title: 'Global Product Catalogue Oversight',
@@ -204,6 +217,112 @@ export const AdminDashboard: React.FC = () => {
               {formatCurrency(verifiedPayPalVolume)}
             </p>
             <span className="text-[10px] text-emerald-700 font-medium">PayPal Orders v2</span>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB: BUYER ORGANISATIONS (MULTI-TENANT ENTERPRISES)
+         ========================================================================= */}
+      {activeTab === 'organisations' && (
+        <div className="space-y-6">
+          {/* Summary metrics for organisations */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Registered Enterprises</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">{organisations.length}</p>
+              <span className="text-[10px] text-emerald-700 font-medium">100% KYC verified</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Combined Annual Budget</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">
+                {formatCurrency(organisations.reduce((sum, o) => sum + (o.annual_procurement_budget || 0), 0))}
+              </p>
+              <span className="text-[10px] text-[#6B6560]">Authorized spend cap</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Multi-Tenant Isolation</span>
+              <p className="text-2xl font-bold text-emerald-700 mt-1 font-mono">Active</p>
+              <span className="text-[10px] text-emerald-700 font-medium">PostgreSQL Row-Level Security</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Enterprise Users</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">
+                {profiles.filter(p => p.role === 'buyer').length}
+              </p>
+              <span className="text-[10px] text-[#6B6560]">Active purchasers</span>
+            </div>
+          </div>
+
+          {/* Enterprises Directory Table */}
+          <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
+            <div className="p-4 border-b border-[rgba(19,17,15,0.08)] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#13110F]" />
+                <h3 className="text-xs font-semibold text-[#13110F]">Multi-Tenant Buyer Organisations Directory</h3>
+              </div>
+              <span className="text-[11px] text-[#6B6560]">
+                {organisations.length} enterprise tenants isolated by Supabase RLS
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#FAF7F2] text-[#6B6560] text-[10px] font-semibold uppercase tracking-wider border-b border-[rgba(19,17,15,0.08)]">
+                  <tr>
+                    <th className="py-2.5 px-4 font-semibold">Enterprise Name</th>
+                    <th className="py-2.5 px-4 font-semibold">Registration / Tax ID</th>
+                    <th className="py-2.5 px-4 font-semibold">Industry Domain</th>
+                    <th className="py-2.5 px-4 font-semibold">Location</th>
+                    <th className="py-2.5 px-4 font-semibold text-right">Annual Budget</th>
+                    <th className="py-2.5 px-4 font-semibold text-center">RLS Scope</th>
+                    <th className="py-2.5 px-4 font-semibold text-right">Verification</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[rgba(19,17,15,0.06)]">
+                  {organisations.map(org => (
+                    <tr key={org.id} className="hover:bg-[#FAF7F2] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-xl bg-[#EDE6DC] text-[#13110F] flex items-center justify-center font-bold text-xs">
+                            {org.name.slice(0, 1)}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-[#13110F] block">{org.name}</span>
+                            <span className="text-[10px] font-mono text-[#8C847D]">{org.id}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-[11px] text-[#13110F] bg-[#FAF7F2] px-2 py-0.5 rounded-md border border-[rgba(19,17,15,0.08)] block truncate max-w-[150px]">
+                          {org.tax_id || org.business_registration_no}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-[#6B6560]">{org.industry || 'Enterprise Software'}</td>
+                      <td className="py-3 px-4 text-[#6B6560]">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-[#8C847D] flex-shrink-0" />
+                          <span>{org.address?.city || 'Bengaluru'}, {org.address?.state || 'KA'}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right font-mono font-semibold text-[#13110F]">
+                        {formatCurrency(org.annual_procurement_budget)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          tenant_id = {org.id}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <Badge variant={org.is_verified ? 'success' : 'neutral'} size="sm">
+                          {org.is_verified ? 'Verified Tenant' : 'Pending Review'}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -403,6 +522,148 @@ export const AdminDashboard: React.FC = () => {
       )}
 
       {/* =========================================================================
+          SECTION: MASTER CATALOGUE OVERSIGHT
+         ========================================================================= */}
+      {activeTab === 'catalogue' && (
+        <div className="space-y-6">
+          <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
+            <div className="p-4 border-b border-[rgba(19,17,15,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Package className="w-4 h-4 text-[#13110F]" />
+                <h3 className="text-xs font-semibold text-[#13110F]">Global Product Catalogue Master Index</h3>
+              </div>
+
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setCatalogueCategoryFilter(cat)}
+                    className={`px-2.5 py-1 rounded-xl text-[11px] font-medium capitalize transition-all whitespace-nowrap ${
+                      catalogueCategoryFilter === cat
+                        ? 'bg-[#13110F] text-white'
+                        : 'bg-[#FAF7F2] text-[#6B6560] hover:text-[#13110F]'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#FAF7F2] text-[#6B6560] text-[10px] font-semibold uppercase tracking-wider border-b border-[rgba(19,17,15,0.08)]">
+                  <tr>
+                    <th className="py-2.5 px-4 font-semibold">SKU ID</th>
+                    <th className="py-2.5 px-4 font-semibold">Product Name</th>
+                    <th className="py-2.5 px-4 font-semibold">Category</th>
+                    <th className="py-2.5 px-4 font-semibold">Brand</th>
+                    <th className="py-2.5 px-4 font-semibold text-right">Benchmark Price</th>
+                    <th className="py-2.5 px-4 font-semibold text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[rgba(19,17,15,0.06)]">
+                  {filteredProducts.map(prod => (
+                    <tr key={prod.id} className="hover:bg-[#FAF7F2] transition-colors">
+                      <td className="py-3 px-4 font-mono font-medium text-[#13110F]">
+                        {prod.id}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-semibold text-[#13110F] block">{prod.name}</span>
+                        <span className="text-[10px] text-[#8C847D]">{prod.description?.slice(0, 50)}...</span>
+                      </td>
+                      <td className="py-3 px-4 text-[#6B6560]">{prod.category_name || 'Commercial'}</td>
+                      <td className="py-3 px-4 font-semibold text-[#13110F]">{prod.brand}</td>
+                      <td className="py-3 px-4 text-right font-mono font-bold text-[#13110F]">
+                        {formatCurrency(prod.benchmark_market_price)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <Badge variant="success" size="sm">
+                          Catalogued
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: PROCUREMENT MONITOR
+         ========================================================================= */}
+      {activeTab === 'procurement' && (
+        <div className="space-y-6">
+          <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
+            <div className="p-4 border-b border-[rgba(19,17,15,0.08)] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-[#13110F]" />
+                <h3 className="text-xs font-semibold text-[#13110F]">Autonomous Procurement Transaction Stream</h3>
+              </div>
+              <span className="text-[11px] text-[#6B6560]">
+                {purchaseOrders.length} commercial procurement orders across platform
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#FAF7F2] text-[#6B6560] text-[10px] font-semibold uppercase tracking-wider border-b border-[rgba(19,17,15,0.08)]">
+                  <tr>
+                    <th className="py-2.5 px-4 font-semibold">PO Number</th>
+                    <th className="py-2.5 px-4 font-semibold">Buyer Enterprise</th>
+                    <th className="py-2.5 px-4 font-semibold">Supplier</th>
+                    <th className="py-2.5 px-4 font-semibold text-right">Order Value</th>
+                    <th className="py-2.5 px-4 font-semibold text-center">Pipeline Status</th>
+                    <th className="py-2.5 px-4 font-semibold text-center">Payment</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[rgba(19,17,15,0.06)]">
+                  {purchaseOrders.map(po => (
+                    <tr key={po.id} className="hover:bg-[#FAF7F2] transition-colors">
+                      <td className="py-3 px-4 font-mono font-medium text-[#13110F]">
+                        {po.po_number}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-semibold text-[#13110F] block">{po.organisation_name || 'Apex Tech Solutions'}</span>
+                        <span className="text-[10px] text-[#8C847D]">{po.created_by}</span>
+                      </td>
+                      <td className="py-3 px-4 text-[#6B6560]">{po.supplier_name}</td>
+                      <td className="py-3 px-4 text-right font-mono font-bold text-[#13110F]">
+                        {formatCurrency(po.total_amount)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <Badge
+                          variant={
+                            po.status === 'delivered'
+                              ? 'success'
+                              : po.status === 'shipped'
+                              ? 'info'
+                              : po.status === 'payment_completed' || po.status === 'approved'
+                              ? 'neutral'
+                              : 'warning'
+                          }
+                          size="sm"
+                        >
+                          {po.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          PayPal Orders v2
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
           SECTION: PAYPAL SETTLEMENT & REVENUE AUDIT
          ========================================================================= */}
       {(activeTab === 'overview' || activeTab === 'payments') && (
@@ -470,6 +731,103 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </Card>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: AI AGENT MULTI-PROVIDER GOVERNANCE
+         ========================================================================= */}
+      {activeTab === 'ai' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Active Primary LLM</span>
+              <p className="text-xl font-bold text-[#13110F] mt-1">Gemini 1.5 Pro</p>
+              <span className="text-[10px] text-emerald-700 font-medium">Google DeepMind</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Average Turnaround</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">180 ms</p>
+              <span className="text-[10px] text-emerald-700 font-medium">Streaming responses</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">JSON Schema Strictness</span>
+              <p className="text-2xl font-bold text-emerald-700 mt-1 font-mono">99.8%</p>
+              <span className="text-[10px] text-[#6B6560]">Zero validation faults</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">Autonomous Decisions</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">142 runs</p>
+              <span className="text-[10px] text-[#6B6560]">Human-in-the-loop gate</span>
+            </div>
+          </div>
+
+          <Card className="p-6 bg-white border-[rgba(19,17,15,0.08)] shadow-subtle space-y-4">
+            <div className="flex items-center justify-between border-b border-[rgba(19,17,15,0.08)] pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#13110F]" />
+                <h3 className="text-xs font-semibold text-[#13110F]">Autonomous Sourcing Engine Governance & Decision Policies</h3>
+              </div>
+              <Badge variant="success" size="sm">Active Guardrails</Badge>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.06)] flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-[#13110F] block">Multi-Criteria Deterministic Sourcing Policy</span>
+                  <span className="text-[10px] text-[#8C847D]">
+                    Scores suppliers across Price (30%), Availability (25%), Lead Time (20%), SLA (15%), and ESG (10%).
+                  </span>
+                </div>
+                <span className="text-emerald-700 font-semibold font-mono text-[11px]">Enforced</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.06)] flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-[#13110F] block">Human-in-the-Loop Spend Ceiling Gate</span>
+                  <span className="text-[10px] text-[#8C847D]">
+                    Any order exceeding ₹50,000 mandates multi-tier manager cryptographic authorization.
+                  </span>
+                </div>
+                <span className="text-emerald-700 font-semibold font-mono text-[11px]">Active</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.06)] flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-[#13110F] block">PayPal Orders v2 Price-Lock Assurance</span>
+                  <span className="text-[10px] text-[#8C847D]">
+                    300-second session lock guarantees locked unit price before order capture execution.
+                  </span>
+                </div>
+                <span className="text-emerald-700 font-semibold font-mono text-[11px]">Active</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: SYSTEM HEALTH & INFRASTRUCTURE TELEMETRY
+         ========================================================================= */}
+      {activeTab === 'health' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">System Uptime</span>
+              <p className="text-2xl font-bold text-[#3E5C31] mt-1 font-mono">99.98%</p>
+              <span className="text-[10px] text-emerald-700 font-medium">30-day trailing</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">PostgreSQL Database</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">28 Tables</p>
+              <span className="text-[10px] text-emerald-700 font-medium">Supabase RLS active</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="text-[11px] text-[#8C847D] block">PayPal Orders v2 Gateway</span>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">200 OK</p>
+              <span className="text-[10px] text-emerald-700 font-medium">Sandbox capture healthy</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

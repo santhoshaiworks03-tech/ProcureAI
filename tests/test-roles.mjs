@@ -162,6 +162,16 @@ async function run() {
     check(await page.locator('text=Platform User Directory & Role Governance').first().isVisible(), 'Admin: User Directory visible');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-admin-dashboard.png') });
 
+    // Verify Admin Buyer Organisations menu (the user reported issue)
+    console.log('\n--- 6B. Testing Admin Buyer Organisations Menu ---');
+    await page.goto(`${TARGET_URL}/admin/dashboard?tab=organisations`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+    const orgHeading = await page.locator('h1').innerText();
+    check(orgHeading.includes('Buyer Enterprises & Multi-Tenant Orgs'), `Admin Org menu heading: "${orgHeading}"`);
+    check(await page.locator('text=Multi-Tenant Buyer Organisations Directory').isVisible(), 'Buyer Organisations Directory table rendered');
+    check(await page.locator('text=Apex Tech Solutions Pvt Ltd').first().isVisible(), 'Seeded enterprise tenant visible in table');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-admin-buyer-organisations.png') });
+
     console.log(`\n======================================================`);
     console.log(`  Tests Completed: ${passed} PASSED, ${failed} FAILED`);
     console.log(`======================================================\n`);
