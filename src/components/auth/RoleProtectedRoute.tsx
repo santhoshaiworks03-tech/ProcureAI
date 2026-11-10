@@ -105,3 +105,4 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedR
 
   return children ? <>{children}</> : <Outlet />;
 };
+

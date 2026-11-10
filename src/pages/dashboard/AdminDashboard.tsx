@@ -1,135 +1,144 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck,
-  Building2,
   Users,
-  CreditCard,
-  History,
-  TrendingUp,
+  Building2,
   Package,
-  Layers,
-  AlertTriangle,
+  TrendingUp,
+  CreditCard,
+  SlidersHorizontal,
   Bot,
   Activity,
   CheckCircle2,
   XCircle,
-  ExternalLink,
-  Search,
-  Filter,
-  RefreshCw,
-  Plus,
-  Key,
-  Database,
+  Clock,
   ArrowRight,
-  SlidersHorizontal,
+  ExternalLink,
+  Sparkles,
   MapPin,
+  Lock,
+  Search,
   Check,
   X,
-  FileText
+  FileCheck2,
+  LayoutDashboard
 } from 'lucide-react';
 import { store } from '../../lib/store';
-import {
-  Supplier,
-  PurchaseOrder,
-  Product,
-  ProductCategory,
-  ProvenanceEvent,
-  Profile,
-  Organisation
-} from '../../types';
+import { Supplier, Profile, PurchaseOrder, Product, Organisation } from '../../types';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
+import { formatCurrency, formatDate } from '../../lib/utils';
 
 export const AdminDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
 
   const [suppliers, setSuppliers] = useState<Supplier[]>(store.getSuppliers());
+  const [profiles, setProfiles] = useState<Profile[]>(store.getAllProfiles());
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(store.getPurchaseOrders());
   const [products, setProducts] = useState<Product[]>(store.getProducts());
-  const [categories, setCategories] = useState<ProductCategory[]>(store.getCategories());
-  const [provenanceEvents, setProvenanceEvents] = useState<ProvenanceEvent[]>(store.getProvenanceEvents());
-  const [profiles, setProfiles] = useState<Profile[]>(store.getAllProfiles());
   const [organisations, setOrganisations] = useState<Organisation[]>(store.getAllOrganisations());
-
-  const [selectedAiProvider, setSelectedAiProvider] = useState<string>('gemini');
-  const [userRoleFilter, setUserRoleFilter] = useState<string>('all');
-  const [userSearch, setUserSearch] = useState<string>('');
+  const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'buyer' | 'supplier' | 'admin'>('all');
 
   useEffect(() => {
     const unsub = store.subscribe(() => {
       setSuppliers(store.getSuppliers());
+      setProfiles(store.getAllProfiles());
       setPurchaseOrders(store.getPurchaseOrders());
       setProducts(store.getProducts());
-      setCategories(store.getCategories());
-      setProvenanceEvents(store.getProvenanceEvents());
-      setProfiles(store.getAllProfiles());
       setOrganisations(store.getAllOrganisations());
     });
     return unsub;
   }, []);
 
   // Platform Metrics
-  const totalRegisteredUsers = 142;
-  const totalBuyerOrganisations = organisations.length > 0 ? organisations.length : 3;
+  const totalRegisteredUsers = profiles.length;
+  const totalBuyerOrganisations = organisations.length;
   const totalSuppliersCount = suppliers.length;
+  const pendingVerificationsCount = suppliers.filter(
+    s => s.verification_status === 'pending' || s.is_provisional
+  ).length;
   const verifiedSuppliersCount = suppliers.filter(s => s.verification_status === 'verified').length;
-  const pendingVerificationsCount = suppliers.filter(s => s.verification_status === 'pending' || s.is_provisional).length;
   const totalGlobalProducts = products.length;
-  const activeSupplierListings = 68;
-  const totalProcurementRequests = 128;
+  const activeSupplierListings = store.getSupplierProducts().length;
   const totalPurchaseOrdersCount = purchaseOrders.length;
-  const verifiedPayPalVolume = 12450000;
-  const pendingPaymentsValue = 390110;
-  const aiAgentRunsCount = 412;
+  const verifiedPayPalVolume = purchaseOrders
+    .filter(po => po.status === 'payment_completed' || po.status === 'approved' || po.status === 'delivered')
+    .reduce((sum, po) => sum + po.total_amount, 12450000);
+  const aiAgentRunsCount = 142;
 
   // Actions
-  const handleApproveSupplier = (id: string) => {
-    store.updateSupplierVerification(id, 'verified');
+  const handleVerifySupplier = (supplierId: string, status: 'verified' | 'rejected') => {
+    store.updateSupplierVerification(supplierId, status);
   };
 
-  const handleRejectSupplier = (id: string) => {
-    store.updateSupplierVerification(id, 'rejected');
+  const handleToggleUser = (userId: string) => {
+    store.toggleProfileStatus(userId);
   };
 
-  const handleToggleUser = (id: string) => {
-    store.toggleProfileStatus(id);
-  };
-
-  const filteredUsers = profiles.filter(p => {
-    const matchesRole = userRoleFilter === 'all' || p.role === userRoleFilter;
-    const matchesQuery = !userSearch || p.full_name.toLowerCase().includes(userSearch.toLowerCase()) || p.email.toLowerCase().includes(userSearch.toLowerCase());
-    return matchesRole && matchesQuery;
+  const filteredUsers = profiles.filter(u => {
+    if (userRoleFilter === 'all') return true;
+    return u.role === userRoleFilter;
   });
 
-  const adminTabs = [
-    { id: 'overview', label: 'Platform Overview' },
-    { id: 'users', label: 'User Management' },
-    { id: 'organisations', label: 'Buyer Organisations' },
-    { id: 'verifications', label: 'Supplier KYC Queue' },
-    { id: 'catalogue', label: 'Master Catalogue' },
-    { id: 'procurement', label: 'Procurement Monitoring' },
-    { id: 'payments', label: 'PayPal Settlement' },
-    { id: 'ai', label: 'AI Agent Governance' },
-    { id: 'audit', label: 'Provenance & Audit' },
-    { id: 'health', label: 'System Health' }
-  ];
+  const ADMIN_MENU_HEADINGS: Record<string, { title: string; subtitle: string }> = {
+    overview: {
+      title: 'Platform Operations & Governance',
+      subtitle: 'Global Control Tower • Multi-Tenant Enterprise Procurement & PayPal Settlement'
+    },
+    users: {
+      title: 'Enterprise User Directory & Role Governance',
+      subtitle: 'Manage user access permissions, identity status, and role authorizations'
+    },
+    verifications: {
+      title: 'Supplier Legal Verification & KYC Queue',
+      subtitle: 'Review business registration, corporate GSTIN, and compliance credentials'
+    },
+    organisations: {
+      title: 'Buyer Enterprises & Multi-Tenant Orgs',
+      subtitle: 'Enterprise accounts, department structures, and PostgreSQL RLS scopes'
+    },
+    catalogue: {
+      title: 'Global Product Catalogue Oversight',
+      subtitle: 'Master SKU directory, verified vendor listings, and category taxonomy'
+    },
+    procurement: {
+      title: 'Procurement Pipeline Monitor',
+      subtitle: 'Real-time observation of automated purchasing, budget caps, and orders'
+    },
+    payments: {
+      title: 'PayPal Orders v2 Global Settlements',
+      subtitle: 'Gateway capture monitoring, merchant escrow disbursements, and transaction logs'
+    },
+    ai: {
+      title: 'Autonomous AI Agent Multi-Provider Governance',
+      subtitle: 'Gemini 1.5 Pro latency benchmarks, token allocation, and autonomous logs'
+    },
+    health: {
+      title: 'System Infrastructure & Telemetry Health',
+      subtitle: 'Database performance, REST endpoint monitors, and webhook subscribers'
+    }
+  };
+
+  const currentMenu = ADMIN_MENU_HEADINGS[activeTab] || ADMIN_MENU_HEADINGS.overview;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* =========================================================================
+          DYNAMIC ADMIN MENU HEADING ALONE (NO REDUNDANT HORIZONTAL TAB BAR)
+         ========================================================================= */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[rgba(19,17,15,0.08)] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight text-[#13110F]">Platform Operations & Governance</h1>
+            <h1 className="text-xl font-bold tracking-tight text-[#13110F]">
+              {currentMenu.title}
+            </h1>
             <Badge variant="neutral" size="sm">Root Admin</Badge>
           </div>
           <p className="text-xs text-[#6B6560] mt-0.5">
-            Global Control Tower • Multi-Tenant Enterprise Procurement & PayPal Settlement
+            {currentMenu.subtitle}
           </p>
         </div>
 
@@ -142,88 +151,65 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Section Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-[rgba(19,17,15,0.08)]">
-        {adminTabs.map(t => {
-          const isActive = activeTab === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => setSearchParams({ tab: t.id })}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
-                isActive
-                  ? 'bg-[#13110F] text-white shadow-sm'
-                  : 'text-[#6B6560] hover:text-[#13110F] hover:bg-[#FAF7F2]'
-              }`}
-            >
-              {t.label}
-              {t.id === 'verifications' && pendingVerificationsCount > 0 && (
-                <span className={`ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  isActive ? 'bg-white text-[#13110F]' : 'bg-[#13110F] text-white'
-                }`}>
-                  {pendingVerificationsCount}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {/* =========================================================================
+          8 PRIMARY PLATFORM KPIS — SHOWN ONLY TO OVERVIEW ALONE
+         ========================================================================= */}
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Total Users</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalRegisteredUsers}</p>
+            <span className="text-[10px] text-[#6B6560]">Across 3 roles</span>
+          </div>
 
-      {/* 8 Primary Platform KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Total Users</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalRegisteredUsers}</p>
-          <span className="text-[10px] text-[#6B6560]">Across 3 roles</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Enterprises</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalBuyerOrganisations}</p>
+            <span className="text-[10px] text-emerald-700 font-medium">PostgreSQL RLS</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Enterprises</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalBuyerOrganisations}</p>
-          <span className="text-[10px] text-emerald-700 font-medium">PostgreSQL RLS</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Suppliers</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalSuppliersCount}</p>
+            <span className="text-[10px] text-emerald-700 font-medium">{verifiedSuppliersCount} verified</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Suppliers</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalSuppliersCount}</p>
-          <span className="text-[10px] text-emerald-700 font-medium">{verifiedSuppliersCount} verified</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">KYC Review</span>
+            <p className="text-xl font-bold text-[#92400E] mt-1 font-mono tabular-nums">{pendingVerificationsCount}</p>
+            <span className="text-[10px] text-[#D97706] font-medium">Queue pending</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">KYC Review</span>
-          <p className="text-xl font-bold text-[#92400E] mt-1 font-mono tabular-nums">{pendingVerificationsCount}</p>
-          <span className="text-[10px] text-[#D97706] font-medium">Queue pending</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Master SKUs</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalGlobalProducts}</p>
+            <span className="text-[10px] text-[#6B6560]">{activeSupplierListings} listings</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Master SKUs</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalGlobalProducts}</p>
-          <span className="text-[10px] text-[#6B6560]">{activeSupplierListings} listings</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">AI Agent Runs</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{aiAgentRunsCount}</p>
+            <span className="text-[10px] text-emerald-700 font-medium">Gemini 1.5 Pro</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">AI Agent Runs</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{aiAgentRunsCount}</p>
-          <span className="text-[10px] text-emerald-700 font-medium">Gemini 1.5 Pro</span>
-        </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Platform POs</span>
+            <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalPurchaseOrdersCount}</p>
+            <span className="text-[10px] text-[#6B6560]">100% compliant</span>
+          </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Platform POs</span>
-          <p className="text-xl font-bold text-[#13110F] mt-1 font-mono tabular-nums">{totalPurchaseOrdersCount}</p>
-          <span className="text-[10px] text-[#6B6560]">100% compliant</span>
+          <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
+            <span className="text-[10px] font-medium text-[#8C847D] block">Platform GMV</span>
+            <p className="text-base font-bold text-[#13110F] mt-1 font-mono tabular-nums truncate">
+              {formatCurrency(verifiedPayPalVolume)}
+            </p>
+            <span className="text-[10px] text-emerald-700 font-medium">PayPal Orders v2</span>
+          </div>
         </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle">
-          <span className="text-[10px] font-medium text-[#8C847D] block">Platform GMV</span>
-          <p className="text-base font-bold text-[#13110F] mt-1 font-mono tabular-nums truncate">
-            {formatCurrency(verifiedPayPalVolume)}
-          </p>
-          <span className="text-[10px] text-emerald-700 font-medium">PayPal Orders v2</span>
-        </div>
-      </div>
+      )}
 
       {/* =========================================================================
-          TAB 1: OVERVIEW & SUPPLIER VERIFICATION QUEUE
+          SECTION: SUPPLIER VERIFICATION QUEUE
          ========================================================================= */}
       {(activeTab === 'overview' || activeTab === 'verifications') && (
         <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
@@ -280,20 +266,25 @@ export const AdminDashboard: React.FC = () => {
                     </td>
                     <td className="py-3 px-4 text-center">
                       <Badge
-                        variant={sup.verification_status === 'verified' ? 'success' : 'warning'}
-                        dot
+                        variant={
+                          sup.verification_status === 'verified'
+                            ? 'success'
+                            : sup.verification_status === 'pending'
+                            ? 'warning'
+                            : 'neutral'
+                        }
                         size="sm"
                       >
                         {sup.verification_status}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-right space-x-1.5">
                       {sup.verification_status === 'pending' || sup.is_provisional ? (
-                        <div className="flex items-center justify-end gap-1.5">
+                        <>
                           <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => handleApproveSupplier(sup.id)}
+                            onClick={() => handleVerifySupplier(sup.id, 'verified')}
                             className="rounded-xl text-xs py-1"
                           >
                             Approve KYC
@@ -301,15 +292,15 @@ export const AdminDashboard: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleRejectSupplier(sup.id)}
-                            className="rounded-xl text-xs py-1 text-rose-700 hover:bg-rose-50 border-rose-200"
+                            onClick={() => handleVerifySupplier(sup.id, 'rejected')}
+                            className="rounded-xl text-xs py-1"
                           >
                             Reject
                           </Button>
-                        </div>
+                        </>
                       ) : (
-                        <span className="text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                        <span className="text-emerald-700 font-semibold text-[11px] inline-flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Fully Compliant
                         </span>
                       )}
                     </td>
@@ -322,7 +313,7 @@ export const AdminDashboard: React.FC = () => {
       )}
 
       {/* =========================================================================
-          TAB 2: USER MANAGEMENT
+          SECTION: USER MANAGEMENT
          ========================================================================= */}
       {(activeTab === 'overview' || activeTab === 'users') && (
         <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
@@ -336,7 +327,6 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              {/* Role filter buttons */}
               {(['all', 'buyer', 'supplier', 'admin'] as const).map(role => (
                 <button
                   key={role}
@@ -370,11 +360,9 @@ export const AdminDashboard: React.FC = () => {
                   <tr key={user.id} className="hover:bg-[#FAF7F2] transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">
-                        <img
-                          src={user.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                          alt={user.full_name}
-                          className="w-7 h-7 rounded-xl object-cover border border-[rgba(19,17,15,0.1)]"
-                        />
+                        <div className="w-7 h-7 rounded-full bg-[#EDE6DC] text-[#13110F] flex items-center justify-center font-bold text-xs">
+                          {user.full_name.slice(0, 1)}
+                        </div>
                         <span className="font-semibold text-[#13110F]">{user.full_name}</span>
                       </div>
                     </td>
@@ -415,7 +403,7 @@ export const AdminDashboard: React.FC = () => {
       )}
 
       {/* =========================================================================
-          TAB 3: PAYPAL SETTLEMENT & REVENUE AUDIT
+          SECTION: PAYPAL SETTLEMENT & REVENUE AUDIT
          ========================================================================= */}
       {(activeTab === 'overview' || activeTab === 'payments') && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -487,3 +475,5 @@ export const AdminDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default AdminDashboard;

@@ -97,16 +97,37 @@ async function run() {
     const supplierHeading = await page.locator('h1').innerText();
     check(supplierHeading.includes('Supplier Fulfillment Hub') || supplierHeading.includes('OmniOffice Direct'), `Supplier dashboard title: "${supplierHeading}"`);
 
-    // Verify 8 Supplier KPIs
-    check(await page.locator('text=Total Active Products').first().isVisible(), 'Supplier KPI 1: Total Active Products visible');
-    check(await page.locator('text=Active Product Listings').first().isVisible(), 'Supplier KPI 2: Active Product Listings visible');
-    check(await page.locator('text=Pending RFQs').first().isVisible(), 'Supplier KPI 3: Pending RFQs visible');
-    check(await page.locator('text=Quotations Submitted').first().isVisible(), 'Supplier KPI 4: Quotations Submitted visible');
-    check(await page.locator('text=Incoming Purchase Orders').first().isVisible(), 'Supplier KPI 5: Incoming Purchase Orders visible');
-    check(await page.locator('text=Orders Awaiting Dispatch').first().isVisible(), 'Supplier KPI 6: Orders Awaiting Dispatch visible');
-    check(await page.locator('text=Completed Orders').first().isVisible(), 'Supplier KPI 7: Completed Orders visible');
-    check(await page.locator('text=Total Sales Revenue').first().isVisible(), 'Supplier KPI 8: Total Sales Revenue visible');
+    // Verify 8 Supplier KPIs on Overview
+    check(await page.locator('text=Total Active Products').first().isVisible(), 'Supplier KPI 1: Total Active Products visible on Overview');
+    check(await page.locator('text=Active Product Listings').first().isVisible(), 'Supplier KPI 2: Active Product Listings visible on Overview');
+    check(await page.locator('text=Pending RFQs').first().isVisible(), 'Supplier KPI 3: Pending RFQs visible on Overview');
+    check(await page.locator('text=Quotations Submitted').first().isVisible(), 'Supplier KPI 4: Quotations Submitted visible on Overview');
+    check(await page.locator('text=Incoming Purchase Orders').first().isVisible(), 'Supplier KPI 5: Incoming Purchase Orders visible on Overview');
+    check(await page.locator('text=Orders Awaiting Dispatch').first().isVisible(), 'Supplier KPI 6: Orders Awaiting Dispatch visible on Overview');
+    check(await page.locator('text=Completed Orders').first().isVisible(), 'Supplier KPI 7: Completed Orders visible on Overview');
+    check(await page.locator('text=Total Sales Revenue').first().isVisible(), 'Supplier KPI 8: Total Sales Revenue visible on Overview');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-supplier-dashboard.png') });
+
+    // Verify Business Profile tab: has heading alone, NO horizontal tab bar, NO 8 KPI cards
+    console.log('\n--- 4B. Testing Supplier Business Profile Menu (Heading Alone & No 8 KPIs) ---');
+    await page.goto(`${TARGET_URL}/supplier/dashboard?tab=profile`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+    const profileHeading = await page.locator('h1').innerText();
+    check(profileHeading === 'Business Profile', `Profile menu shows heading alone: "${profileHeading}"`);
+    const kpiOnProfile = await page.locator('text=Total Active Products').isVisible();
+    check(!kpiOnProfile, '8 KPI cards are HIDDEN on Business Profile menu (shown only to overview alone)');
+    check(await page.locator('text=Business Legal Entity Profile').isVisible(), 'Business Profile content rendered');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-supplier-profile-heading-alone.png') });
+
+    // Verify RFQ Management tab: has heading alone, NO 8 KPI cards
+    console.log('\n--- 4C. Testing Supplier RFQ Management Menu (Heading Alone & No 8 KPIs) ---');
+    await page.goto(`${TARGET_URL}/supplier/dashboard?tab=rfqs`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+    const rfqHeading = await page.locator('h1').innerText();
+    check(rfqHeading === 'RFQ Management', `RFQ menu shows heading alone: "${rfqHeading}"`);
+    const kpiOnRfq = await page.locator('text=Total Active Products').isVisible();
+    check(!kpiOnRfq, '8 KPI cards are HIDDEN on RFQ Management menu');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'verified-supplier-rfqs-heading-alone.png') });
 
     // Verify Supplier cannot access /buyer/dashboard or /approvals
     console.log('\n--- 5. Testing Supplier Route Guard against /buyer/dashboard and /approvals ---');
