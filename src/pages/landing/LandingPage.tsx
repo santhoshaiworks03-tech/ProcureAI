@@ -20,8 +20,7 @@ import {
   Package,
   DollarSign,
   Activity,
-  FileCheck,
-  Zap
+  FileCheck
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { Button } from '../../components/ui/Button';
@@ -71,14 +70,6 @@ export const LandingPage: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowOpeningScreen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#EDE6DC] hover:bg-[#E2D8CC] text-xs font-semibold text-[#13110F] border border-[rgba(19,17,15,0.08)] transition-all hover:scale-105 active:scale-95 shadow-subtle"
-            title="Watch Brand Reveal Video (2x Speed)"
-          >
-            <Zap className="w-3.5 h-3.5 text-[#BE123C] fill-current" />
-            <span>Brand Reveal (2x)</span>
-          </button>
           <Link to="/login">
             <Button variant="outline" size="sm">
               Sign In

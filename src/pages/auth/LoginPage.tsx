@@ -18,14 +18,12 @@ import {
   Bot,
   CreditCard,
   Layers,
-  Activity,
-  Zap
+  Activity
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { UserRole } from '../../types';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { BrandRevealOpeningScreen } from '../../components/brand/BrandRevealOpeningScreen';
 
 interface RolePortalConfig {
   role: UserRole;
@@ -131,7 +129,6 @@ export const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [showOpeningScreen, setShowOpeningScreen] = useState<boolean>(true);
 
   // Sync email when role changes
   const handleSelectRole = (role: UserRole) => {
@@ -205,16 +202,6 @@ export const LoginPage: React.FC = () => {
       className="min-h-screen relative flex flex-col justify-between font-sans selection:bg-[#F2C8A8] selection:text-[#13110F] bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: `url('/login-bg.jpg')` }}
     >
-      {/* Brand Reveal Opening Screen (2x Speed) */}
-      <AnimatePresence>
-        {showOpeningScreen && (
-          <BrandRevealOpeningScreen
-            pageTitle="Authentication Portal"
-            onComplete={() => setShowOpeningScreen(false)}
-          />
-        )}
-      </AnimatePresence>
-
       {/* Cinematic Ambient Dark Vignette Overlay for Crisp Readability & Contrast */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0B0C0E]/80 via-[#0B0C0E]/70 to-[#0B0C0E]/90 backdrop-blur-[2px] -z-10 pointer-events-none" />
 
@@ -237,14 +224,6 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <button
-            onClick={() => setShowOpeningScreen(true)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[#FAF7F2] text-[11px] backdrop-blur-md transition-all hover:scale-105 active:scale-95"
-            title="Watch Brand Reveal Video (2x Speed)"
-          >
-            <Zap className="w-3 h-3 text-[#F2C8A8] fill-current" />
-            <span>Brand Reveal (2x)</span>
-          </button>
 
           <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#FAF7F2] text-[11px] backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-[#B4C7A6] animate-pulse"></span>

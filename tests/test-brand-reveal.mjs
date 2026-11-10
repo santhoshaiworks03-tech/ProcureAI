@@ -55,72 +55,47 @@ async function run() {
 
   try {
     // 1. Visit Landing Page
-    console.log('\n--- 1. Testing Landing Page Opening Screen (2x Speed Video) ---');
+    console.log('\n--- 1. Testing Landing Page Full-Screen Loading Screen (~2.5s) ---');
     await page.goto(`${TARGET_URL}/`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(400);
 
-    // Verify Opening Screen is visible
-    const openingScreen = page.locator('text=2.0x SPEED').first();
-    check(await openingScreen.isVisible(), 'Brand Reveal Opening Screen is visible on Landing Page');
-
-    // Verify video element and 2x playback rate
+    // Verify fullscreen video loading screen is visible
     const video = page.locator('video[src="/procureai-intro.mp4"]').first();
-    check(await video.isVisible(), 'ProcureAI intro video element is rendered');
+    check(await video.isVisible(), 'ProcureAI intro video is playing as full-screen loading screen');
 
-    const playbackRate = await page.evaluate(() => {
-      const v = document.querySelector('video[src="/procureai-intro.mp4"]');
-      return v ? v.playbackRate : 0;
-    });
-    check(playbackRate === 2.0, `Video playbackRate is strictly 2.0x (actual: ${playbackRate})`);
+    // Verify NO details or player controls around the video
+    const skipBtn = await page.locator('button:has-text("Skip Intro")').count();
+    check(skipBtn === 0, 'No "Skip Intro" button or details around the video');
 
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'landing-opening-screen-2x.png') });
+    const watermark = await page.locator('text=2.0x SPEED').count();
+    check(watermark === 0, 'No "2.0x SPEED" watermark details around the video');
 
-    // Click "Skip Intro" to transition to landing page
-    console.log('Skipping intro to reveal Landing Page...');
-    await page.locator('button:has-text("Skip Intro")').first().click();
-    await page.waitForTimeout(800);
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'landing-fullscreen-loading-screen.png') });
+
+    // Wait ~2.8s for video loading screen to complete and transition
+    console.log('Waiting ~2.8s for loading screen to complete auto-transition...');
+    await page.waitForTimeout(2800);
 
     const landingHeading = await page.locator('h1').innerText();
-    check(landingHeading.includes('Procurement, Powered by') || landingHeading.includes('Intelligence'), `Landing page revealed after intro: "${landingHeading}"`);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'landing-page-revealed.png') });
+    check(landingHeading.includes('Procurement, Powered by') || landingHeading.includes('Intelligence'), `Landing page smoothly revealed: "${landingHeading}"`);
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'landing-page-after-loading.png') });
 
-    // 2. Visit Login Page
-    console.log('\n--- 2. Testing Login Page Opening Screen (2x Speed Video) ---');
+    // 2. Visit Login Page - NO loading screen before login page
+    console.log('\n--- 2. Testing Login Page: Direct Entry With ZERO Video Loading ---');
     await page.goto(`${TARGET_URL}/login`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(500);
 
-    const loginOpeningScreen = page.locator('text=2.0x SPEED').first();
-    check(await loginOpeningScreen.isVisible(), 'Brand Reveal Opening Screen is visible on Login Page');
+    // Verify NO video on login page
+    const loginVideoCount = await page.locator('video[src="/procureai-intro.mp4"]').count();
+    check(loginVideoCount === 0, 'ZERO video loading screen before login page (video removed as requested)');
 
-    const loginVideo = page.locator('video[src="/procureai-intro.mp4"]').first();
-    check(await loginVideo.isVisible(), 'ProcureAI intro video element is rendered on Login Page');
-
-    const loginPlaybackRate = await page.evaluate(() => {
-      const v = document.querySelector('video[src="/procureai-intro.mp4"]');
-      return v ? v.playbackRate : 0;
-    });
-    check(loginPlaybackRate === 2.0, `Login video playbackRate is strictly 2.0x (actual: ${loginPlaybackRate})`);
-
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'login-opening-screen-2x.png') });
-
-    // Click "Enter Site" in bottom bar
-    console.log('Entering site to reveal Login Page...');
-    await page.locator('button:has-text("Enter Site")').first().click();
-    await page.waitForTimeout(800);
-
+    // Verify login portal is directly visible immediately
     const loginHeading = await page.locator('h1').innerText();
-    check(loginHeading.includes('Sign In to Your ProcureAI Portal'), `Login portal revealed after intro: "${loginHeading}"`);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'login-page-revealed.png') });
+    check(loginHeading.includes('Sign In to Your ProcureAI Portal'), `Login portal directly loaded: "${loginHeading}"`);
 
-    // 3. Test "Brand Reveal (2x)" re-trigger button on Login Page
-    console.log('\n--- 3. Testing Re-triggering Brand Reveal (2x) ---');
-    const replayBtn = page.locator('button:has-text("Brand Reveal (2x)")').first();
-    check(await replayBtn.isVisible(), 'Re-trigger Brand Reveal (2x) button is visible on Login Page');
-    await replayBtn.click();
-    await page.waitForTimeout(600);
-
-    check(await page.locator('text=2.0x SPEED').first().isVisible(), 'Opening Screen successfully re-opened upon clicking Brand Reveal');
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'login-opening-screen-retriggered.png') });
+    const emailInput = page.locator('input[type="email"]');
+    check(await emailInput.isVisible(), 'Login email input directly visible');
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'login-page-direct-entry.png') });
 
     console.log(`\n======================================================`);
     console.log(`  Tests Completed: ${passed} PASSED, ${failed} FAILED`);
