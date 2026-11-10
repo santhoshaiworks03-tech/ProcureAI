@@ -36,17 +36,16 @@ export const LandingPage: React.FC = () => {
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 bg-[#F4EEE6]/85 backdrop-blur-xl border-b border-[rgba(19,17,15,0.08)] px-6 sm:px-12 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-sm shadow-sm">
-            P
+          <div className="bg-[#13110F] px-3 py-1.5 rounded-2xl flex items-center shadow-md border border-black/20">
+            <img
+              src="/procureai-logo.png"
+              alt="ProcureAI"
+              className="h-6 sm:h-7 w-auto object-contain"
+            />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-base tracking-tight text-[#13110F]">ProcureAI</span>
-              <Badge variant="neutral" size="sm" className="font-mono text-[10px]">
-                v2.0
-              </Badge>
-            </div>
-          </div>
+          <Badge variant="neutral" size="sm" className="font-mono text-[10px]">
+            v2.0
+          </Badge>
         </div>
 
         {/* Desktop Nav Links */}
@@ -310,8 +309,12 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-[rgba(19,17,15,0.08)] bg-white px-6 sm:px-12 py-10 text-xs text-[#6B6560]">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-xs">
-              P
+            <div className="bg-[#13110F] px-3 py-1.5 rounded-2xl flex items-center shadow-sm">
+              <img
+                src="/procureai-logo.png"
+                alt="ProcureAI 2.0"
+                className="h-6 w-auto object-contain"
+              />
             </div>
             <div>
               <span className="font-bold text-[#13110F] block">ProcureAI 2.0</span>

@@ -30,6 +30,7 @@ import {
   SEED_PROVENANCE_EVENTS,
   SEED_NOTIFICATIONS
 } from './seedData';
+import { supabase } from './supabaseClient';
 
 const INITIAL_RFQS: SupplierRFQ[] = [
   {
@@ -172,6 +173,35 @@ class ReactiveDataStore {
     this.checkoutSessions = this.load('procureai_checkout_sessions', []);
     this.payments = this.load('procureai_payments', []);
     this.approvalRequests = this.load('procureai_approval_requests', this.generateInitialApprovals());
+    this.hydrateFromSupabase().catch(() => {});
+  }
+
+  private async hydrateFromSupabase() {
+    if (!supabase) return;
+    try {
+      const [prodsRes, supsRes, posRes, provRes] = await Promise.allSettled([
+        supabase.from('products').select('*'),
+        supabase.from('suppliers').select('*'),
+        supabase.from('purchase_orders').select('*, items:purchase_order_items(*)'),
+        supabase.from('provenance_events').select('*').order('event_number', { ascending: false })
+      ]);
+
+      if (prodsRes.status === 'fulfilled' && prodsRes.value.data && prodsRes.value.data.length > 0) {
+        this.products = prodsRes.value.data as Product[];
+      }
+      if (supsRes.status === 'fulfilled' && supsRes.value.data && supsRes.value.data.length > 0) {
+        this.suppliers = supsRes.value.data as Supplier[];
+      }
+      if (posRes.status === 'fulfilled' && posRes.value.data && posRes.value.data.length > 0) {
+        this.purchaseOrders = posRes.value.data as PurchaseOrder[];
+      }
+      if (provRes.status === 'fulfilled' && provRes.value.data && provRes.value.data.length > 0) {
+        this.provenanceEvents = provRes.value.data as ProvenanceEvent[];
+      }
+      this.notify();
+    } catch (e) {
+      console.warn('Hydration from Supabase encountered error, retaining cached store:', e);
+    }
   }
 
   private load<T>(key: string, fallback: T): T {
@@ -241,10 +271,75 @@ class ReactiveDataStore {
     return '/buyer/dashboard';
   }
 
+  public async loginWithCredentials(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; role: UserRole; error?: string }> {
+    if (!email || !email.trim()) {
+      return { success: false, role: 'buyer', error: 'Please enter a valid business email address.' };
+    }
+    if (!password || password.trim().length < 6) {
+      return { success: false, role: 'buyer', error: 'Password must be at least 6 characters.' };
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Supabase Auth handshake if connected
+    if (supabase) {
+      try {
+        const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: password.trim()
+        });
+
+        if (!authErr && authData?.user) {
+          const { data: dbProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+
+          if (dbProfile) {
+            this.currentProfileId = dbProfile.id;
+            this.currentRole = dbProfile.role as UserRole;
+            this.isAuthenticatedUser = true;
+            localStorage.setItem('procureai_authenticated', 'true');
+            localStorage.setItem('procureai_active_role', this.currentRole);
+            localStorage.setItem('procureai_active_profile', this.currentProfileId);
+            this.notify();
+            return { success: true, role: this.currentRole };
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase auth check returned, consulting verified directory:', err);
+      }
+    }
+
+    // 2. Verified profile directory lookup (strictly derives role from backend profile record)
+    const match = this.profiles.find(p => p.email.toLowerCase() === cleanEmail);
+    if (!match) {
+      return {
+        success: false,
+        role: 'buyer',
+        error: 'No registered portal account found matching this email address.'
+      };
+    }
+
+    this.currentProfileId = match.id;
+    this.currentRole = match.role;
+    this.isAuthenticatedUser = true;
+    localStorage.setItem('procureai_authenticated', 'true');
+    localStorage.setItem('procureai_active_role', match.role);
+    localStorage.setItem('procureai_active_profile', match.id);
+    this.notify();
+
+    return { success: true, role: match.role };
+  }
+
   public login(role?: UserRole, email?: string): UserRole {
     this.isAuthenticatedUser = true;
     localStorage.setItem('procureai_authenticated', 'true');
-    let effectiveRole: UserRole = role || 'buyer';
+    let effectiveRole: UserRole = 'buyer';
 
     if (email) {
       const match = this.profiles.find(p => p.email.toLowerCase() === email.toLowerCase());
@@ -252,7 +347,11 @@ class ReactiveDataStore {
         this.currentProfileId = match.id;
         effectiveRole = match.role;
         localStorage.setItem('procureai_active_profile', match.id);
+      } else {
+        effectiveRole = role || 'buyer';
       }
+    } else if (role) {
+      effectiveRole = role;
     }
 
     this.currentRole = effectiveRole;
@@ -298,14 +397,13 @@ class ReactiveDataStore {
   }
 
   public setRole(role: UserRole) {
+    const currentProf = this.profiles.find(p => p.id === this.currentProfileId);
+    if (currentProf && currentProf.role !== 'admin' && currentProf.role !== role) {
+      console.warn(`[Role Security] Unauthorized role escalation blocked: cannot switch from ${currentProf.role} to ${role}`);
+      return;
+    }
     this.currentRole = role;
-    this.isAuthenticatedUser = true;
-    localStorage.setItem('procureai_authenticated', 'true');
     localStorage.setItem('procureai_active_role', role);
-    if (role === 'buyer') this.currentProfileId = 'usr-buyer-01';
-    else if (role === 'supplier') this.currentProfileId = 'usr-supplier-01';
-    else if (role === 'admin') this.currentProfileId = 'usr-admin-01';
-    localStorage.setItem('procureai_active_profile', this.currentProfileId);
     this.notify();
   }
 
@@ -313,14 +411,27 @@ class ReactiveDataStore {
     return this.organisations[0];
   }
 
-  // --- Supplier RFQ & Quotation Management ---
+  // --- Supplier RFQ & Quotation Management (Strict Role & Tenant Isolation) ---
   public getSupplierRfqs(supplierId?: string): SupplierRFQ[] {
-    return [...this.rfqs];
+    const targetSupplier = supplierId || (this.currentRole === 'supplier' ? 'sup-01' : undefined);
+    if (targetSupplier) {
+      return this.rfqs.filter(r => !r.target_supplier_id || r.target_supplier_id === targetSupplier);
+    }
+    // Only platform admin or purchasing buyer can view all RFQs
+    if (this.currentRole === 'admin' || this.currentRole === 'buyer') {
+      return [...this.rfqs];
+    }
+    return this.rfqs.filter(r => !r.target_supplier_id || r.target_supplier_id === 'sup-01');
   }
 
   public getSupplierQuotations(supplierId?: string): SupplierQuotation[] {
-    if (supplierId) {
-      return this.quotations.filter(q => q.supplier_id === supplierId);
+    const targetSupplier = supplierId || (this.currentRole === 'supplier' ? 'sup-01' : undefined);
+    if (targetSupplier) {
+      return this.quotations.filter(q => q.supplier_id === targetSupplier);
+    }
+    // Suppliers can NEVER inspect competitor quotations
+    if (this.currentRole === 'supplier') {
+      return this.quotations.filter(q => q.supplier_id === 'sup-01');
     }
     return [...this.quotations];
   }

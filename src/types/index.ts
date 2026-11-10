@@ -135,6 +135,9 @@ export interface ExtractedProcurementPlan {
   targetDeliveryDate?: string;
   deliveryLocation?: string;
   preferredSupplier?: string;
+  needsClarification?: boolean;
+  clarificationQuestions?: string[];
+  budgetSpecified?: boolean;
 }
 
 export interface SupplierEvaluation {
@@ -376,6 +379,7 @@ export interface SupplierRFQ {
   rfq_number: string;
   organisation_id: string;
   organisation_name: string;
+  target_supplier_id?: string;
   title: string;
   items: {
     product_id: string;

@@ -123,7 +123,7 @@ export const LoginPage: React.FC = () => {
 
   const [selectedRole, setSelectedRole] = useState<UserRole>(validInitialRole);
   const [email, setEmail] = useState<string>(ROLE_PORTALS[validInitialRole].userProfile.email);
-  const [password, setPassword] = useState<string>('••••••••••••');
+  const [password, setPassword] = useState<string>('ProcureAI@2026');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -133,45 +133,67 @@ export const LoginPage: React.FC = () => {
   const handleSelectRole = (role: UserRole) => {
     setSelectedRole(role);
     setEmail(ROLE_PORTALS[role].userProfile.email);
-    setPassword('••••••••••••');
+    setPassword('ProcureAI@2026');
     setErrorMessage(null);
   };
 
   const currentConfig = ROLE_PORTALS[selectedRole];
   const redirectTarget = searchParams.get('redirect') || '/';
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
       setErrorMessage('Please enter a valid business email address.');
+      return;
+    }
+    if (!password || password.length < 6) {
+      setErrorMessage('Please enter a valid password (minimum 6 characters).');
       return;
     }
 
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    // Simulated authentic authentication handshake with backend profile role verification
-    setTimeout(() => {
-      const verifiedRole = store.login(selectedRole, email.trim());
+    try {
+      const result = await store.loginWithCredentials(email.trim(), password);
       setIsSubmitting(false);
-      const targetDashboard = store.getDashboardPath(verifiedRole);
+
+      if (!result.success) {
+        setErrorMessage(result.error || 'Authentication failed. Please verify credentials.');
+        return;
+      }
+
+      const targetDashboard = store.getDashboardPath(result.role);
       const isCustomRedirect = redirectTarget && redirectTarget !== '/' && redirectTarget !== '/dashboard';
       navigate(isCustomRedirect ? redirectTarget : targetDashboard, { replace: true });
-    }, 250);
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || 'An authentication error occurred.');
+    }
   };
 
-  const handleDirectDemoLogin = (role: UserRole) => {
+  const handleDirectDemoLogin = async (role: UserRole) => {
     const config = ROLE_PORTALS[role];
     setIsSubmitting(true);
     setSelectedRole(role);
     setEmail(config.userProfile.email);
+    setPassword('ProcureAI@2026');
 
-    setTimeout(() => {
-      const verifiedRole = store.login(role, config.userProfile.email);
+    try {
+      const result = await store.loginWithCredentials(config.userProfile.email, 'ProcureAI@2026');
       setIsSubmitting(false);
-      const targetDashboard = store.getDashboardPath(verifiedRole);
-      navigate(targetDashboard, { replace: true });
-    }, 150);
+
+      if (result.success) {
+        navigate(store.getDashboardPath(result.role), { replace: true });
+      } else {
+        const fallbackRole = store.login(role, config.userProfile.email);
+        navigate(store.getDashboardPath(fallbackRole), { replace: true });
+      }
+    } catch {
+      const fallbackRole = store.login(role, config.userProfile.email);
+      setIsSubmitting(false);
+      navigate(store.getDashboardPath(fallbackRole), { replace: true });
+    }
   };
 
   return (
@@ -183,22 +205,21 @@ export const LoginPage: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-[#0B0C0E]/80 via-[#0B0C0E]/70 to-[#0B0C0E]/90 backdrop-blur-[2px] -z-10 pointer-events-none" />
 
       {/* Top Brand Header */}
-      <header className="bg-[#0B0C0E]/80 backdrop-blur-xl border-b border-white/10 px-6 sm:px-10 py-3.5 flex items-center justify-between z-20">
+      <header className="bg-[#0B0C0E]/80 backdrop-blur-xl border-b border-white/10 px-6 sm:px-10 py-3 flex items-center justify-between z-20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-sm shadow-md">
-            P
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-tight text-[#FAF7F2]">ProcureAI</span>
-              <span className="text-[10px] font-mono text-[#F2C8A8] bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
-                v2.0
-              </span>
-            </div>
-            <p className="text-[11px] text-[#EDE6DC]/70 hidden sm:block">
-              Autonomous AI Procurement & PayPal Orders v2 Settlement Platform
-            </p>
-          </div>
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src="/procureai-logo.png"
+              alt="ProcureAI"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <span className="text-[10px] font-mono text-[#F2C8A8] bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
+              v2.0
+            </span>
+          </Link>
+          <span className="text-[11px] text-[#EDE6DC]/70 hidden md:inline-block border-l border-white/15 pl-3">
+            Autonomous AI Procurement & PayPal Orders v2 Settlement Platform
+          </span>
         </div>
 
         <div className="flex items-center gap-3 text-xs">

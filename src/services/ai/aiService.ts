@@ -33,18 +33,27 @@ export class AIProcurementService {
     const text = promptText.toLowerCase();
     const allProducts = store.getProducts();
 
-    // Default budget detection: e.g. "budget is ₹5,00,000" or "500000" or "5 lakhs"
-    let maxBudget = 500000;
-    const budgetMatch = promptText.match(/(?:budget|max|limit)(?:\s*(?:is|of|:)?\s*(?:₹|rs\.?|inr)?\s*)([\d,]+(?:\.\d+)?|\d+\s*(?:lakh|lac|cr))/i);
+    // Rule 12 & Zero-Hallucination Policy: Detect if budget is specified
+    let maxBudget = 0;
+    let budgetSpecified = false;
+    const clarificationQuestions: string[] = [];
+
+    const budgetMatch = promptText.match(/(?:budget|max|ceiling|limit)(?:\s*(?:is|of|:)?\s*(?:₹|rs\.?|inr)?\s*)([\d,]+(?:\.\d+)?|\d+\s*(?:lakh|lac|cr))/i);
     if (budgetMatch) {
       const bStr = budgetMatch[1].replace(/,/g, '').trim().toLowerCase();
       if (bStr.includes('lakh') || bStr.includes('lac')) {
         const val = parseFloat(bStr);
         maxBudget = val * 100000;
+        budgetSpecified = true;
       } else {
         const parsed = parseFloat(bStr);
-        if (!isNaN(parsed) && parsed > 0) maxBudget = parsed;
+        if (!isNaN(parsed) && parsed > 0) {
+          maxBudget = parsed;
+          budgetSpecified = true;
+        }
       }
+    } else {
+      clarificationQuestions.push("Target budget ceiling was not specified in your request. Please specify your procurement budget ceiling.");
     }
 
     const items: ProcurementRequirementItem[] = [];
@@ -65,128 +74,139 @@ export class AIProcurementService {
     };
 
     // 1. Check for chairs
-    const chairQty = extractQuantity(['chair', 'chairs', 'ergonomic seating', 'mesh chair']);
-    if (chairQty > 0 || text.includes('chair')) {
-      const matchedProd = allProducts.find(p => p.category_id === 'cat-01' && p.sku === 'FUR-CHR-AERO-01') || allProducts[0];
-      items.push({
-        id: `item-chair-${Date.now()}`,
-        itemName: 'Ergonomic Office Mesh Chair',
-        quantity: chairQty > 0 ? chairQty : 50,
-        specifications: { Mechanism: 'Synchronized tilt', Lumbar: 'Adjustable', Certification: 'BIFMA Level 3' },
-        matchedProductId: matchedProd.id,
-        matchedProductName: matchedProd.name,
-        sku: matchedProd.sku,
-        gtin: matchedProd.gtin
-      });
+    if (text.includes('chair') || text.includes('seating')) {
+      const chairQty = extractQuantity(['chair', 'chairs', 'ergonomic seating', 'mesh chair']);
+      const matchedProd = allProducts.find(p => p.category_id === 'cat-01' && p.sku === 'FUR-CHR-AERO-01') || allProducts.find(p => p.category_id === 'cat-01');
+      if (matchedProd) {
+        if (chairQty === 0) {
+          clarificationQuestions.push(`How many units of "${matchedProd.name}" do you require?`);
+        }
+        items.push({
+          id: `item-chair-${Date.now()}`,
+          itemName: matchedProd.name,
+          quantity: chairQty, // 0 if not specified (no invented quantity!)
+          specifications: { Mechanism: 'Synchronized tilt', Lumbar: 'Adjustable', Certification: 'BIFMA Level 3' },
+          matchedProductId: matchedProd.id,
+          matchedProductName: matchedProd.name,
+          sku: matchedProd.sku,
+          gtin: matchedProd.gtin
+        });
+      }
     }
 
     // 2. Check for desks
-    const deskQty = extractQuantity(['desk', 'desks', 'workstation', 'standing desk', 'table']);
-    if (deskQty > 0 || text.includes('desk') || text.includes('table')) {
-      const matchedProd = allProducts.find(p => p.category_id === 'cat-02' && p.sku === 'FUR-DSK-DUAL-01') || allProducts[4];
-      items.push({
-        id: `item-desk-${Date.now()}`,
-        itemName: 'Electric Height-Adjustable Standing Desk',
-        quantity: deskQty > 0 ? deskQty : 30,
-        specifications: { Range: '650-1280mm', Load: '125kg dual motor', Surface: 'Oak engineered' },
-        matchedProductId: matchedProd.id,
-        matchedProductName: matchedProd.name,
-        sku: matchedProd.sku,
-        gtin: matchedProd.gtin
-      });
+    if (text.includes('desk') || text.includes('table') || text.includes('workstation')) {
+      const deskQty = extractQuantity(['desk', 'desks', 'workstation', 'standing desk', 'table']);
+      const matchedProd = allProducts.find(p => p.category_id === 'cat-02' && p.sku === 'FUR-DSK-DUAL-01') || allProducts.find(p => p.category_id === 'cat-02');
+      if (matchedProd) {
+        if (deskQty === 0) {
+          clarificationQuestions.push(`How many units of "${matchedProd.name}" do you require?`);
+        }
+        items.push({
+          id: `item-desk-${Date.now()}`,
+          itemName: matchedProd.name,
+          quantity: deskQty, // 0 if not specified
+          specifications: { Range: '650-1280mm', Load: '125kg dual motor', Surface: 'Oak engineered' },
+          matchedProductId: matchedProd.id,
+          matchedProductName: matchedProd.name,
+          sku: matchedProd.sku,
+          gtin: matchedProd.gtin
+        });
+      }
     }
 
     // 3. Check for cabinets / storage
-    const cabQty = extractQuantity(['cabinet', 'cabinets', 'pedestal', 'storage', 'filing']);
-    if (cabQty > 0 || text.includes('cabinet') || text.includes('filing') || text.includes('storage')) {
-      const matchedProd = allProducts.find(p => p.category_id === 'cat-03' && p.sku === 'FUR-CAB-PED3-01') || allProducts[8];
-      items.push({
-        id: `item-cab-${Date.now()}`,
-        itemName: 'Under-Desk 3-Drawer Steel Mobile Pedestal',
-        quantity: cabQty > 0 ? cabQty : 20,
-        specifications: { Steel: '0.8mm CRCA', Locking: 'Central core key lock', AntiTilt: '5th caster' },
-        matchedProductId: matchedProd.id,
-        matchedProductName: matchedProd.name,
-        sku: matchedProd.sku,
-        gtin: matchedProd.gtin
-      });
+    if (text.includes('cabinet') || text.includes('filing') || text.includes('storage') || text.includes('pedestal')) {
+      const cabQty = extractQuantity(['cabinet', 'cabinets', 'pedestal', 'storage', 'filing']);
+      const matchedProd = allProducts.find(p => p.category_id === 'cat-03' && p.sku === 'FUR-CAB-PED3-01') || allProducts.find(p => p.category_id === 'cat-03');
+      if (matchedProd) {
+        if (cabQty === 0) {
+          clarificationQuestions.push(`How many units of "${matchedProd.name}" do you require?`);
+        }
+        items.push({
+          id: `item-cab-${Date.now()}`,
+          itemName: matchedProd.name,
+          quantity: cabQty, // 0 if not specified
+          specifications: { Steel: '0.8mm CRCA', Locking: 'Central core key lock', AntiTilt: '5th caster' },
+          matchedProductId: matchedProd.id,
+          matchedProductName: matchedProd.name,
+          sku: matchedProd.sku,
+          gtin: matchedProd.gtin
+        });
+      }
     }
 
     // 4. Check for monitors / displays
-    const monQty = extractQuantity(['monitor', 'monitors', 'display', 'screen']);
-    if (monQty > 0 || text.includes('monitor') || text.includes('screen')) {
-      const matchedProd = allProducts.find(p => p.category_id === 'cat-04') || allProducts[12];
-      items.push({
-        id: `item-mon-${Date.now()}`,
-        itemName: 'UltraSharp 27-inch 4K USB-C Hub Monitor',
-        quantity: monQty > 0 ? monQty : 10,
-        specifications: { Resolution: '4K UHD', PowerDelivery: '90W USB-C' },
-        matchedProductId: matchedProd.id,
-        matchedProductName: matchedProd.name,
-        sku: matchedProd.sku,
-        gtin: matchedProd.gtin
-      });
+    if (text.includes('monitor') || text.includes('display') || text.includes('screen')) {
+      const monQty = extractQuantity(['monitor', 'monitors', 'display', 'screen']);
+      const matchedProd = allProducts.find(p => p.category_id === 'cat-04');
+      if (matchedProd) {
+        if (monQty === 0) {
+          clarificationQuestions.push(`How many units of "${matchedProd.name}" do you require?`);
+        }
+        items.push({
+          id: `item-mon-${Date.now()}`,
+          itemName: matchedProd.name,
+          quantity: monQty, // 0 if not specified
+          specifications: { Resolution: '4K UHD', PowerDelivery: '90W USB-C' },
+          matchedProductId: matchedProd.id,
+          matchedProductName: matchedProd.name,
+          sku: matchedProd.sku,
+          gtin: matchedProd.gtin
+        });
+      }
     }
 
     // 5. Check for laptops / computers
-    const lapQty = extractQuantity(['laptop', 'laptops', 'notebook', 'pc', 'computer']);
-    if (lapQty > 0 || text.includes('laptop') || text.includes('pc')) {
-      const matchedProd = allProducts.find(p => p.category_id === 'cat-05') || allProducts[16];
-      items.push({
-        id: `item-lap-${Date.now()}`,
-        itemName: 'EliteBook 14-inch G10 Business Laptop',
-        quantity: lapQty > 0 ? lapQty : 5,
-        specifications: { CPU: 'Intel Core i7 vPro', RAM: '32GB DDR5', SSD: '1TB NVMe' },
-        matchedProductId: matchedProd.id,
-        matchedProductName: matchedProd.name,
-        sku: matchedProd.sku,
-        gtin: matchedProd.gtin
-      });
+    if (text.includes('laptop') || text.includes('notebook') || text.includes('computer')) {
+      const lapQty = extractQuantity(['laptop', 'laptops', 'notebook', 'pc', 'computer']);
+      const matchedProd = allProducts.find(p => p.category_id === 'cat-05');
+      if (matchedProd) {
+        if (lapQty === 0) {
+          clarificationQuestions.push(`How many units of "${matchedProd.name}" do you require?`);
+        }
+        items.push({
+          id: `item-lap-${Date.now()}`,
+          itemName: matchedProd.name,
+          quantity: lapQty, // 0 if not specified
+          specifications: { CPU: 'Intel Core i7 vPro', RAM: '32GB DDR5', SSD: '1TB NVMe' },
+          matchedProductId: matchedProd.id,
+          matchedProductName: matchedProd.name,
+          sku: matchedProd.sku,
+          gtin: matchedProd.gtin
+        });
+      }
     }
 
-    // If nothing matched, provide default standard office setup items
+    // If nothing matched, DO NOT invent fake products! Request clarification!
     if (items.length === 0) {
-      const prod1 = allProducts[0];
-      const prod2 = allProducts[4];
-      const prod3 = allProducts[8];
-      items.push(
-        {
-          id: `item-def-1`,
-          itemName: prod1.name,
-          quantity: 50,
-          matchedProductId: prod1.id,
-          matchedProductName: prod1.name,
-          sku: prod1.sku,
-          gtin: prod1.gtin
-        },
-        {
-          id: `item-def-2`,
-          itemName: prod2.name,
-          quantity: 30,
-          matchedProductId: prod2.id,
-          matchedProductName: prod2.name,
-          sku: prod2.sku,
-          gtin: prod2.gtin
-        },
-        {
-          id: `item-def-3`,
-          itemName: prod3.name,
-          quantity: 20,
-          matchedProductId: prod3.id,
-          matchedProductName: prod3.name,
-          sku: prod3.sku,
-          gtin: prod3.gtin
-        }
-      );
+      clarificationQuestions.push("No catalogue items could be identified from your prompt. Please specify the required items (e.g., Office Chairs, Standing Desks, 4K Monitors) and quantity.");
+    }
+
+    const needsClarification = clarificationQuestions.length > 0;
+
+    // If budget was not specified, compute realistic estimated benchmark from matched items if quantities exist
+    if (!budgetSpecified && items.length > 0) {
+      const estimatedBenchmark = items.reduce((sum, item) => {
+        const prod = allProducts.find(p => p.id === item.matchedProductId);
+        const qty = item.quantity > 0 ? item.quantity : 1;
+        return sum + (prod ? prod.benchmark_market_price * qty : 0);
+      }, 0);
+      maxBudget = estimatedBenchmark > 0 ? Math.round(estimatedBenchmark * 1.1) : 0;
     }
 
     return {
-      title: `Procurement Request — ${items.map(i => `${i.quantity}x ${i.itemName.split(' ')[0]}`).join(', ')}`,
+      title: items.length > 0 
+        ? `Procurement Request — ${items.map(i => `${i.quantity > 0 ? i.quantity : '?'}x ${i.itemName.split(' ')[0]}`).join(', ')}`
+        : 'Procurement Request — Clarification Required',
       items,
       maxBudget,
       currency: 'INR',
       targetDeliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      deliveryLocation: 'Apex Tech Solutions HQ, Outer Ring Road, Bengaluru'
+      deliveryLocation: 'Apex Tech Solutions HQ, Outer Ring Road, Bengaluru',
+      needsClarification,
+      clarificationQuestions,
+      budgetSpecified
     };
   }
 

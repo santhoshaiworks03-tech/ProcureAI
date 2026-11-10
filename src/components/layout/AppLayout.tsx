@@ -62,11 +62,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const handleRoleChange = (newRole: UserRole) => {
-    store.setRole(newRole);
-    setActiveRole(newRole);
-    navigate(store.getDashboardPath(newRole));
-  };
 
   let navItems: { label: string; path: string; icon: any; badge?: number }[] = [];
 
@@ -156,30 +151,34 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         className="hidden md:flex fixed top-0 bottom-0 left-0 z-40 bg-[#13110F] text-[#EDE6DC] flex-col border-r border-[rgba(244,238,230,0.08)] select-none shadow-xl overflow-hidden"
       >
         {/* Brand Header */}
-        <div className="h-14 flex items-center justify-between px-4 border-b border-[rgba(244,238,230,0.08)] flex-shrink-0">
-          <Link to={store.getDashboardPath(activeRole)} className="flex items-center gap-2.5 overflow-hidden group">
-            <motion.div
-              whileHover={{ rotate: 10, scale: 1.08 }}
-              className="w-7 h-7 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm"
-            >
-              P
-            </motion.div>
-            <AnimatePresence initial={false}>
-              {!collapsed && (
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex items-baseline gap-1.5 whitespace-nowrap"
-                >
-                  <span className="text-sm font-bold text-[#FAF7F2] tracking-tight group-hover:text-[#F2C8A8] transition-colors">
-                    ProcureAI
-                  </span>
-                  <span className="text-[10px] text-[#F2C8A8] font-mono font-semibold">2.0</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+        <div className="h-14 flex items-center justify-between px-3.5 border-b border-[rgba(244,238,230,0.08)] flex-shrink-0">
+          <Link to={store.getDashboardPath(activeRole)} className="flex items-center gap-2 overflow-hidden group">
+            {collapsed ? (
+              <motion.div
+                whileHover={{ rotate: 6, scale: 1.08 }}
+                className="w-8 h-8 rounded-xl bg-white/[0.05] p-1 border border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm"
+              >
+                <img
+                  src="/procureai-icon.png"
+                  alt="ProcureAI"
+                  className="w-6 h-6 object-contain"
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="flex items-center gap-1.5"
+              >
+                <img
+                  src="/procureai-logo.png"
+                  alt="ProcureAI"
+                  className="h-7 w-auto object-contain"
+                />
+                <span className="text-[10px] text-[#F2C8A8] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-white/10 border border-white/15">
+                  2.0
+                </span>
+              </motion.div>
+            )}
           </Link>
 
           <button
@@ -419,10 +418,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             >
               <div className="h-14 flex items-center justify-between px-4 border-b border-[rgba(244,238,230,0.08)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-xl bg-[#F2C8A8] text-[#13110F] flex items-center justify-center font-bold text-xs">
-                    P
-                  </div>
-                  <span className="text-sm font-bold text-[#FAF7F2] tracking-tight">ProcureAI 2.0</span>
+                  <img
+                    src="/procureai-logo.png"
+                    alt="ProcureAI"
+                    className="h-7 w-auto object-contain"
+                  />
+                  <span className="text-[10px] text-[#F2C8A8] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-white/10 border border-white/15">
+                    2.0
+                  </span>
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
@@ -531,36 +534,29 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Authenticated Portal Badge & Role Switcher with Fluid Spring Flow Motion */}
-            <div className="flex items-center bg-[#EDE6DC] p-0.5 rounded-xl border border-[rgba(19,17,15,0.08)] relative shadow-subtle">
-              <span className="text-[11px] font-medium text-[#6B6560] px-2 hidden sm:flex items-center gap-1 select-none">
-                <UserCheck className="w-3 h-3 text-[#8C847D]" /> Portal:
+            {/* Authenticated Portal & Verified Session Badge */}
+            <div className="flex items-center gap-2 bg-[#EDE6DC] px-2.5 py-1 rounded-xl border border-[rgba(19,17,15,0.08)] shadow-subtle">
+              <span className="w-2 h-2 rounded-full bg-[#B4C7A6] animate-pulse"></span>
+              <span className="text-[11px] font-semibold text-[#13110F] hidden sm:inline">
+                {activeRole === 'admin'
+                  ? 'Root Admin Control Tower'
+                  : activeRole === 'supplier'
+                  ? 'Supplier Fulfillment Hub'
+                  : 'Enterprise Buyer Portal'}
               </span>
-              {(['buyer', 'supplier', 'admin'] as UserRole[]).map(r => (
-                <button
-                  key={r}
-                  onClick={() => handleRoleChange(r)}
-                  className={`relative text-[11px] px-3 py-1 rounded-lg font-medium transition-colors capitalize select-none z-10 ${
-                    activeRole === r ? 'text-[#13110F] font-semibold' : 'text-[#6B6560] hover:text-[#13110F]'
-                  }`}
-                >
-                  {activeRole === r && (
-                    <motion.div
-                      layoutId="activeRoleFlowPill"
-                      className="absolute inset-0 bg-white rounded-lg shadow-sm border border-[rgba(19,17,15,0.08)] -z-10"
-                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-                    />
-                  )}
-                  {r}
-                </button>
-              ))}
-              <Link
-                to={`/login?role=${activeRole}`}
-                className="text-[10px] text-[#13110F] hover:text-[#26221F] font-medium px-2.5 border-l border-[rgba(19,17,15,0.1)] hover:underline z-10"
-                title="Switch via dedicated portal login"
+              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white text-[#6B6560] border border-[rgba(19,17,15,0.08)] uppercase">
+                {activeRole}
+              </span>
+              <button
+                onClick={() => {
+                  store.logout();
+                  navigate('/login');
+                }}
+                className="text-[10px] text-[#8C847D] hover:text-[#13110F] pl-1.5 font-medium transition-colors border-l border-[rgba(19,17,15,0.12)] ml-0.5"
+                title="Switch portal account via authenticated login"
               >
-                Sign In
-              </Link>
+                Switch
+              </button>
             </div>
 
             {/* Quick Sign Out */}

@@ -82,7 +82,7 @@ export function App() {
             <Route
               path="/buyer/dashboard"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <BuyerDashboard />
                 </RoleProtectedRoute>
               }
@@ -108,11 +108,11 @@ export function App() {
               }
             />
 
-            {/* Buyer & Admin Enterprise Purchasing Workflows */}
+            {/* Buyer Purchasing Workflows (Rule 10: Strict Buyer Role Isolation) */}
             <Route
               path="/agent"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <AIAgentPage />
                 </RoleProtectedRoute>
               }
@@ -120,7 +120,7 @@ export function App() {
             <Route
               path="/catalogue"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <CataloguePage />
                 </RoleProtectedRoute>
               }
@@ -128,7 +128,7 @@ export function App() {
             <Route
               path="/suppliers"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <SuppliersPage />
                 </RoleProtectedRoute>
               }
@@ -136,7 +136,7 @@ export function App() {
             <Route
               path="/intelligence"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <SupplierIntelligencePage />
                 </RoleProtectedRoute>
               }
@@ -144,7 +144,7 @@ export function App() {
             <Route
               path="/forecasting"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <DemandForecastingPage />
                 </RoleProtectedRoute>
               }
@@ -152,7 +152,7 @@ export function App() {
             <Route
               path="/orders"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <PurchaseOrdersPage />
                 </RoleProtectedRoute>
               }
@@ -160,7 +160,7 @@ export function App() {
             <Route
               path="/approvals"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <ApprovalsPage />
                 </RoleProtectedRoute>
               }
@@ -168,7 +168,7 @@ export function App() {
             <Route
               path="/payments"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <PaymentsPage />
                 </RoleProtectedRoute>
               }
@@ -176,7 +176,7 @@ export function App() {
             <Route
               path="/provenance"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <ProvenanceLedgerPage />
                 </RoleProtectedRoute>
               }
@@ -184,7 +184,7 @@ export function App() {
             <Route
               path="/analytics"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
+                <RoleProtectedRoute allowedRoles={['buyer']}>
                   <AnalyticsPage />
                 </RoleProtectedRoute>
               }
