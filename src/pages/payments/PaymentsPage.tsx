@@ -382,7 +382,7 @@ export const PaymentsPage: React.FC = () => {
             </button>
             <button
               onClick={() => handleSimulateWebhook('CHECKOUT.ORDER.APPROVED')}
-              className="px-2.5 py-1 rounded-md bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 text-[10px] font-mono transition-colors"
+              className="px-2.5 py-1 rounded-md bg-[#1C1916] hover:bg-[#26221F] text-[#FAF7F2] hover:text-white border border-white/20 text-[10px] font-mono transition-colors"
             >
               Dispatch CHECKOUT.ORDER.APPROVED
             </button>

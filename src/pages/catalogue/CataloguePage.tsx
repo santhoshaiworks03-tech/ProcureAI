@@ -145,7 +145,7 @@ export const CataloguePage: React.FC = () => {
         return (
           <button
             onClick={() => setSelectedProduct(params.data.rawProduct)}
-            className="px-2.5 py-1 text-[11px] font-medium text-blue-700 hover:text-blue-900 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
+            className="px-2.5 py-1 text-[11px] font-medium text-[#13110F] hover:text-[#6B6560] border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
           >
             Compare
           </button>
@@ -205,7 +205,7 @@ export const CataloguePage: React.FC = () => {
               placeholder="Search by product name, category, or brand"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:bg-white"
             />
           </div>
 

@@ -706,7 +706,7 @@ export const DashboardPage: React.FC = () => {
               href="https://developer.paypal.com/dashboard/applications/sandbox"
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-blue-600 hover:underline flex items-center justify-center gap-1 pt-1"
+              className="text-xs text-[#13110F] hover:text-[#6B6560] font-medium hover:underline flex items-center justify-center gap-1 pt-1"
             >
               Open PayPal Developer portal <ExternalLink className="w-3 h-3" />
             </a>

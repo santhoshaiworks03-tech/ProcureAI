@@ -121,7 +121,7 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.priceWeight}
               onChange={e => setWeights({ ...weights, priceWeight: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="w-full accent-[#13110F] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
@@ -138,7 +138,7 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.availabilityWeight}
               onChange={e => setWeights({ ...weights, availabilityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="w-full accent-[#13110F] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
@@ -155,7 +155,7 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.deliveryWeight}
               onChange={e => setWeights({ ...weights, deliveryWeight: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="w-full accent-[#13110F] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
@@ -172,7 +172,7 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.reliabilityWeight}
               onChange={e => setWeights({ ...weights, reliabilityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="w-full accent-[#13110F] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
 
@@ -189,7 +189,7 @@ export const SupplierIntelligencePage: React.FC = () => {
               step="0.05"
               value={weights.qualityWeight}
               onChange={e => setWeights({ ...weights, qualityWeight: parseFloat(e.target.value) })}
-              className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="w-full accent-[#13110F] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
           </div>
         </div>
@@ -204,7 +204,7 @@ export const SupplierIntelligencePage: React.FC = () => {
             placeholder="Search suppliers by name or category"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:bg-white"
           />
         </div>
       </Card>
@@ -257,7 +257,7 @@ export const SupplierIntelligencePage: React.FC = () => {
                             }
                           }
                         }}
-                        className="rounded border-slate-300 text-[#13110F] focus:ring-0 cursor-pointer"
+                        className="rounded border-slate-300 text-[#13110F] accent-[#13110F] focus:ring-0 cursor-pointer"
                         title="Select for head-to-head comparison"
                       />
                     </td>

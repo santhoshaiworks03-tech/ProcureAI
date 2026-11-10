@@ -125,7 +125,7 @@ export const AdminPage: React.FC = () => {
                 onClick={() => setSelectedAiProvider(prov.id)}
                 className={`p-2.5 rounded-lg border text-left transition-colors ${
                   selectedAiProvider === prov.id
-                    ? 'border-blue-600 bg-blue-50/20'
+                    ? 'border-[#13110F] bg-[#FAF7F2] ring-1 ring-[#13110F]'
                     : 'border-slate-200/80 hover:border-slate-300 bg-white'
                 }`}
               >
@@ -182,7 +182,7 @@ export const AdminPage: React.FC = () => {
               href="https://developer.paypal.com/dashboard/applications/sandbox"
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-blue-600 font-medium hover:underline flex items-center gap-1"
+              className="text-xs text-[#13110F] font-medium hover:underline hover:text-[#6B6560] flex items-center gap-1"
             >
               PayPal Developer portal <ExternalLink className="w-3 h-3" />
             </a>

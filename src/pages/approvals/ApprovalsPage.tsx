@@ -98,7 +98,7 @@ export const ApprovalsPage: React.FC = () => {
                 <Card
                   key={appr.id}
                   className={`p-4 border transition-colors ${
-                    isHighlighted ? 'border-blue-500/80 ring-1 ring-blue-500/20 bg-blue-50/10' : 'border-slate-200/80'
+                    isHighlighted ? 'border-[#13110F] ring-1 ring-[#13110F]/20 bg-[#FAF7F2]' : 'border-slate-200/80'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -234,7 +234,7 @@ export const ApprovalsPage: React.FC = () => {
                 placeholder="Enter audit approval remarks or reason for rejection"
                 value={actionNotes}
                 onChange={e => setActionNotes(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-slate-200/90 text-xs focus:outline-none focus:ring-1 focus:ring-blue-600"
+                className="w-full p-2.5 rounded-lg border border-slate-200/90 text-xs focus:outline-none focus:ring-1 focus:ring-[#13110F]"
               />
             </div>
 

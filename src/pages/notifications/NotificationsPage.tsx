@@ -92,7 +92,7 @@ export const NotificationsPage: React.FC = () => {
           <Card
             key={notif.id}
             className={`p-3.5 transition-colors border ${
-              !notif.is_read ? 'bg-white border-blue-500/30' : 'bg-slate-50/60 border-slate-200/80'
+              !notif.is_read ? 'bg-white border-[#13110F]/30' : 'bg-slate-50/60 border-slate-200/80'
             }`}
           >
             <div className="flex items-start justify-between gap-4">

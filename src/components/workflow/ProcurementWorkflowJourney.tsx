@@ -120,7 +120,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-[#13110F] animate-pulse"></span>
             <h3 className="text-sm font-bold text-slate-900 tracking-tight">
               Autonomous Procurement & PayPal Settlement Journey
             </h3>
@@ -160,7 +160,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
                   <div
                     className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
                       isActive
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-500/40 ring-offset-2'
+                        ? 'bg-[#13110F] text-white shadow-md shadow-black/20 ring-2 ring-[#13110F]/30 ring-offset-2'
                         : isCompleted
                         ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                         : 'bg-slate-50 text-slate-400 border border-slate-200/80 group-hover:border-slate-300'
@@ -168,7 +168,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
                   >
                     <Icon className="w-4 h-4" />
                     {isActive && (
-                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white animate-ping"></span>
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#F2C8A8] border-2 border-white animate-ping"></span>
                     )}
                   </div>
 
@@ -177,7 +177,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
                     <span
                       className={`block text-[11px] font-semibold truncate ${
                         isActive
-                          ? 'text-blue-600'
+                          ? 'text-[#13110F]'
                           : isCompleted
                           ? 'text-slate-800'
                           : 'text-slate-400'
@@ -199,7 +199,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
                         stage.id < currentActiveStage
                           ? 'bg-emerald-400'
                           : stage.id === currentActiveStage
-                          ? 'bg-gradient-to-r from-blue-600 to-slate-200'
+                          ? 'bg-gradient-to-r from-[#13110F] to-slate-200'
                           : 'bg-slate-200'
                       }`}
                     />
@@ -217,7 +217,7 @@ export const ProcurementWorkflowJourney: React.FC<ProcurementWorkflowJourneyProp
           <div className="flex items-start gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-semibold flex-shrink-0 ${
               selectedStage.id === currentActiveStage
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-[#13110F] text-white shadow-sm'
                 : selectedStage.id < currentActiveStage
                 ? 'bg-emerald-600 text-white'
                 : 'bg-slate-200 text-slate-600'

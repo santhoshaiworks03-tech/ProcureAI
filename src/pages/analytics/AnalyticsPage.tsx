@@ -144,8 +144,8 @@ export const AnalyticsPage: React.FC = () => {
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Area type="monotone" dataKey="spend" name="Spend" stroke="#1D4ED8" fill="#1D4ED8" fillOpacity={0.12} strokeWidth={1.5} />
-                <Area type="monotone" dataKey="savings" name="AI savings" stroke="#16A36A" fill="#16A36A" fillOpacity={0.12} strokeWidth={1.5} />
+                <Area type="monotone" dataKey="spend" name="Spend" stroke="#13110F" fill="#13110F" fillOpacity={0.08} strokeWidth={2} />
+                <Area type="monotone" dataKey="savings" name="AI savings" stroke="#3E5C31" fill="#B4C7A6" fillOpacity={0.25} strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -166,15 +166,15 @@ export const AnalyticsPage: React.FC = () => {
                 <Tooltip
                   formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Spend']}
                   contentStyle={{
-                    backgroundColor: '#07090E',
-                    color: '#F8FAFC',
+                    backgroundColor: '#13110F',
+                    color: '#FAF7F2',
                     borderRadius: '6px',
                     fontSize: '11px',
                     border: 'none',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                   }}
                 />
-                <Bar dataKey="spend" name="Total spend" fill="#0F172A" radius={[0, 3, 3, 0]} />
+                <Bar dataKey="spend" name="Total spend" fill="#13110F" radius={[0, 3, 3, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

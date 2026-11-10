@@ -116,9 +116,9 @@ export const DemandForecastingPage: React.FC = () => {
                 }}
               />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-              <Bar dataKey="currentStock" name="Current stock" fill="#94A3B8" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="forecasted30d" name="30-day demand" fill="#0F172A" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="recommendedReorder" name="Recommended reorder" fill="#1D4ED8" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="currentStock" name="Current stock" fill="#A8A29E" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="forecasted30d" name="30-day demand" fill="#13110F" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="recommendedReorder" name="Recommended reorder" fill="#D97746" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

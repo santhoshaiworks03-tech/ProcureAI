@@ -149,7 +149,7 @@ export const AIAgentPage: React.FC = () => {
               value={inputPrompt}
               onChange={e => setInputPrompt(e.target.value)}
               placeholder="Describe what you need to purchase, required quantities, and budget cap..."
-              className="w-full p-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white resize-none"
+              className="w-full p-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] bg-white resize-none"
             />
             <div className="absolute right-2.5 bottom-2.5">
               <Button
@@ -187,9 +187,9 @@ export const AIAgentPage: React.FC = () => {
 
       {/* Execution Progress */}
       {isProcessing && (
-        <Card className="border-blue-200 bg-blue-50/20 py-3">
+        <Card className="border-[rgba(19,17,15,0.12)] bg-[#FAF7F2] py-3">
           <div className="flex items-center gap-3">
-            <RefreshCw className="w-4 h-4 text-blue-600 animate-spin flex-shrink-0" />
+            <RefreshCw className="w-4 h-4 text-[#13110F] animate-spin flex-shrink-0" />
             <div className="flex-1">
               <p className="text-xs font-medium text-slate-900">
                 {activeStep === 1 && 'Extracting specifications, quantities & budget...'}
@@ -286,7 +286,7 @@ export const AIAgentPage: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {evaluations.slice(0, 5).map((ev, idx) => (
-                    <tr key={ev.supplierId} className={idx === 0 ? 'bg-blue-50/20' : 'hover:bg-slate-50/40'}>
+                    <tr key={ev.supplierId} className={idx === 0 ? 'bg-[#FAF7F2]' : 'hover:bg-slate-50/40'}>
                       <td className="py-2.5 px-4">
                         <div className="flex items-center gap-2">
                           <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-medium ${
@@ -305,7 +305,7 @@ export const AIAgentPage: React.FC = () => {
                       <td className="py-2.5 px-3 text-center font-mono tabular-nums">{ev.deliveryScore}%</td>
                       <td className="py-2.5 px-3 text-center font-mono tabular-nums">{ev.reliabilityScore}%</td>
                       <td className="py-2.5 px-3 text-center">
-                        <span className={`font-mono text-xs font-semibold tabular-nums ${idx === 0 ? 'text-blue-700' : 'text-slate-800'}`}>
+                        <span className={`font-mono text-xs font-semibold tabular-nums ${idx === 0 ? 'text-[#13110F]' : 'text-slate-800'}`}>
                           {ev.compositeScore}%
                         </span>
                       </td>
