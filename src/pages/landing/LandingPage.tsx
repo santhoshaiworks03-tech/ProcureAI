@@ -141,48 +141,25 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Hero Interactive App Preview */}
-        <div className="max-w-6xl mx-auto mt-14 rounded-2xl border border-[rgba(19,17,15,0.08)] shadow-2xl bg-white p-2 sm:p-4 overflow-hidden">
-          <div className="bg-[#13110F] rounded-xl overflow-hidden text-[#FAF7F2] p-4 sm:p-6 space-y-5 border border-[rgba(244,238,230,0.08)]">
-            <div className="flex items-center justify-between border-b border-[rgba(244,238,230,0.08)] pb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#E57373]"></span>
-                <span className="w-3 h-3 rounded-full bg-[#FFD54F]"></span>
-                <span className="w-3 h-3 rounded-full bg-[#B4C7A6]"></span>
-                <span className="ml-2 font-mono text-xs text-[#8C847D]">procureai.enterprise/dashboard</span>
+        {/* Hero Interactive App Preview Showcase */}
+        <div className="max-w-5xl mx-auto mt-12 rounded-3xl border border-[rgba(19,17,15,0.1)] shadow-2xl bg-white p-2 sm:p-3 overflow-hidden group">
+          <div className="relative rounded-2xl overflow-hidden bg-[#13110F]">
+            <img
+              src="/hero-laptop.jpg"
+              alt="ProcureAI Enterprise Platform on Laptop"
+              className="w-full h-auto object-cover transform group-hover:scale-[1.01] transition-transform duration-700"
+            />
+            <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-[#13110F]/85 backdrop-blur-md border border-white/10 hidden sm:flex items-center justify-between text-white text-xs">
+              <div className="flex items-center gap-3">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#B4C7A6] animate-pulse"></span>
+                <span className="font-semibold">ProcureAI 2.0 Autonomous Procurement Terminal</span>
+                <span className="text-[#F2C8A8] text-[11px] font-mono">• PayPal Orders v2 Capture</span>
               </div>
-              <Badge variant="success" dot size="sm">
-                Sandbox Orders v2 Ready
-              </Badge>
-            </div>
-
-            {/* Quick Metrics Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
-              <div className="p-4 rounded-xl bg-[#1C1916] border border-[rgba(244,238,230,0.08)]">
-                <span className="text-[11px] text-[#8C847D] block font-medium">Platform GMV Volume</span>
-                <span className="text-xl sm:text-2xl font-bold text-[#FAF7F2] font-mono mt-1 block">₹1,24,50,000</span>
-                <span className="text-[10px] text-[#B4C7A6] flex items-center gap-1 mt-1">
-                  <TrendingUp className="w-3 h-3" /> +14.2% AI savings
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-[#1C1916] border border-[rgba(244,238,230,0.08)]">
-                <span className="text-[11px] text-[#8C847D] block font-medium">Commercial Suppliers</span>
-                <span className="text-xl sm:text-2xl font-bold text-[#FAF7F2] font-mono mt-1 block">8 Vendors</span>
-                <span className="text-[10px] text-[#8C847D] mt-1 block">100% KYC Verified</span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-[#1C1916] border border-[rgba(244,238,230,0.08)]">
-                <span className="text-[11px] text-[#8C847D] block font-medium">Session Lock Protection</span>
-                <span className="text-xl sm:text-2xl font-bold text-[#FAF7F2] font-mono mt-1 block">300 Seconds</span>
-                <span className="text-[10px] text-[#F2C8A8] mt-1 block">Zero Price Slippage</span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-[#1C1916] border border-[rgba(244,238,230,0.08)]">
-                <span className="text-[11px] text-[#8C847D] block font-medium">Audit Trail Records</span>
-                <span className="text-xl sm:text-2xl font-bold text-[#FAF7F2] font-mono mt-1 block">100% Verified</span>
-                <span className="text-[10px] text-[#FAF7F2]/70 mt-1 block">Tamper-Proof Audit</span>
-              </div>
+              <Link to="/login">
+                <Button variant="secondary" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                  Explore Live Demo
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
