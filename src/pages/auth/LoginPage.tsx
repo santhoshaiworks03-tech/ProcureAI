@@ -268,10 +268,10 @@ export const LoginPage: React.FC = () => {
                   key={r}
                   type="button"
                   onClick={() => handleSelectRole(r)}
-                  className={`text-left p-3 rounded-xl border transition-all text-xs flex flex-col justify-between gap-2.5 active:scale-[0.98] ${
+                  className={`text-left p-3.5 rounded-xl border transition-all duration-200 text-xs flex flex-col justify-between gap-2.5 hover:-translate-y-1 active:scale-[0.98] ${
                     isSelected
-                      ? 'bg-[#1C1916]/95 backdrop-blur-2xl border-[#F2C8A8] ring-2 ring-[#F2C8A8]/60 text-white shadow-xl shadow-black/50'
-                      : 'bg-[#13110F]/75 backdrop-blur-xl border border-white/15 hover:border-white/30 hover:bg-[#13110F]/90 text-[#EDE6DC] shadow-lg'
+                      ? 'bg-[#1C1916]/95 backdrop-blur-2xl border-[#F2C8A8] ring-2 ring-[#F2C8A8]/60 text-white shadow-2xl shadow-black/60 -translate-y-0.5'
+                      : 'bg-[#13110F]/75 backdrop-blur-xl border border-white/15 hover:border-white/30 hover:bg-[#13110F]/90 text-[#EDE6DC] shadow-lg hover:shadow-2xl'
                   }`}
                 >
                   <div className="flex items-start justify-between w-full">

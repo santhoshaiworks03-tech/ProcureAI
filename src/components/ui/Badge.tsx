@@ -45,7 +45,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center font-medium border tabular-nums select-none',
+        'inline-flex items-center font-medium border tabular-nums select-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-subtle cursor-default',
         variantStyles[variant],
         sizeStyles[size],
         className

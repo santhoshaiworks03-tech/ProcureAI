@@ -82,3 +82,101 @@
   background: #94a3b8;
 }
 
+/* =========================================================================
+   UNIVERSAL FLOATING HOVER SYSTEM (ALL PAGES, ALL ROLES, ALL ELEMENTS)
+   Applies smooth elevation & floating when cursor hovers over elements
+   ========================================================================= */
+
+/* 1. Universal Card & Tile Float on Cursor Hover */
+.card,
+[class*="rounded-2xl"][class*="border"]:not([class*="fixed"]):not([class*="absolute"]):not(main):not(aside):not(header):not(nav),
+[class*="rounded-xl"][class*="border"]:not([class*="fixed"]):not([class*="absolute"]):not(main):not(aside):not(header):not(nav):not(input):not(select):not(textarea),
+.shadow-subtle:not([class*="fixed"]):not(input):not(textarea):not(aside):not(header):not(nav),
+div[class*="bg-white"][class*="rounded-2xl"],
+div[class*="bg-white"][class*="rounded-xl"]:not([class*="fixed"]):not([class*="absolute"]),
+.rounded-2xl.bg-white,
+.rounded-xl.bg-white,
+.hover-float {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.card:hover,
+[class*="rounded-2xl"][class*="border"]:not([class*="fixed"]):not([class*="absolute"]):not(main):not(aside):not(header):not(nav):hover,
+[class*="rounded-xl"][class*="border"]:not([class*="fixed"]):not([class*="absolute"]):not(main):not(aside):not(header):not(nav):not(input):not(select):not(textarea):hover,
+.shadow-subtle:not([class*="fixed"]):not(input):not(textarea):not(aside):not(header):not(nav):hover,
+div[class*="bg-white"][class*="rounded-2xl"]:not([class*="fixed"]):hover,
+div[class*="bg-white"][class*="rounded-xl"]:not([class*="fixed"]):not([class*="absolute"]):hover,
+.rounded-2xl.bg-white:not([class*="fixed"]):hover,
+.rounded-xl.bg-white:not([class*="fixed"]):not([class*="absolute"]):hover,
+.hover-float:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 28px -4px rgba(19, 17, 15, 0.08), 0 4px 10px -2px rgba(19, 17, 15, 0.04) !important;
+  border-color: rgba(19, 17, 15, 0.16) !important;
+}
+
+/* 2. Interactive Buttons & Action Triggers */
+button:not(:disabled),
+.btn-float {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              border-color 0.15s ease;
+  will-change: transform;
+}
+
+button:not(:disabled):hover,
+.btn-float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -2px rgba(19, 17, 15, 0.1);
+}
+
+button:not(:disabled):active,
+.btn-float:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* 3. Interactive Badges, Chips & Status Pills */
+span[class*="rounded-full"][class*="border"],
+.badge-float {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+span[class*="rounded-full"][class*="border"]:hover,
+.badge-float:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 8px -1px rgba(19, 17, 15, 0.08);
+}
+
+/* 4. Interactive Table Rows */
+tbody tr {
+  transition: transform 0.16s ease, background-color 0.15s ease, box-shadow 0.16s ease;
+}
+
+tbody tr:hover {
+  transform: translateY(-1px);
+  background-color: rgba(250, 247, 242, 0.85);
+  box-shadow: 0 4px 12px -2px rgba(19, 17, 15, 0.04);
+}
+
+/* 5. Navigation Links & Header Icons */
+nav a,
+header a,
+header button {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.15s ease,
+              background-color 0.15s ease;
+}
+
+nav a:hover,
+header a:hover,
+header button:hover {
+  transform: translateY(-1px);
+}
+
+

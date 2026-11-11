@@ -40,7 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[#13110F]/15 disabled:opacity-50 disabled:cursor-not-allowed select-none hover:scale-[1.03] active:scale-[0.97] whitespace-nowrap',
+        'inline-flex items-center justify-center transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[#13110F]/15 disabled:opacity-50 disabled:cursor-not-allowed select-none hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] active:translate-y-0 whitespace-nowrap cursor-pointer',
         variantStyles[variant],
         sizeStyles[size],
         className
