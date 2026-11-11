@@ -15,8 +15,14 @@ import {
   NotificationItem,
   UserRole,
   SupplierRFQ,
-  SupplierQuotation
+  SupplierQuotation,
+  RegionalSettings
 } from '../types';
+
+import {
+  DEFAULT_REGIONAL_SETTINGS,
+  CURRENCY_REGISTRY
+} from './regionalSettings';
 
 import {
   SEED_ORGANISATIONS,
@@ -184,6 +190,7 @@ class ReactiveDataStore {
   private notifications!: NotificationItem[];
   private rfqs!: SupplierRFQ[];
   private quotations!: SupplierQuotation[];
+  private regionalSettings!: RegionalSettings;
   private listeners: Set<() => void> = new Set();
 
   // --- High-Performance Lookups & Indexed Caches ($O(1)$) ---
@@ -253,6 +260,9 @@ class ReactiveDataStore {
     try {
       localStorage.setItem('procureai_approval_requests', JSON.stringify(this.approvalRequests));
     } catch (e) {}
+
+    // Centralized Regional & Localization Settings
+    this.regionalSettings = this.load('procureai_regional_settings', DEFAULT_REGIONAL_SETTINGS);
 
     // Build initial $O(1)$ fast lookup indices
     this.rebuildIndices();
@@ -804,6 +814,73 @@ class ReactiveDataStore {
     return newPO;
   }
 
+  public async updatePurchaseOrder(poId: string, updates: Partial<PurchaseOrder>): Promise<PurchaseOrder | undefined> {
+    const poIndex = this.purchaseOrders.findIndex(p => p.id === poId || p.po_number === poId);
+    if (poIndex === -1) return undefined;
+
+    const po = this.purchaseOrders[poIndex];
+
+    // If items are modified, recalculate financials
+    let items = updates.items ?? po.items;
+    items = items.map(item => ({
+      ...item,
+      total_amount: item.quantity * item.unit_price
+    }));
+
+    const subtotal_amount = items.reduce((sum, item) => sum + item.total_amount, 0);
+    const tax_amount = Math.round(subtotal_amount * 0.18);
+    const shipping_amount = updates.shipping_amount !== undefined ? updates.shipping_amount : (po.shipping_amount || 0);
+    const total_amount = subtotal_amount + tax_amount + shipping_amount;
+
+    const updatedPO: PurchaseOrder = {
+      ...po,
+      ...updates,
+      items,
+      subtotal_amount,
+      tax_amount,
+      shipping_amount,
+      total_amount,
+      updated_at: new Date().toISOString()
+    };
+
+    this.purchaseOrders[poIndex] = updatedPO;
+    this.save('procureai_purchase_orders', this.purchaseOrders);
+
+    // Sync associated approval request if present
+    const appr = this.approvalRequests.find(a => a.purchase_order_id === updatedPO.id);
+    if (appr) {
+      appr.purchase_order = updatedPO;
+      appr.threshold_amount = updatedPO.total_amount;
+      appr.updated_at = new Date().toISOString();
+      if (!appr.history) appr.history = [];
+      appr.history.push({
+        actor_name: this.getCurrentUser().full_name,
+        action: 'CUSTOMIZED',
+        notes: `PO elements customized. New total: ${updatedPO.currency} ${updatedPO.total_amount.toLocaleString()}`,
+        created_at: new Date().toISOString()
+      });
+      this.save('procureai_approval_requests', this.approvalRequests);
+    }
+
+    // Append provenance event
+    await this.appendProvenanceEvent({
+      event_type: 'PURCHASE_ORDER_CUSTOMIZED',
+      actor_name: this.getCurrentUser().full_name,
+      actor_role: this.getCurrentUser().role,
+      organisation_id: updatedPO.organisation_id,
+      purchase_order_id: updatedPO.id,
+      po_number: updatedPO.po_number,
+      metadata: {
+        totalAmount: updatedPO.total_amount,
+        itemsCount: updatedPO.items.length,
+        notes: 'Manual element customization by buyer'
+      }
+    });
+
+    this.notify();
+    return updatedPO;
+  }
+
   public async updatePurchaseOrderStatus(poId: string, status: PurchaseOrderStatus, metadata?: Record<string, any>): Promise<PurchaseOrder | undefined> {
     const po = this.purchaseOrders.find(p => p.id === poId || p.po_number === poId);
     if (!po) return undefined;
@@ -1271,6 +1348,107 @@ class ReactiveDataStore {
     return this.cachedAdminMetrics;
   }
 
+  // --- Centralized Regional & Localization Governance ---
+  public getRegionalSettings(): RegionalSettings {
+    return { ...this.regionalSettings };
+  }
+
+  public async updateRegionalSettings(settingsUpdate: Partial<RegionalSettings>): Promise<RegionalSettings> {
+    const currentUser = this.getCurrentUser();
+    // 4. ACCESS CONTROL: Validate admin permissions on the backend
+    if (currentUser.role !== 'admin') {
+      throw new Error('Access Denied: Only authorized administrators can modify global regional and localization settings.');
+    }
+
+    const previous = { ...this.regionalSettings };
+
+    // Resolve default currency symbol if currency was changed without explicit symbol
+    let currencySymbol = settingsUpdate.currencySymbol;
+    if (settingsUpdate.currency && !currencySymbol) {
+      currencySymbol = CURRENCY_REGISTRY[settingsUpdate.currency]?.symbol || '$';
+    }
+
+    this.regionalSettings = {
+      ...this.regionalSettings,
+      ...settingsUpdate,
+      ...(currencySymbol ? { currencySymbol } : {}),
+      lastUpdated: new Date().toISOString(),
+      updatedBy: currentUser.full_name || 'Root Administrator'
+    };
+
+    // Persist in localStorage for resilient offline/multi-session storage
+    this.save('procureai_regional_settings', this.regionalSettings);
+
+    // Invalidate cached metrics so rollups reflect new format/currency
+    this.cachedBuyerMetrics = null;
+    this.cachedAdminMetrics = null;
+    this.cachedSupplierMetricsMap.clear();
+
+    // 4. Maintain audit logs showing who changed settings and when
+    await this.appendProvenanceEvent({
+      event_type: 'REGIONAL_SETTINGS_UPDATED',
+      actor_name: currentUser.full_name,
+      actor_role: 'admin',
+      metadata: {
+        previousSettings: {
+          currency: previous.currency,
+          numberFormat: previous.numberFormat,
+          dateFormat: previous.dateFormat,
+          timeFormat: previous.timeFormat,
+          timezone: previous.timezone,
+          measurementSystem: previous.measurementSystem
+        },
+        newSettings: {
+          currency: this.regionalSettings.currency,
+          numberFormat: this.regionalSettings.numberFormat,
+          dateFormat: this.regionalSettings.dateFormat,
+          timeFormat: this.regionalSettings.timeFormat,
+          timezone: this.regionalSettings.timezone,
+          measurementSystem: this.regionalSettings.measurementSystem
+        },
+        changeSummary: `Admin ${currentUser.full_name} configured currency to ${this.regionalSettings.currency} (${this.regionalSettings.currencySymbol}), number format to ${this.regionalSettings.numberFormat}, date format to ${this.regionalSettings.dateFormat}, time format to ${this.regionalSettings.timeFormat}, timezone to ${this.regionalSettings.timezone}, units to ${this.regionalSettings.measurementSystem}.`
+      }
+    });
+
+    // Notify all UI subscribers across the application for instant zero-refresh dynamic updates
+    this.notify();
+
+    return { ...this.regionalSettings };
+  }
+
+  public async resetRegionalSettings(): Promise<RegionalSettings> {
+    const currentUser = this.getCurrentUser();
+    if (currentUser.role !== 'admin') {
+      throw new Error('Access Denied: Only authorized administrators can reset global regional settings.');
+    }
+
+    const previous = { ...this.regionalSettings };
+    this.regionalSettings = {
+      ...DEFAULT_REGIONAL_SETTINGS,
+      lastUpdated: new Date().toISOString(),
+      updatedBy: `${currentUser.full_name} (Reset to Default)`
+    };
+
+    this.save('procureai_regional_settings', this.regionalSettings);
+    this.cachedBuyerMetrics = null;
+    this.cachedAdminMetrics = null;
+    this.cachedSupplierMetricsMap.clear();
+
+    await this.appendProvenanceEvent({
+      event_type: 'REGIONAL_SETTINGS_RESET',
+      actor_name: currentUser.full_name,
+      actor_role: 'admin',
+      metadata: {
+        previousSettings: previous,
+        resetTo: this.regionalSettings,
+        changeSummary: `Admin ${currentUser.full_name} reset global regional settings to system default (India Standard).`
+      }
+    });
+
+    this.notify();
+    return { ...this.regionalSettings };
+  }
+
   // --- Reset to Initial State ---
   public resetToSeedData() {
     localStorage.removeItem('procureai_orgs');
@@ -1286,6 +1464,7 @@ class ReactiveDataStore {
     localStorage.removeItem('procureai_provenance_events');
     localStorage.removeItem('procureai_demand_forecasts');
     localStorage.removeItem('procureai_notifications');
+    localStorage.removeItem('procureai_regional_settings');
 
     this.organisations = [...SEED_ORGANISATIONS];
     this.profiles = [...SEED_PROFILES];
@@ -1298,6 +1477,7 @@ class ReactiveDataStore {
     this.provenanceEvents = [...SEED_PROVENANCE_EVENTS];
     this.notifications = [...SEED_NOTIFICATIONS];
     this.approvalRequests = this.generateInitialApprovals();
+    this.regionalSettings = { ...DEFAULT_REGIONAL_SETTINGS };
     this.checkoutSessions = [];
     this.payments = [];
 

@@ -24,6 +24,7 @@ import { store } from '../../lib/store';
 import { UserRole } from '../../types';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { formatCurrency } from '../../lib/utils';
 
 interface RolePortalConfig {
   role: UserRole;
@@ -107,7 +108,7 @@ const ROLE_PORTALS: Record<UserRole, RolePortalConfig> = {
       'Supplier legal KYC, GSTIN & corporate tax ID verification queue',
       'Complete compliance audit trail & governance log',
       'Supabase PostgreSQL 28-table RLS health monitor',
-      'Platform GMV oversight (₹1,24,50,000 settled volume)'
+      `Platform GMV oversight (${formatCurrency(12450000)} settled volume)`
     ]
   }
 };

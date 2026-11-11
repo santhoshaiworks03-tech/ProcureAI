@@ -35,6 +35,7 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { formatCurrency, formatDate } from '../../lib/utils';
+import { RegionalSettingsSection } from '../../components/admin/RegionalSettingsSection';
 
 export const AdminDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,6 +139,10 @@ export const AdminDashboard: React.FC = () => {
     health: {
       title: 'System Infrastructure & Telemetry Health',
       subtitle: 'Database performance, REST endpoint monitors, and webhook subscribers'
+    },
+    settings: {
+      title: 'Regional & Localization Settings',
+      subtitle: 'Centralized global currency, number formatting, timezone, date conventions, and measurement units'
     }
   };
 
@@ -162,6 +167,15 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link to="/admin/dashboard?tab=settings">
+            <Button
+              variant={activeTab === 'settings' ? 'primary' : 'outline'}
+              size="sm"
+              leftIcon={<Globe className="w-3.5 h-3.5" />}
+            >
+              Regional settings
+            </Button>
+          </Link>
           <Link to="/admin">
             <Button variant="outline" size="sm" leftIcon={<SlidersHorizontal className="w-3.5 h-3.5" />}>
               System configuration
@@ -792,7 +806,7 @@ export const AdminDashboard: React.FC = () => {
                 <div>
                   <span className="font-semibold text-[#13110F] block">Human-in-the-Loop Spend Ceiling Gate</span>
                   <span className="text-[10px] text-[#8C847D]">
-                    Any order exceeding ₹50,000 mandates multi-tier manager cryptographic authorization.
+                    Any order exceeding {formatCurrency(50000)} mandates multi-tier manager cryptographic authorization.
                   </span>
                 </div>
                 <span className="text-emerald-700 font-semibold font-mono text-[11px]">Active</span>
@@ -835,6 +849,13 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: REGIONAL & LOCALIZATION SETTINGS (ADMIN EXCLUSIVE)
+         ========================================================================= */}
+      {activeTab === 'settings' && (
+        <RegionalSettingsSection />
       )}
     </div>
   );

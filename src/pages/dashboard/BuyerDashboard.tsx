@@ -40,7 +40,7 @@ import { PurchaseOrder, Supplier, SupplierProduct, ProvenanceEvent } from '../..
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
+import { formatCurrency, formatDate, formatDateTime, getCurrencySymbol } from '../../lib/utils';
 
 export const BuyerDashboard: React.FC = () => {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(() => store.getPurchaseOrders());
@@ -227,9 +227,9 @@ export const BuyerDashboard: React.FC = () => {
               <AreaChart data={monthlySpendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EDE6DC" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B6560' }} axisLine={{ stroke: 'rgba(19,17,15,0.1)' }} />
-                <YAxis tick={{ fontSize: 11, fill: '#6B6560' }} tickFormatter={v => `₹${v / 1000}k`} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#6B6560' }} tickFormatter={v => `${getCurrencySymbol()}${v / 1000}k`} axisLine={false} tickLine={false} />
                 <Tooltip
-                  formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, '']}
+                  formatter={(val: any) => [formatCurrency(Number(val)), '']}
                   contentStyle={{
                     backgroundColor: '#13110F',
                     color: '#FAF7F2',

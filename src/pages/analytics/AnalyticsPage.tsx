@@ -20,7 +20,7 @@ import { store } from '../../lib/store';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, getCurrencySymbol } from '../../lib/utils';
 
 export const AnalyticsPage: React.FC = () => {
   const [dateRange, setDateRange] = useState('90d');
@@ -131,9 +131,9 @@ export const AnalyticsPage: React.FC = () => {
               <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={{ stroke: '#E2E8F0' }} />
-                <YAxis tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={v => `₹${v / 1000}k`} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={v => `${getCurrencySymbol()}${v / 1000}k`} axisLine={false} tickLine={false} />
                 <Tooltip
-                  formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Amount']}
+                  formatter={(val: any) => [formatCurrency(Number(val)), 'Amount']}
                   contentStyle={{
                     backgroundColor: '#07090E',
                     color: '#F8FAFC',
@@ -161,10 +161,10 @@ export const AnalyticsPage: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={supplierSpendData} layout="vertical" margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={v => `₹${v / 1000}k`} axisLine={{ stroke: '#E2E8F0' }} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={v => `${getCurrencySymbol()}${v / 1000}k`} axisLine={{ stroke: '#E2E8F0' }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: '#334155' }} width={130} axisLine={false} tickLine={false} />
                 <Tooltip
-                  formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Spend']}
+                  formatter={(val: any) => [formatCurrency(Number(val)), 'Spend']}
                   contentStyle={{
                     backgroundColor: '#13110F',
                     color: '#FAF7F2',

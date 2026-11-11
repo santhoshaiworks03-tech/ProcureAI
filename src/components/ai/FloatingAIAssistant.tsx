@@ -20,6 +20,7 @@ import { store } from '../../lib/store';
 import { aiProcurementService } from '../../services/ai/aiService';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { formatCurrency } from '../../lib/utils';
 
 interface ChatMessage {
   id: string;
@@ -101,7 +102,7 @@ export const FloatingAIAssistant: React.FC = () => {
             {
               id: `ast-${Date.now()}`,
               sender: 'assistant',
-              text: `Our PayPal Orders API v2 gateway has settled ${payments.length} verified transactions to suppliers. Total settled volume is ₹1,24,50,000 across all tenant vendors with zero chargeback disputes.`,
+              text: `Our PayPal Orders API v2 gateway has settled ${payments.length} verified transactions to suppliers. Total settled volume is ${formatCurrency(12450000)} across all tenant vendors with zero chargeback disputes.`,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
           ]);
@@ -113,7 +114,7 @@ export const FloatingAIAssistant: React.FC = () => {
         const evaluated = aiProcurementService.evaluateSuppliers(plan.items);
         const topSupplier = evaluated[0]?.supplierName || 'OmniOffice Direct Ltd';
 
-        const replyText = `I analyzed your requirement using Google Gemini 1.5 Pro. Identified ${plan.items.length} line items (estimated budget cap: ₹${plan.maxBudget.toLocaleString('en-IN')}). Highest scoring vendor is ${topSupplier} with ${Math.round(evaluated[0]?.compositeScore || 95)}% composite score.`;
+        const replyText = `I analyzed your requirement using Google Gemini 1.5 Pro. Identified ${plan.items.length} line items (estimated budget cap: ${formatCurrency(plan.maxBudget)}). Highest scoring vendor is ${topSupplier} with ${Math.round(evaluated[0]?.compositeScore || 95)}% composite score.`;
 
         setMessages(prev => [
           ...prev,

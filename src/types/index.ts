@@ -412,4 +412,37 @@ export interface SupplierQuotation {
   created_at: string;
 }
 
+// --- Regional & Localization Settings Types ---
+export type SupportedCurrency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'AUD' | 'SGD' | 'AED';
+
+export type NumberFormatType = 'indian' | 'us' | 'european';
+
+export type DateFormatType = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | 'DD-MMM-YYYY';
+
+export type TimeFormatType = '12h' | '24h';
+
+export type MeasurementSystem = 'metric' | 'us_customary';
+
+export type SupportedLocale = 'en-IN' | 'en-US' | 'en-GB' | 'de-DE' | 'fr-FR';
+
+export interface RegionalSettings {
+  currency: SupportedCurrency;
+  currencySymbol: string;
+  currencyPosition: 'prefix' | 'suffix';
+  enableCurrencyConversion: boolean;
+  numberFormat: NumberFormatType;
+  dateFormat: DateFormatType;
+  timeFormat: TimeFormatType;
+  measurementSystem: MeasurementSystem;
+  weightUnit: 'kg' | 'lb' | 'g' | 'oz';
+  dimensionUnit: 'cm' | 'in' | 'm' | 'ft';
+  distanceUnit: 'km' | 'mi';
+  temperatureUnit: '°C' | '°F';
+  locale: SupportedLocale;
+  timezone: string;
+  lastUpdated: string;
+  updatedBy: string;
+}
+
+
 

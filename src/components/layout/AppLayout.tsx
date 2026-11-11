@@ -30,11 +30,13 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Globe
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { UserRole, NotificationItem } from '../../types';
 import { FloatingAIAssistant } from '../ai/FloatingAIAssistant';
+import { formatDateTime } from '../../lib/utils';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -106,14 +108,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const formatNotificationTime = (dateStr: string) => {
     try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+      return formatDateTime(dateStr);
     } catch {
       return dateStr;
     }
@@ -199,6 +194,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       { label: 'Provenance Ledger', path: '/provenance', icon: History },
       { label: 'Analytics & Reports', path: '/analytics', icon: BarChart3 },
       { label: 'System Health', path: '/admin/dashboard?tab=health', icon: Activity },
+      { label: 'Regional Settings', path: '/admin/dashboard?tab=settings', icon: Globe },
       { label: 'Platform Settings', path: '/admin', icon: Settings }
     ];
   } else {

@@ -38,7 +38,7 @@ import { Supplier, SupplierProduct, PurchaseOrder, SupplierRFQ, SupplierQuotatio
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
+import { formatCurrency, formatDate, formatDateTime, getCurrencySymbol } from '../../lib/utils';
 
 export const SupplierDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -1018,12 +1018,12 @@ export const SupplierDashboard: React.FC = () => {
             </div>
             <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)]">
               <span className="text-[11px] text-[#8C847D] block">Pending Payouts</span>
-              <p className="text-2xl font-bold text-[#92400E] mt-1 font-mono">₹0</p>
+              <p className="text-2xl font-bold text-[#92400E] mt-1 font-mono">{formatCurrency(0)}</p>
               <p className="text-[10px] text-[#6B6560] mt-0.5">All captured funds disbursed</p>
             </div>
             <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)]">
               <span className="text-[11px] text-[#8C847D] block">Gateway Transaction Fee</span>
-              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">1.9% + ₹3</p>
+              <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">1.9% + {formatCurrency(3)}</p>
               <p className="text-[10px] text-[#6B6560] mt-0.5">Commercial enterprise rate</p>
             </div>
           </div>
@@ -1374,12 +1374,12 @@ export const SupplierDashboard: React.FC = () => {
               </div>
               <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)]">
                 <span className="text-[11px] text-[#8C847D] block">Pending Payouts</span>
-                <p className="text-2xl font-bold text-[#92400E] mt-1 font-mono">₹0</p>
+                <p className="text-2xl font-bold text-[#92400E] mt-1 font-mono">{formatCurrency(0)}</p>
                 <p className="text-[10px] text-[#6B6560] mt-0.5">All captured funds disbursed</p>
               </div>
               <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(19,17,15,0.08)]">
                 <span className="text-[11px] text-[#8C847D] block">Gateway Transaction Fee</span>
-                <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">1.9% + ₹3</p>
+                <p className="text-2xl font-bold text-[#13110F] mt-1 font-mono">1.9% + {formatCurrency(3)}</p>
                 <p className="text-[10px] text-[#6B6560] mt-0.5">Commercial enterprise rate</p>
               </div>
             </div>
@@ -1524,7 +1524,7 @@ export const SupplierDashboard: React.FC = () => {
               <form onSubmit={handleSaveListing} className="space-y-3 text-xs">
                 <div>
                   <label className="text-[11px] font-semibold text-[#13110F] block mb-1">
-                    Contracted Unit Price (₹)
+                    Contracted Unit Price ({getCurrencySymbol()})
                   </label>
                   <input
                     type="number"

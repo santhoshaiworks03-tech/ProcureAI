@@ -75,7 +75,7 @@ export const ApprovalsPage: React.FC = () => {
           </p>
         </div>
         <Badge variant="neutral">
-          Approval threshold: ₹2,50,000
+          Approval threshold: {formatCurrency(250000)}
         </Badge>
       </div>
 

@@ -4,7 +4,9 @@ import {
   FileText,
   Download,
   Search,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  Edit3
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { PurchaseOrder, PurchaseOrderStatus } from '../../types';
@@ -15,6 +17,7 @@ import { Modal } from '../../components/ui/Modal';
 import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
 import { generatePurchaseOrderPDF } from '../../services/pdf/pdfService';
 import { OrderTrackingTimeline } from '../../components/orders/OrderTrackingTimeline';
+import { PurchaseOrderCustomizerModal } from '../../components/orders/PurchaseOrderCustomizerModal';
 
 export const PurchaseOrdersPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -24,6 +27,11 @@ export const PurchaseOrdersPage: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+
+  // Manual PO Customizer State
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+  const [customizingOrder, setCustomizingOrder] = useState<PurchaseOrder | null>(null);
+  const [customizerMode, setCustomizerMode] = useState<'edit' | 'create'>('edit');
 
   useEffect(() => {
     const unsub = store.subscribe(() => {
@@ -82,11 +90,25 @@ export const PurchaseOrdersPage: React.FC = () => {
             Full lifecycle documentation, official PDF invoice generation, and PayPal payment tracking.
           </p>
         </div>
-        <Link to="/agent">
-          <Button variant="primary" size="sm">
-            New procurement request
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Plus className="w-3.5 h-3.5" />}
+            onClick={() => {
+              setCustomizingOrder(null);
+              setCustomizerMode('create');
+              setIsCustomizerOpen(true);
+            }}
+          >
+            Create Manual PO
           </Button>
-        </Link>
+          <Link to="/agent">
+            <Button variant="primary" size="sm">
+              New procurement request
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -168,6 +190,21 @@ export const PurchaseOrdersPage: React.FC = () => {
                       >
                         Inspect
                       </Button>
+                      {(po.status === 'pending_approval' || po.status === 'approved') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCustomizingOrder(po);
+                            setCustomizerMode('edit');
+                            setIsCustomizerOpen(true);
+                          }}
+                          title="Edit & Customize PO Elements"
+                          leftIcon={<Edit3 className="w-3.5 h-3.5 text-slate-700" />}
+                        >
+                          Edit
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
@@ -213,6 +250,20 @@ export const PurchaseOrdersPage: React.FC = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {(selectedOrder.status === 'pending_approval' || selectedOrder.status === 'approved') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    leftIcon={<Edit3 className="w-3.5 h-3.5" />}
+                    onClick={() => {
+                      setCustomizingOrder(selectedOrder);
+                      setCustomizerMode('edit');
+                      setIsCustomizerOpen(true);
+                    }}
+                  >
+                    Edit PO Elements
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -299,6 +350,20 @@ export const PurchaseOrdersPage: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Purchase Order Customizer Modal */}
+      <PurchaseOrderCustomizerModal
+        isOpen={isCustomizerOpen}
+        onClose={() => setIsCustomizerOpen(false)}
+        order={customizerMode === 'edit' ? customizingOrder : null}
+        mode={customizerMode}
+        onSave={saved => {
+          setOrders(store.getPurchaseOrders());
+          if (selectedOrder && selectedOrder.id === saved.id) {
+            setSelectedOrder(saved);
+          }
+        }}
+      />
     </div>
   );
 };

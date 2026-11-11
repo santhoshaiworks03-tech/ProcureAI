@@ -15,6 +15,7 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { formatCurrency } from '../../lib/utils';
+import { RegionalSettingsSection } from '../../components/admin/RegionalSettingsSection';
 
 export const AdminPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState(store.getSuppliers());
@@ -260,6 +261,9 @@ export const AdminPage: React.FC = () => {
           </table>
         </div>
       </Card>
+
+      {/* Regional & Localization Settings Module */}
+      <RegionalSettingsSection />
     </div>
   );
 };

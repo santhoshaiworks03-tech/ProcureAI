@@ -9,7 +9,15 @@ import {
   RefreshCw,
   Lock,
   Layers,
-  FileText
+  FileText,
+  Sparkles,
+  Edit3,
+  Sliders,
+  CheckCircle2,
+  Plus,
+  Package,
+  Calendar,
+  Truck
 } from 'lucide-react';
 import { store } from '../../lib/store';
 import { aiProcurementService } from '../../services/ai/aiService';
@@ -23,6 +31,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { formatCurrency } from '../../lib/utils';
+import { PurchaseOrderCustomizerModal } from '../../components/orders/PurchaseOrderCustomizerModal';
 
 export const AIAgentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -31,6 +40,12 @@ export const AIAgentPage: React.FC = () => {
   const defaultPrompt =
     searchParams.get('prompt') ||
     'I need 50 office chairs, 30 office desks and 20 filing cabinets. My budget is ₹5,00,000. Find reliable suppliers, compare prices, estimate delivery and prepare the best purchase order.';
+
+  // Mode state: 'ai' = AI Autonomous Mode, 'manual' = Manual Order Customizer
+  const [procurementMode, setProcurementMode] = useState<'ai' | 'manual'>('ai');
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+  const [customizerMode, setCustomizerMode] = useState<'edit' | 'create'>('edit');
+  const [customizationAlert, setCustomizationAlert] = useState<string | null>(null);
 
   const [inputPrompt, setInputPrompt] = useState(defaultPrompt);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,6 +63,50 @@ export const AIAgentPage: React.FC = () => {
     'Restock 60 AeroPro Ergonomic Chairs and 25 Under-Desk Cable Management Trays under ₹3,00,000.'
   ];
 
+  const handleCustomizerSave = (savedOrder: PurchaseOrder) => {
+    setGeneratedPO(savedOrder);
+    setCustomizationAlert(`Purchase Order ${savedOrder.po_number} customized with updated items, pricing, and terms.`);
+    setTimeout(() => setCustomizationAlert(null), 6000);
+
+    if (recommendation) {
+      setRecommendation({
+        ...recommendation,
+        totalProjectedCost: savedOrder.total_amount,
+        selectedSuppliers: [
+          {
+            ...recommendation.selectedSuppliers[0],
+            supplierId: savedOrder.supplier_id,
+            supplierName: savedOrder.supplier_name,
+            subtotal: savedOrder.subtotal_amount,
+            tax: savedOrder.tax_amount,
+            shipping: savedOrder.shipping_amount,
+            total: savedOrder.total_amount,
+            items: savedOrder.items.map(i => ({
+              productId: i.product_id,
+              productName: i.product_name,
+              quantity: i.quantity,
+              unitPrice: i.unit_price,
+              total: i.total_amount
+            }))
+          },
+          ...recommendation.selectedSuppliers.slice(1)
+        ]
+      });
+    }
+  };
+
+  const handleLaunchManualCreate = () => {
+    setCustomizerMode('create');
+    setIsCustomizerOpen(true);
+  };
+
+  const handleOpenEditPO = () => {
+    if (generatedPO) {
+      setCustomizerMode('edit');
+      setIsCustomizerOpen(true);
+    }
+  };
+
   const handleRunAgent = async (promptToRun = inputPrompt) => {
     if (!promptToRun.trim()) return;
 
@@ -57,6 +116,7 @@ export const AIAgentPage: React.FC = () => {
     setEvaluations([]);
     setRecommendation(null);
     setGeneratedPO(null);
+    setCustomizationAlert(null);
 
     try {
       await new Promise(r => setTimeout(r, 400));
@@ -94,6 +154,7 @@ export const AIAgentPage: React.FC = () => {
           product_id: i.productId,
           product_name: i.productName,
           quantity: i.quantity,
+          unitPrice: i.unitPrice,
           unit_price: i.unitPrice,
           total_amount: i.total
         })),
@@ -124,66 +185,243 @@ export const AIAgentPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            Autonomous Procurement Agent
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <span>Procurement Studio</span>
+            <span className="text-xs font-normal text-slate-400 font-mono">v2.4</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Parses natural language, queries verified catalogues, scores suppliers, and prepares purchase orders.
+            Dual procurement engine: Autonomous AI reasoning (Gemini 1.5) or manual granular purchase order customization.
           </p>
         </div>
 
-        <Badge variant="default" dot>
-          Human approval gate active
-        </Badge>
+        {/* Dual Mode Switcher Tabs */}
+        <div className="flex items-center gap-2">
+          <div className="flex p-1 bg-slate-100 rounded-xl border border-slate-200 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setProcurementMode('ai')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                procurementMode === 'ai'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span>AI Autonomous Mode</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setProcurementMode('manual')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                procurementMode === 'manual'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5 text-blue-600" />
+              <span>Manual Order Customizer</span>
+            </button>
+          </div>
+
+          <Badge variant="default" dot>
+            Human approval gate active
+          </Badge>
+        </div>
       </div>
 
-      {/* Prompt Card */}
-      <Card className="space-y-4">
-        <div>
-          <label className="text-xs font-semibold text-slate-900 block mb-1.5">
-            Purchasing requirement
-          </label>
-          <div className="relative">
-            <textarea
-              rows={3}
-              value={inputPrompt}
-              onChange={e => setInputPrompt(e.target.value)}
-              placeholder="Describe what you need to purchase, required quantities, and budget cap..."
-              className="w-full p-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] bg-white resize-none"
-            />
-            <div className="absolute right-2.5 bottom-2.5">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => handleRunAgent()}
-                isLoading={isProcessing}
-                leftIcon={<Bot className="w-3.5 h-3.5" />}
+      {/* Customization Alert Banner */}
+      {customizationAlert && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 flex items-center justify-between text-xs animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span className="font-medium">{customizationAlert}</span>
+          </div>
+          <Badge variant="success">Synchronized with Ledger & Approvals</Badge>
+        </div>
+      )}
+
+      {/* ===================== MODE 1: AI AUTONOMOUS AGENT ===================== */}
+      {procurementMode === 'ai' && (
+        <>
+          {/* Prompt Card */}
+          <Card className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Bot className="w-3.5 h-3.5 text-slate-700" />
+                  Natural language procurement requirement
+                </label>
+                <span className="text-[11px] text-slate-400">Powered by Gemini 1.5 Pro</span>
+              </div>
+              <div className="relative">
+                <textarea
+                  rows={3}
+                  value={inputPrompt}
+                  onChange={e => setInputPrompt(e.target.value)}
+                  placeholder="Describe what you need to purchase, required quantities, and budget cap..."
+                  className="w-full p-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#13110F] focus:border-[#13110F] bg-white resize-none"
+                />
+                <div className="absolute right-2.5 bottom-2.5">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleRunAgent()}
+                    isLoading={isProcessing}
+                    leftIcon={<Bot className="w-3.5 h-3.5" />}
+                  >
+                    Analyze & evaluate
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Suggested Prompts */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] text-slate-400 font-medium block">Reference prompts:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {suggestedPrompts.map((p, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setInputPrompt(p);
+                      handleRunAgent(p);
+                    }}
+                    className="text-left text-[11px] bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-md transition-colors truncate max-w-xl"
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
+
+      {/* ===================== MODE 2: MANUAL ORDER CUSTOMIZER ===================== */}
+      {procurementMode === 'manual' && (
+        <div className="space-y-6">
+          {/* Manual Studio Banner */}
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-2xl shadow-sm border-0">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              <div className="space-y-2 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 text-[#F2C8A8] text-xs font-semibold">
+                  <Edit3 className="w-3.5 h-3.5" />
+                  Buyer Direct Customizer
+                </div>
+                <h2 className="text-xl font-bold tracking-tight">Manual Purchase Order Studio</h2>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Directly configure suppliers, line items, custom pricing, SLA delivery schedules, and compliance warranty terms. Combine with AI Copilot instant refinements or craft complete orders manually.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+                <Button
+                  variant="primary"
+                  className="bg-[#F2C8A8] text-[#13110F] hover:bg-[#ebd5c3] font-semibold shadow-sm w-full sm:w-auto"
+                  onClick={handleLaunchManualCreate}
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
+                  Create Custom Purchase Order
+                </Button>
+                {generatedPO && (
+                  <Button
+                    variant="outline"
+                    className="bg-white/10 text-white border-white/20 hover:bg-white/20 w-full sm:w-auto"
+                    onClick={handleOpenEditPO}
+                    leftIcon={<Edit3 className="w-3.5 h-3.5" />}
+                  >
+                    Edit Active PO ({generatedPO.po_number})
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* Quick Start Presets Grid */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+                Quick-Start Order Presets
+              </span>
+              <span className="text-[11px] text-slate-500">Click any preset to prefill and launch customizer</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                onClick={handleLaunchManualCreate}
+                className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-md cursor-pointer transition-all space-y-2 group"
               >
-                Analyze & evaluate
-              </Button>
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-amber-50 text-amber-800">
+                    <Building className="w-4 h-4" />
+                  </div>
+                  <Badge variant="default">Commercial Furnishings</Badge>
+                </div>
+                <h3 className="font-semibold text-slate-900 text-xs group-hover:text-black">
+                  Executive Ergonomics Setup
+                </h3>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  50 Commercial Ergonomic Chairs, 30 Height-Adjustable Desks, and 20 Cable Organizers.
+                </p>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                  <span>Approx: {formatCurrency(485000)}</span>
+                  <span className="text-blue-600 font-medium group-hover:underline flex items-center gap-1">
+                    Customize <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+
+              <div
+                onClick={handleLaunchManualCreate}
+                className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-md cursor-pointer transition-all space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-blue-50 text-blue-800">
+                    <Package className="w-4 h-4" />
+                  </div>
+                  <Badge variant="default">IT Infrastructure</Badge>
+                </div>
+                <h3 className="font-semibold text-slate-900 text-xs group-hover:text-black">
+                  Developer Workstation Kit
+                </h3>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  15 UltraSharp 27" 4K Monitors, 15 Ergonomic Keyboards, and 15 USB-C Docks.
+                </p>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                  <span>Approx: {formatCurrency(650000)}</span>
+                  <span className="text-blue-600 font-medium group-hover:underline flex items-center gap-1">
+                    Customize <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+
+              <div
+                onClick={handleLaunchManualCreate}
+                className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-md cursor-pointer transition-all space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-emerald-50 text-emerald-800">
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <Badge variant="default">Facilities & Supplies</Badge>
+                </div>
+                <h3 className="font-semibold text-slate-900 text-xs group-hover:text-black">
+                  Facilities Restock Bundle
+                </h3>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  25 Heavy Duty Filing Cabinets, 40 Task Stools, and 30 Desktop Partitions.
+                </p>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+                  <span>Approx: {formatCurrency(310000)}</span>
+                  <span className="text-blue-600 font-medium group-hover:underline flex items-center gap-1">
+                    Customize <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Suggested Prompts */}
-        <div className="space-y-1.5 pt-1">
-          <span className="text-[11px] text-slate-400 font-medium block">Reference prompts:</span>
-          <div className="flex flex-wrap gap-1.5">
-            {suggestedPrompts.map((p, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setInputPrompt(p);
-                  handleRunAgent(p);
-                }}
-                className="text-left text-[11px] bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-md transition-colors truncate max-w-xl"
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Card>
+      )}
 
       {/* Execution Progress */}
       {isProcessing && (
@@ -327,9 +565,24 @@ export const AIAgentPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-semibold text-slate-500">03</span>
-                  <h2 className="text-sm font-semibold text-slate-900">Recommended order allocation</h2>
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-900">Recommended order allocation</h2>
+                    <p className="text-[11px] text-slate-500">Dual control: Generated by AI, customizable by Buyer</p>
+                  </div>
                 </div>
-                <Badge variant="success" dot>Recommended</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="success" dot>Recommended</Badge>
+                  {generatedPO && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleOpenEditPO}
+                      leftIcon={<Edit3 className="w-3.5 h-3.5 text-[#13110F]" />}
+                    >
+                      Edit PO Elements
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/60 text-xs text-slate-700 space-y-1.5 leading-relaxed">
@@ -339,30 +592,83 @@ export const AIAgentPage: React.FC = () => {
                 </p>
               </div>
 
-              {recommendation.selectedSuppliers.map((sup, sIdx) => (
-                <div key={sIdx} className="border border-slate-200 rounded-lg p-3.5 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-slate-500" /> {sup.supplierName}
-                    </span>
-                    <span className="text-[11px] text-slate-500">{sup.deliveryDays} business days</span>
+              {generatedPO ? (
+                <div className="border border-slate-200 rounded-xl p-4 space-y-3 bg-white shadow-2xs">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+                        <Building className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block">{generatedPO.supplier_name}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">PO: {generatedPO.po_number}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="neutral">
+                        {generatedPO.items.length} line {generatedPO.items.length === 1 ? 'item' : 'items'}
+                      </Badge>
+                      <button
+                        type="button"
+                        onClick={handleOpenEditPO}
+                        className="text-[11px] font-medium text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                      >
+                        <Edit3 className="w-3 h-3" /> Edit Elements
+                      </button>
+                    </div>
                   </div>
 
                   <div className="divide-y divide-slate-100 text-xs">
-                    {sup.items.map((line, lIdx) => (
-                      <div key={lIdx} className="flex items-center justify-between py-1.5">
-                        <span className="text-slate-700">{line.productName} (x{line.quantity})</span>
-                        <span className="font-medium text-slate-900 tabular-nums">{formatCurrency(line.total)}</span>
+                    {generatedPO.items.map((line, lIdx) => (
+                      <div key={line.id || lIdx} className="flex items-center justify-between py-2">
+                        <div>
+                          <span className="text-slate-900 font-medium block">{line.product_name}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {formatCurrency(line.unit_price)} × {line.quantity} units
+                          </span>
+                        </div>
+                        <span className="font-semibold text-slate-900 tabular-nums">
+                          {formatCurrency(line.total_amount)}
+                        </span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>Subtotal: {formatCurrency(sup.subtotal)} • GST (18%): {formatCurrency(sup.tax)} • Shipping: {formatCurrency(sup.shipping)}</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">{formatCurrency(sup.total)}</span>
+                  <div className="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+                    <span className="text-[11px]">
+                      Subtotal: <strong className="text-slate-900">{formatCurrency(generatedPO.subtotal_amount)}</strong> • GST (18%): <strong className="text-slate-900">{formatCurrency(generatedPO.tax_amount)}</strong> • Freight: <strong className="text-slate-900">{formatCurrency(generatedPO.shipping_amount)}</strong>
+                    </span>
+                    <span className="font-bold text-slate-900 tabular-nums text-sm">
+                      Total: {formatCurrency(generatedPO.total_amount)}
+                    </span>
                   </div>
                 </div>
-              ))}
+              ) : (
+                recommendation.selectedSuppliers.map((sup, sIdx) => (
+                  <div key={sIdx} className="border border-slate-200 rounded-lg p-3.5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+                        <Building className="w-3.5 h-3.5 text-slate-500" /> {sup.supplierName}
+                      </span>
+                      <span className="text-[11px] text-slate-500">{sup.deliveryDays} business days</span>
+                    </div>
+
+                    <div className="divide-y divide-slate-100 text-xs">
+                      {sup.items.map((line, lIdx) => (
+                        <div key={lIdx} className="flex items-center justify-between py-1.5">
+                          <span className="text-slate-700">{line.productName} (x{line.quantity})</span>
+                          <span className="font-medium text-slate-900 tabular-nums">{formatCurrency(line.total)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                      <span>Subtotal: {formatCurrency(sup.subtotal)} • GST (18%): {formatCurrency(sup.tax)} • Shipping: {formatCurrency(sup.shipping)}</span>
+                      <span className="font-semibold text-slate-900 tabular-nums">{formatCurrency(sup.total)}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </Card>
 
             {/* Financial Summary & Human Gate Box */}
@@ -379,7 +685,9 @@ export const AIAgentPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Order total:</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">{formatCurrency(recommendation.totalProjectedCost)}</span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      {formatCurrency(generatedPO ? generatedPO.total_amount : recommendation.totalProjectedCost)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-emerald-700 font-medium pt-1.5 border-t border-slate-100">
                     <span>Identified savings:</span>
@@ -387,7 +695,11 @@ export const AIAgentPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between text-slate-500 text-[11px]">
                     <span>Budget utilization:</span>
-                    <span className="tabular-nums">{recommendation.budgetUtilizationPercentage}%</span>
+                    <span className="tabular-nums">
+                      {generatedPO
+                        ? Math.min(100, Math.round((generatedPO.total_amount / extractedPlan.maxBudget) * 100))
+                        : recommendation.budgetUtilizationPercentage}%
+                    </span>
                   </div>
                 </div>
 
@@ -405,6 +717,16 @@ export const AIAgentPage: React.FC = () => {
               </div>
 
               <div className="space-y-2 pt-2">
+                {generatedPO && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-slate-300 hover:bg-slate-50 text-slate-800"
+                    onClick={handleOpenEditPO}
+                    leftIcon={<Edit3 className="w-3.5 h-3.5 text-[#13110F]" />}
+                  >
+                    Edit & Customize PO Elements
+                  </Button>
+                )}
                 {generatedPO && (
                   <Button
                     variant="primary"
@@ -429,6 +751,15 @@ export const AIAgentPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Purchase Order Customizer Modal */}
+      <PurchaseOrderCustomizerModal
+        isOpen={isCustomizerOpen}
+        onClose={() => setIsCustomizerOpen(false)}
+        order={customizerMode === 'edit' ? generatedPO : null}
+        mode={customizerMode}
+        onSave={handleCustomizerSave}
+      />
     </div>
   );
 };
