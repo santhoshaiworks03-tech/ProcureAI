@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -81,28 +81,58 @@ export const SupplierDashboard: React.FC = () => {
     return unsub;
   }, []);
 
-  // OmniOffice Direct scoped data
-  const myListings = supplierProducts.filter(sp => sp.supplier_id === mySupplier.id);
-  const myOrders = purchaseOrders.filter(
-    po => po.supplier_id === mySupplier.id || po.supplier_name.toLowerCase().includes('omni')
-  );
-  const myQuotations = quotations.filter(q => q.supplier_id === mySupplier.id);
+  // OmniOffice Direct scoped data (Memoized)
+  const myListings = useMemo<SupplierProduct[]>(() => {
+    return supplierProducts.filter((sp: SupplierProduct) => sp.supplier_id === mySupplier.id);
+  }, [supplierProducts, mySupplier.id]);
 
-  // Metrics
-  const totalActiveProducts = myListings.length;
-  const activeProductListings = myListings.filter(l => l.listing_status === 'active').length;
-  const pendingRfqsCount = rfqs.filter(r => r.status === 'pending').length;
-  const quotationsSubmittedCount = myQuotations.length;
-  const incomingOrdersCount = myOrders.length;
-  const ordersAwaitingDispatch = myOrders.filter(
-    po => po.status === 'approved' || po.status === 'confirmed' || po.status === 'processing'
-  ).length;
-  const completedOrdersCount = myOrders.filter(
-    po => po.status === 'delivered' || po.status === 'payment_completed'
-  ).length;
-  const totalSalesRevenue = myOrders
-    .filter(po => po.status === 'payment_completed' || po.status === 'delivered' || po.status === 'shipped')
-    .reduce((sum, po) => sum + po.total_amount, 862500);
+  const myOrders = useMemo<PurchaseOrder[]>(() => {
+    return purchaseOrders.filter(
+      (po: PurchaseOrder) => po.supplier_id === mySupplier.id || po.supplier_name.toLowerCase().includes('omni')
+    );
+  }, [purchaseOrders, mySupplier.id]);
+
+  const myQuotations = useMemo<SupplierQuotation[]>(() => {
+    return quotations.filter((q: SupplierQuotation) => q.supplier_id === mySupplier.id);
+  }, [quotations, mySupplier.id]);
+
+  // Metrics (Memoized)
+  const {
+    totalActiveProducts,
+    activeProductListings,
+    pendingRfqsCount,
+    quotationsSubmittedCount,
+    incomingOrdersCount,
+    ordersAwaitingDispatch,
+    completedOrdersCount,
+    totalSalesRevenue
+  } = useMemo(() => {
+    const activeProducts = myListings.length;
+    const activeListings = myListings.filter((l: SupplierProduct) => l.listing_status === 'active').length;
+    const pendingRfqs = rfqs.filter((r: SupplierRFQ) => r.status === 'pending').length;
+    const quotesSub = myQuotations.length;
+    const inOrders = myOrders.length;
+    const awaitingDispatch = myOrders.filter(
+      (po: PurchaseOrder) => po.status === 'approved' || po.status === 'confirmed' || po.status === 'processing'
+    ).length;
+    const completedOrders = myOrders.filter(
+      (po: PurchaseOrder) => po.status === 'delivered' || po.status === 'payment_completed'
+    ).length;
+    const salesRevenue = myOrders
+      .filter((po: PurchaseOrder) => po.status === 'payment_completed' || po.status === 'delivered' || po.status === 'shipped')
+      .reduce((sum: number, po: PurchaseOrder) => sum + po.total_amount, 862500);
+
+    return {
+      totalActiveProducts: activeProducts,
+      activeProductListings: activeListings,
+      pendingRfqsCount: pendingRfqs,
+      quotationsSubmittedCount: quotesSub,
+      incomingOrdersCount: inOrders,
+      ordersAwaitingDispatch: awaitingDispatch,
+      completedOrdersCount: completedOrders,
+      totalSalesRevenue: salesRevenue
+    };
+  }, [myListings, rfqs, myQuotations, myOrders]);
 
   // Actions
   const handleDispatch = async (poId: string) => {

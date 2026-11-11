@@ -39,15 +39,19 @@ export const PurchaseOrdersPage: React.FC = () => {
     }
   }, [initialPoId]);
 
-  const filteredOrders = orders.filter(po => {
-    const matchesSearch =
-      po.po_number.toLowerCase().includes(search.toLowerCase()) ||
-      po.supplier_name.toLowerCase().includes(search.toLowerCase()) ||
-      (po.payment_reference && po.payment_reference.toLowerCase().includes(search.toLowerCase()));
+  const filteredOrders = React.useMemo(() => {
+    const s = search.trim().toLowerCase();
+    return orders.filter(po => {
+      const matchesSearch =
+        !s ||
+        po.po_number.toLowerCase().includes(s) ||
+        po.supplier_name.toLowerCase().includes(s) ||
+        (po.payment_reference && po.payment_reference.toLowerCase().includes(s));
 
-    const matchesStatus = statusFilter === 'all' || po.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus = statusFilter === 'all' || po.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [orders, search, statusFilter]);
 
   const getStatusBadge = (status: PurchaseOrderStatus) => {
     switch (status) {

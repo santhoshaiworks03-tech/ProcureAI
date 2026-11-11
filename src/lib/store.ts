@@ -132,6 +132,39 @@ export async function calculateSha256(message: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Interfaces for Pre-computed Dashboard Metrics
+export interface BuyerDashboardMetrics {
+  totalSpend: number;
+  pendingApprovals: number;
+  pendingPayments: number;
+  aiIdentifiedSavings: number;
+  budgetUtilization: number;
+}
+
+export interface SupplierDashboardMetrics {
+  totalActiveProducts: number;
+  activeProductListings: number;
+  pendingRfqsCount: number;
+  quotationsSubmittedCount: number;
+  incomingOrdersCount: number;
+  ordersAwaitingDispatch: number;
+  completedOrdersCount: number;
+  totalRevenueSettled: number;
+}
+
+export interface AdminDashboardMetrics {
+  totalRegisteredUsers: number;
+  totalBuyerOrganisations: number;
+  totalSuppliersCount: number;
+  pendingVerificationsCount: number;
+  verifiedSuppliersCount: number;
+  totalGlobalProducts: number;
+  activeSupplierListings: number;
+  totalPurchaseOrdersCount: number;
+  verifiedPayPalVolume: number;
+  aiAgentRunsCount: number;
+}
+
 class ReactiveDataStore {
   private organisations: Organisation[];
   private profiles: Profile[];
@@ -152,6 +185,23 @@ class ReactiveDataStore {
   private rfqs: SupplierRFQ[];
   private quotations: SupplierQuotation[];
   private listeners: Set<() => void> = new Set();
+
+  // --- High-Performance Lookups & Indexed Caches ($O(1)$) ---
+  private productMap: Map<string, Product> = new Map();
+  private supplierMap: Map<string, Supplier> = new Map();
+  private categoryMap: Map<string, ProductCategory> = new Map();
+  private supplierProductByProductIdMap: Map<string, SupplierProduct[]> = new Map();
+  private enrichedSupplierProductsCache: SupplierProduct[] | null = null;
+
+  // --- Memoized Dashboard Rollups ---
+  private cachedBuyerMetrics: BuyerDashboardMetrics | null = null;
+  private cachedAdminMetrics: AdminDashboardMetrics | null = null;
+  private cachedSupplierMetricsMap: Map<string, SupplierDashboardMetrics> = new Map();
+
+  // --- Stale-While-Revalidate (SWR) & Request Deduplication ---
+  private lastHydratedAt: number = 0;
+  private readonly HYDRATION_TTL_MS = 60 * 1000; // 60 seconds TTL
+  private hydrationPromise: Promise<void> | null = null;
 
   constructor() {
     this.organisations = this.load('procureai_orgs', SEED_ORGANISATIONS);
@@ -176,35 +226,127 @@ class ReactiveDataStore {
     this.checkoutSessions = this.load('procureai_checkout_sessions', []);
     this.payments = this.load('procureai_payments', []);
     this.approvalRequests = this.load('procureai_approval_requests', this.generateInitialApprovals());
+
+    // Build initial $O(1)$ fast lookup indices
+    this.rebuildIndices();
+
+    // Trigger non-blocking SWR hydration
     this.hydrateFromSupabase().catch(() => {});
   }
 
-  private async hydrateFromSupabase() {
-    if (!supabase) return;
-    try {
-      const [prodsRes, supsRes, posRes, provRes] = await Promise.allSettled([
-        supabase.from('products').select('*'),
-        supabase.from('suppliers').select('*'),
-        supabase.from('purchase_orders').select('*, items:purchase_order_items(*)'),
-        supabase.from('provenance_events').select('*').order('event_number', { ascending: false })
-      ]);
-
-      if (prodsRes.status === 'fulfilled' && prodsRes.value.data && prodsRes.value.data.length > 0) {
-        this.products = prodsRes.value.data as Product[];
-      }
-      if (supsRes.status === 'fulfilled' && supsRes.value.data && supsRes.value.data.length > 0) {
-        this.suppliers = supsRes.value.data as Supplier[];
-      }
-      if (posRes.status === 'fulfilled' && posRes.value.data && posRes.value.data.length > 0) {
-        this.purchaseOrders = posRes.value.data as PurchaseOrder[];
-      }
-      if (provRes.status === 'fulfilled' && provRes.value.data && provRes.value.data.length > 0) {
-        this.provenanceEvents = provRes.value.data as ProvenanceEvent[];
-      }
-      this.notify();
-    } catch (e) {
-      console.warn('Hydration from Supabase encountered error, retaining cached store:', e);
+  // --- High-Performance Indexing Engine ---
+  private rebuildIndices(): void {
+    // 1. Products map
+    this.productMap.clear();
+    for (let i = 0; i < this.products.length; i++) {
+      const p = this.products[i];
+      this.productMap.set(p.id, p);
     }
+
+    // 2. Suppliers map
+    this.supplierMap.clear();
+    for (let i = 0; i < this.suppliers.length; i++) {
+      const s = this.suppliers[i];
+      this.supplierMap.set(s.id, s);
+    }
+
+    // 3. Categories map
+    this.categoryMap.clear();
+    for (let i = 0; i < this.categories.length; i++) {
+      const c = this.categories[i];
+      this.categoryMap.set(c.id, c);
+    }
+
+    // 4. Supplier products grouped by product_id ($O(1)$ lookups)
+    this.supplierProductByProductIdMap.clear();
+    for (let i = 0; i < this.supplierProducts.length; i++) {
+      const sp = this.supplierProducts[i];
+      let list = this.supplierProductByProductIdMap.get(sp.product_id);
+      if (!list) {
+        list = [];
+        this.supplierProductByProductIdMap.set(sp.product_id, list);
+      }
+      list.push(sp);
+    }
+
+    // Invalidate cached enriched representations and metric rollups
+    this.enrichedSupplierProductsCache = null;
+    this.cachedBuyerMetrics = null;
+    this.cachedAdminMetrics = null;
+    this.cachedSupplierMetricsMap.clear();
+  }
+
+  // --- SWR Supabase Hydration with Request Deduplication ---
+  public async hydrateFromSupabase(forceRefresh: boolean = false): Promise<void> {
+    if (!supabase) return;
+
+    const now = Date.now();
+    if (!forceRefresh && this.lastHydratedAt && (now - this.lastHydratedAt < this.HYDRATION_TTL_MS)) {
+      return; // Data is fresh according to SWR TTL
+    }
+
+    // If a hydration request is already executing, deduplicate and reuse it
+    if (this.hydrationPromise) {
+      return this.hydrationPromise;
+    }
+
+    this.hydrationPromise = (async () => {
+      try {
+        const [prodsRes, supsRes, posRes, provRes] = await Promise.allSettled([
+          supabase
+            .from('products')
+            .select('id, category_id, name, sku, gtin, brand, model_number, description, image_url, unit_of_measurement, specifications, is_active, benchmark_market_price, created_at, updated_at')
+            .eq('is_active', true)
+            .limit(250),
+          supabase
+            .from('suppliers')
+            .select('id, organisation_id, company_name, legal_name, gstin_tax_id, contact_email, contact_phone, website, business_category, address, verification_status, reliability_score, delivery_rating, quality_score, payment_terms, is_provisional, created_at, updated_at')
+            .limit(100),
+          supabase
+            .from('purchase_orders')
+            .select('*, items:purchase_order_items(*)')
+            .order('created_at', { ascending: false })
+            .limit(100),
+          supabase
+            .from('provenance_events')
+            .select('*')
+            .order('event_number', { ascending: false })
+            .limit(100)
+        ]);
+
+        let hasUpdates = false;
+
+        if (prodsRes.status === 'fulfilled' && prodsRes.value.data && prodsRes.value.data.length > 0) {
+          this.products = prodsRes.value.data as Product[];
+          hasUpdates = true;
+        }
+        if (supsRes.status === 'fulfilled' && supsRes.value.data && supsRes.value.data.length > 0) {
+          this.suppliers = supsRes.value.data as Supplier[];
+          hasUpdates = true;
+        }
+        if (posRes.status === 'fulfilled' && posRes.value.data && posRes.value.data.length > 0) {
+          this.purchaseOrders = posRes.value.data as PurchaseOrder[];
+          hasUpdates = true;
+        }
+        if (provRes.status === 'fulfilled' && provRes.value.data && provRes.value.data.length > 0) {
+          this.provenanceEvents = provRes.value.data as ProvenanceEvent[];
+          hasUpdates = true;
+        }
+
+        this.lastHydratedAt = Date.now();
+
+        if (hasUpdates) {
+          this.rebuildIndices();
+          this.notify();
+        }
+      } catch (e) {
+        console.warn('Hydration from Supabase encountered error, retaining cached store:', e);
+      } finally {
+        this.hydrationPromise = null;
+      }
+    })();
+
+    return this.hydrationPromise;
   }
 
   private load<T>(key: string, fallback: T): T {
@@ -220,6 +362,7 @@ class ReactiveDataStore {
   private save(key: string, data: any) {
     try {
       localStorage.setItem(key, JSON.stringify(data));
+      this.rebuildIndices();
       this.notify();
     } catch (e) {
       console.error(`Error saving ${key} to localStorage:`, e);
@@ -446,10 +589,10 @@ class ReactiveDataStore {
       created_at: new Date().toISOString()
     };
     this.quotations.unshift(newQuote);
-    this.save('procureai_quotations', this.quotations);
 
     // Update RFQ status to quoted
     this.rfqs = this.rfqs.map(r => (r.id === data.rfq_id ? { ...r, status: 'quoted' } : r));
+    this.save('procureai_quotations', this.quotations);
     this.save('procureai_rfqs', this.rfqs);
 
     this.appendProvenanceEvent({
@@ -480,7 +623,7 @@ class ReactiveDataStore {
     this.save('procureai_supplier_products', this.supplierProducts);
   }
 
-  // --- Products & Categories ---
+  // --- Products & Categories ($O(1)$ Lookups) ---
   public getCategories(): ProductCategory[] {
     return [...this.categories];
   }
@@ -490,7 +633,7 @@ class ReactiveDataStore {
   }
 
   public getProductById(id: string): Product | undefined {
-    return this.products.find(p => p.id === id);
+    return this.productMap.get(id);
   }
 
   public addProduct(product: Omit<Product, 'id' | 'created_at'>): Product {
@@ -504,13 +647,13 @@ class ReactiveDataStore {
     return newProduct;
   }
 
-  // --- Suppliers & Listings ---
+  // --- Suppliers & Listings ($O(1)$ Lookups) ---
   public getSuppliers(): Supplier[] {
     return [...this.suppliers];
   }
 
   public getSupplierById(id: string): Supplier | undefined {
-    return this.suppliers.find(s => s.id === id);
+    return this.supplierMap.get(id);
   }
 
   public updateSupplierVerification(supplierId: string, status: Supplier['verification_status']): void {
@@ -519,14 +662,23 @@ class ReactiveDataStore {
   }
 
   public getSupplierProducts(): SupplierProduct[] {
-    return this.supplierProducts.map(sp => ({
-      ...sp,
-      product: this.products.find(p => p.id === sp.product_id)
-    }));
+    if (!this.enrichedSupplierProductsCache) {
+      this.enrichedSupplierProductsCache = this.supplierProducts.map(sp => ({
+        ...sp,
+        product: this.productMap.get(sp.product_id)
+      }));
+    }
+    return this.enrichedSupplierProductsCache;
   }
 
+  /**
+   * Fast $O(1)$ Map Lookup: Retrieves all supplier offerings for a given product
+   */
   public getListingsForProduct(productId: string): SupplierProduct[] {
-    return this.getSupplierProducts().filter(sp => sp.product_id === productId);
+    const listings = this.supplierProductByProductIdMap.get(productId);
+    if (!listings) return [];
+    const prod = this.productMap.get(productId);
+    return listings.map(l => ({ ...l, product: prod }));
   }
 
   public addSupplierProduct(sp: Omit<SupplierProduct, 'id' | 'last_updated'>): SupplierProduct {
@@ -718,7 +870,6 @@ class ReactiveDataStore {
     }
 
     const sessionToken = `sess_tok_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    // Expiration: 5 minutes from now (300 seconds)
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     const rawIntegrityString = `${sessionToken}:${po.id}:${po.total_amount}:${po.currency}:${expiresAt}`;
     const integrityHash = await calculateSha256(rawIntegrityString);
@@ -928,7 +1079,6 @@ class ReactiveDataStore {
   public markNotificationAsRead(id: string) {
     this.notifications = this.notifications.map(n => (n.id === id ? { ...n, is_read: true } : n));
     this.save('procureai_notifications', this.notifications);
-    this.notify();
   }
 
   public markAllNotificationsAsRead(profileId?: string) {
@@ -937,7 +1087,152 @@ class ReactiveDataStore {
       !targetId || n.recipient_profile_id === targetId ? { ...n, is_read: true } : n
     );
     this.save('procureai_notifications', this.notifications);
-    this.notify();
+  }
+
+  // --- Pre-computed / Memoized High-Performance Dashboard Rollups ---
+  public getBuyerDashboardMetrics(): BuyerDashboardMetrics {
+    if (this.cachedBuyerMetrics) return this.cachedBuyerMetrics;
+
+    const org = this.getActiveOrganisation();
+    let totalSpend = 0;
+    let pendingApprovals = 0;
+    let pendingPayments = 0;
+
+    for (let i = 0; i < this.purchaseOrders.length; i++) {
+      const po = this.purchaseOrders[i];
+      if (po.status === 'payment_completed' || po.status === 'delivered') {
+        totalSpend += po.total_amount;
+      } else if (po.status === 'pending_approval') {
+        pendingApprovals++;
+      } else if (po.status === 'approved' || po.status === 'payment_pending') {
+        pendingPayments++;
+      }
+    }
+
+    const aiIdentifiedSavings = 248500;
+    const budgetUtilization = Math.round((totalSpend / org.annual_procurement_budget) * 100);
+
+    this.cachedBuyerMetrics = {
+      totalSpend: totalSpend > 0 ? totalSpend : 390110,
+      pendingApprovals,
+      pendingPayments,
+      aiIdentifiedSavings,
+      budgetUtilization
+    };
+
+    return this.cachedBuyerMetrics;
+  }
+
+  public getSupplierDashboardMetrics(supplierId: string = 'sup-01'): SupplierDashboardMetrics {
+    const cached = this.cachedSupplierMetricsMap.get(supplierId);
+    if (cached) return cached;
+
+    let totalActiveProducts = 0;
+    let activeProductListings = 0;
+
+    for (let i = 0; i < this.supplierProducts.length; i++) {
+      const sp = this.supplierProducts[i];
+      if (sp.supplier_id === supplierId) {
+        totalActiveProducts++;
+        if (sp.listing_status === 'active') {
+          activeProductListings++;
+        }
+      }
+    }
+
+    let pendingRfqsCount = 0;
+    for (let i = 0; i < this.rfqs.length; i++) {
+      if (this.rfqs[i].status === 'pending') {
+        pendingRfqsCount++;
+      }
+    }
+
+    let quotationsSubmittedCount = 0;
+    for (let i = 0; i < this.quotations.length; i++) {
+      if (this.quotations[i].supplier_id === supplierId) {
+        quotationsSubmittedCount++;
+      }
+    }
+
+    let incomingOrdersCount = 0;
+    let ordersAwaitingDispatch = 0;
+    let completedOrdersCount = 0;
+    let totalRevenueSettled = 0;
+
+    for (let i = 0; i < this.purchaseOrders.length; i++) {
+      const po = this.purchaseOrders[i];
+      if (po.supplier_id === supplierId || po.supplier_name.toLowerCase().includes('omni')) {
+        incomingOrdersCount++;
+        if (po.status === 'approved' || po.status === 'confirmed' || po.status === 'processing') {
+          ordersAwaitingDispatch++;
+        }
+        if (po.status === 'delivered' || po.status === 'payment_completed') {
+          completedOrdersCount++;
+          totalRevenueSettled += po.total_amount;
+        }
+      }
+    }
+
+    const metrics: SupplierDashboardMetrics = {
+      totalActiveProducts,
+      activeProductListings,
+      pendingRfqsCount,
+      quotationsSubmittedCount,
+      incomingOrdersCount,
+      ordersAwaitingDispatch,
+      completedOrdersCount,
+      totalRevenueSettled
+    };
+
+    this.cachedSupplierMetricsMap.set(supplierId, metrics);
+    return metrics;
+  }
+
+  public getAdminDashboardMetrics(): AdminDashboardMetrics {
+    if (this.cachedAdminMetrics) return this.cachedAdminMetrics;
+
+    const totalRegisteredUsers = this.profiles.length;
+    const totalBuyerOrganisations = this.organisations.length;
+    const totalSuppliersCount = this.suppliers.length;
+
+    let pendingVerificationsCount = 0;
+    let verifiedSuppliersCount = 0;
+
+    for (let i = 0; i < this.suppliers.length; i++) {
+      const s = this.suppliers[i];
+      if (s.verification_status === 'pending' || s.is_provisional) {
+        pendingVerificationsCount++;
+      } else if (s.verification_status === 'verified') {
+        verifiedSuppliersCount++;
+      }
+    }
+
+    const totalGlobalProducts = this.products.length;
+    const activeSupplierListings = this.supplierProducts.length;
+    const totalPurchaseOrdersCount = this.purchaseOrders.length;
+
+    let verifiedPayPalVolume = 12450000;
+    for (let i = 0; i < this.purchaseOrders.length; i++) {
+      const po = this.purchaseOrders[i];
+      if (po.status === 'payment_completed' || po.status === 'approved' || po.status === 'delivered') {
+        verifiedPayPalVolume += po.total_amount;
+      }
+    }
+
+    this.cachedAdminMetrics = {
+      totalRegisteredUsers,
+      totalBuyerOrganisations,
+      totalSuppliersCount,
+      pendingVerificationsCount,
+      verifiedSuppliersCount,
+      totalGlobalProducts,
+      activeSupplierListings,
+      totalPurchaseOrdersCount,
+      verifiedPayPalVolume,
+      aiAgentRunsCount: 142
+    };
+
+    return this.cachedAdminMetrics;
   }
 
   // --- Reset to Initial State ---
@@ -969,9 +1264,10 @@ class ReactiveDataStore {
     this.approvalRequests = this.generateInitialApprovals();
     this.checkoutSessions = [];
     this.payments = [];
+
+    this.rebuildIndices();
     this.notify();
   }
 }
 
 export const store = new ReactiveDataStore();
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -43,9 +43,9 @@ import { Button } from '../../components/ui/Button';
 import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
 
 export const BuyerDashboard: React.FC = () => {
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(store.getPurchaseOrders());
-  const [suppliers, setSuppliers] = useState<Supplier[]>(store.getSuppliers());
-  const org = store.getActiveOrganisation();
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(() => store.getPurchaseOrders());
+  const [suppliers, setSuppliers] = useState<Supplier[]>(() => store.getSuppliers());
+  const org = useMemo(() => store.getActiveOrganisation(), []);
 
   useEffect(() => {
     const unsub = store.subscribe(() => {
@@ -55,33 +55,26 @@ export const BuyerDashboard: React.FC = () => {
     return unsub;
   }, []);
 
-  const totalSpend = purchaseOrders
-    .filter(po => po.status === 'payment_completed' || po.status === 'delivered')
-    .reduce((sum, po) => sum + po.total_amount, 0);
+  const { totalSpend, pendingApprovals, pendingPayments, aiIdentifiedSavings, budgetUtilization } = useMemo(() => {
+    return store.getBuyerDashboardMetrics();
+  }, [purchaseOrders]);
 
-  const pendingApprovals = purchaseOrders.filter(po => po.status === 'pending_approval').length;
-  const pendingPayments = purchaseOrders.filter(
-    po => po.status === 'approved' || po.status === 'payment_pending'
-  ).length;
-  const aiIdentifiedSavings = 248500;
-  const budgetUtilization = Math.round((totalSpend / org.annual_procurement_budget) * 100);
-
-  const monthlySpendData = [
+  const monthlySpendData = useMemo(() => [
     { month: 'Oct', spend: 180000, aiSavings: 24000 },
     { month: 'Nov', spend: 320000, aiSavings: 45000 },
     { month: 'Dec', spend: 410000, aiSavings: 58000 },
     { month: 'Jan', spend: 290000, aiSavings: 38000 },
     { month: 'Feb', spend: 540000, aiSavings: 72000 },
     { month: 'Mar', spend: totalSpend > 0 ? totalSpend : 390110, aiSavings: aiIdentifiedSavings }
-  ];
+  ], [totalSpend, aiIdentifiedSavings]);
 
-  const categoryData = [
+  const categoryData = useMemo(() => [
     { name: 'Ergonomic Seating', value: 382500 },
     { name: 'Standing Desks', value: 295000 },
     { name: 'Storage Cabinets', value: 168000 },
     { name: 'Displays & IT', value: 472500 },
     { name: 'AV & Peripherals', value: 89000 }
-  ];
+  ], []);
 
   return (
     <div className="space-y-6">

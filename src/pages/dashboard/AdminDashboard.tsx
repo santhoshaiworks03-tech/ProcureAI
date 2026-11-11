@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -40,11 +40,11 @@ export const AdminDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
 
-  const [suppliers, setSuppliers] = useState<Supplier[]>(store.getSuppliers());
-  const [profiles, setProfiles] = useState<Profile[]>(store.getAllProfiles());
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(store.getPurchaseOrders());
-  const [products, setProducts] = useState<Product[]>(store.getProducts());
-  const [organisations, setOrganisations] = useState<Organisation[]>(store.getAllOrganisations());
+  const [suppliers, setSuppliers] = useState<Supplier[]>(() => store.getSuppliers());
+  const [profiles, setProfiles] = useState<Profile[]>(() => store.getAllProfiles());
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(() => store.getPurchaseOrders());
+  const [products, setProducts] = useState<Product[]>(() => store.getProducts());
+  const [organisations, setOrganisations] = useState<Organisation[]>(() => store.getAllOrganisations());
   const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'buyer' | 'supplier' | 'admin'>('all');
   const [catalogueCategoryFilter, setCatalogueCategoryFilter] = useState<string>('all');
 
@@ -59,21 +59,21 @@ export const AdminDashboard: React.FC = () => {
     return unsub;
   }, []);
 
-  // Platform Metrics
-  const totalRegisteredUsers = profiles.length;
-  const totalBuyerOrganisations = organisations.length;
-  const totalSuppliersCount = suppliers.length;
-  const pendingVerificationsCount = suppliers.filter(
-    s => s.verification_status === 'pending' || s.is_provisional
-  ).length;
-  const verifiedSuppliersCount = suppliers.filter(s => s.verification_status === 'verified').length;
-  const totalGlobalProducts = products.length;
-  const activeSupplierListings = store.getSupplierProducts().length;
-  const totalPurchaseOrdersCount = purchaseOrders.length;
-  const verifiedPayPalVolume = purchaseOrders
-    .filter(po => po.status === 'payment_completed' || po.status === 'approved' || po.status === 'delivered')
-    .reduce((sum, po) => sum + po.total_amount, 12450000);
-  const aiAgentRunsCount = 142;
+  // Platform Metrics (Memoized)
+  const {
+    totalRegisteredUsers,
+    totalBuyerOrganisations,
+    totalSuppliersCount,
+    pendingVerificationsCount,
+    verifiedSuppliersCount,
+    totalGlobalProducts,
+    activeSupplierListings,
+    totalPurchaseOrdersCount,
+    verifiedPayPalVolume,
+    aiAgentRunsCount
+  } = useMemo(() => {
+    return store.getAdminDashboardMetrics();
+  }, [profiles, organisations, suppliers, products, purchaseOrders]);
 
   // Actions
   const handleVerifySupplier = (supplierId: string, status: 'verified' | 'rejected') => {
@@ -84,17 +84,23 @@ export const AdminDashboard: React.FC = () => {
     store.toggleProfileStatus(userId);
   };
 
-  const filteredUsers = profiles.filter(u => {
-    if (userRoleFilter === 'all') return true;
-    return u.role === userRoleFilter;
-  });
+  const filteredUsers = useMemo<Profile[]>(() => {
+    return profiles.filter((u: Profile) => {
+      if (userRoleFilter === 'all') return true;
+      return u.role === userRoleFilter;
+    });
+  }, [profiles, userRoleFilter]);
 
-  const filteredProducts = products.filter(p => {
-    if (catalogueCategoryFilter === 'all') return true;
-    return (p.category_name || 'General') === catalogueCategoryFilter;
-  });
+  const filteredProducts = useMemo<Product[]>(() => {
+    return products.filter((p: Product) => {
+      if (catalogueCategoryFilter === 'all') return true;
+      return (p.category_name || 'General') === catalogueCategoryFilter;
+    });
+  }, [products, catalogueCategoryFilter]);
 
-  const categories = ['all', ...Array.from(new Set(products.map(p => p.category_name || 'General')))];
+  const categories = useMemo<string[]>(() => {
+    return ['all', ...Array.from(new Set(products.map((p: Product) => p.category_name || 'General')))];
+  }, [products]);
 
   const ADMIN_MENU_HEADINGS: Record<string, { title: string; subtitle: string }> = {
     overview: {

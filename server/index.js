@@ -1,17 +1,55 @@
 import express from 'express';
 import cors from 'cors';
 import crypto from 'crypto';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(express.json());
+// 1. Performance Middleware: HTTP payload compression (gzip / deflate)
+app.use(compression({
+  threshold: 1024, // Only compress responses larger than 1KB
+  level: 6 // Balanced compression vs CPU overhead
+}));
 
-// In-memory checkout sessions and orders for server verification
+// 2. High-Throughput CORS & JSON parsing
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+app.use(express.json({ limit: '1mb' }));
+
+// 3. Rate Limiting Protection (DDoS mitigation & burst handling)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes window
+  max: 500, // Up to 500 requests per 15 minutes per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Rate limit exceeded. Please retry after a brief pause.' }
+});
+app.use('/api/', apiLimiter);
+
+// In-memory checkout sessions map
 const activeCheckoutSessions = new Map();
 
-// Helper: PayPal Sandbox Access Token generator
+// Periodic automatic memory leak prevention: prune expired sessions every 5 minutes
+const cleanupTimer = setInterval(() => {
+  const now = Date.now();
+  for (const [token, session] of activeCheckoutSessions.entries()) {
+    if (new Date(session.expiresAt).getTime() < now) {
+      activeCheckoutSessions.delete(token);
+    }
+  }
+}, 5 * 60 * 1000);
+if (cleanupTimer.unref) cleanupTimer.unref();
+
+// In-Memory OAuth Token Cache (Prevents slow external PayPal OAuth round-trips)
+let cachedPayPalToken = null;
+let payPalTokenExpiresAt = 0;
+
+// Helper: High-Performance PayPal Sandbox Access Token with TTL Caching
 async function getPayPalAccessToken() {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
@@ -19,6 +57,12 @@ async function getPayPalAccessToken() {
 
   if (!clientId || !clientSecret || clientId === 'test' || clientId.includes('placeholder')) {
     return null; // Signals sandbox fallback / simulation mode
+  }
+
+  const now = Date.now();
+  // Return cached token if valid for at least another 2 minutes (120 seconds safety margin)
+  if (cachedPayPalToken && payPalTokenExpiresAt > now + 120 * 1000) {
+    return cachedPayPalToken;
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -36,16 +80,27 @@ async function getPayPalAccessToken() {
   }
 
   const data = await response.json();
-  return data.access_token;
+  cachedPayPalToken = data.access_token;
+  // TTL: PayPal standard is 32400 seconds (9 hours)
+  const ttlSeconds = typeof data.expires_in === 'number' ? data.expires_in : 32400;
+  payPalTokenExpiresAt = now + ttlSeconds * 1000;
+
+  return cachedPayPalToken;
 }
 
-// 1. Health & Config endpoint
+// 1. Health & Config endpoint with HTTP caching headers
 app.get('/api/health', (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
+    'X-Content-Type-Options': 'nosniff'
+  });
   res.json({
     status: 'healthy',
     product: 'ProcureAI',
     aiProvider: process.env.AI_PROVIDER || 'gemini',
     paypalMode: 'sandbox',
+    activeSessionsCount: activeCheckoutSessions.size,
+    tokenCached: Boolean(cachedPayPalToken && payPalTokenExpiresAt > Date.now()),
     timestamp: new Date().toISOString()
   });
 });
@@ -90,11 +145,6 @@ app.post('/api/checkout/session', (req, res) => {
 app.post('/api/paypal/create-order', async (req, res) => {
   try {
     const { sessionToken, purchaseOrderId, amount, currency } = req.body;
-
-    const session = activeCheckoutSessions.get(sessionToken);
-    if (!session && sessionToken !== 'test-bypass') {
-      // Allow graceful verification
-    }
 
     const token = await getPayPalAccessToken();
     const baseUrl = process.env.PAYPAL_API_BASE_URL || 'https://api-m.sandbox.paypal.com';
@@ -197,17 +247,14 @@ app.post('/api/paypal/capture-order', async (req, res) => {
 // 5. PayPal Webhook endpoint
 app.post('/api/paypal/webhook', (req, res) => {
   const event = req.body;
-  console.log('Received PayPal Webhook Event:', event.event_type);
-
   // Return 200 OK immediately to PayPal webhook dispatcher
   res.status(200).json({
     received: true,
-    eventType: event.event_type,
-    id: event.id
+    eventType: event?.event_type,
+    id: event?.id
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`[ProcureAI Server] Running on http://localhost:${PORT}`);
+  console.log(`[ProcureAI Server] High-performance server running on http://localhost:${PORT}`);
 });
-
