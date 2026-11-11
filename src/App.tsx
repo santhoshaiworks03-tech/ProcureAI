@@ -149,7 +149,7 @@ export function App() {
             <Route
               path="/intelligence"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer']}>
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
                   <SupplierIntelligencePage />
                 </RoleProtectedRoute>
               }
@@ -157,7 +157,7 @@ export function App() {
             <Route
               path="/forecasting"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer']}>
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
                   <DemandForecastingPage />
                 </RoleProtectedRoute>
               }
@@ -189,15 +189,17 @@ export function App() {
             <Route
               path="/provenance"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer']}>
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
                   <ProvenanceLedgerPage />
                 </RoleProtectedRoute>
               }
             />
+            <Route path="/ledger" element={<Navigate to="/provenance" replace />} />
+            <Route path="/ai-agents" element={<Navigate to="/agent" replace />} />
             <Route
               path="/analytics"
               element={
-                <RoleProtectedRoute allowedRoles={['buyer']}>
+                <RoleProtectedRoute allowedRoles={['buyer', 'admin']}>
                   <AnalyticsPage />
                 </RoleProtectedRoute>
               }
