@@ -711,7 +711,7 @@ export const SupplierDashboard: React.FC = () => {
                           className="flex-1 rounded-xl text-xs"
                           onClick={() => handleOpenQuoteModal(rfq)}
                         >
-                          Submit Quotation
+                          Accept Quotation
                         </Button>
                         <Button
                           variant="outline"
@@ -1224,7 +1224,7 @@ export const SupplierDashboard: React.FC = () => {
                             className="flex-1 rounded-xl text-xs"
                             onClick={() => handleOpenQuoteModal(rfq)}
                           >
-                            Submit Quotation
+                            Accept Quotation
                           </Button>
                           <Button
                             variant="outline"
@@ -1382,7 +1382,7 @@ export const SupplierDashboard: React.FC = () => {
             >
               <div className="flex items-center justify-between border-b border-[rgba(19,17,15,0.08)] pb-3">
                 <div>
-                  <h3 className="text-sm font-bold text-[#13110F]">Submit Commercial Quotation</h3>
+                  <h3 className="text-sm font-bold text-[#13110F]">Accept Commercial Quotation</h3>
                   <span className="text-[11px] text-[#8C847D] font-mono">{quotingRfq.rfq_number} • {quotingRfq.title}</span>
                 </div>
                 <button onClick={() => setQuotingRfq(null)} className="p-1 rounded-lg text-[#8C847D] hover:text-[#13110F]">
@@ -1471,7 +1471,7 @@ export const SupplierDashboard: React.FC = () => {
                     Cancel
                   </Button>
                   <Button type="submit" variant="primary" size="sm" disabled={isSubmittingQuote}>
-                    {isSubmittingQuote ? 'Submitting...' : 'Confirm & Submit Quote'}
+                    {isSubmittingQuote ? 'Accepting...' : 'Confirm & Accept Quotation'}
                   </Button>
                 </div>
               </form>
