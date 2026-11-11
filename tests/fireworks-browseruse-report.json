@@ -1,0 +1,277 @@
+{
+  "targetUrl": "https://procureai-hazel.vercel.app",
+  "durationSeconds": "41.4",
+  "passed": 39,
+  "failed": 0,
+  "metrics": [
+    {
+      "name": "Navigate to /landing",
+      "duration": 4346
+    },
+    {
+      "name": "Navigate to /login",
+      "duration": 1766
+    },
+    {
+      "name": "Navigate to /buyer/dashboard",
+      "duration": 2176
+    },
+    {
+      "name": "Navigate to /catalogue",
+      "duration": 2282
+    },
+    {
+      "name": "Navigate to /approvals",
+      "duration": 2286
+    },
+    {
+      "name": "Navigate to /supplier/dashboard",
+      "duration": 1892
+    },
+    {
+      "name": "Navigate to /supplier/dashboard?tab=inventory",
+      "duration": 2068
+    },
+    {
+      "name": "Navigate to /supplier/dashboard?tab=rfqs",
+      "duration": 1675
+    },
+    {
+      "name": "Navigate to /admin/dashboard",
+      "duration": 2117
+    },
+    {
+      "name": "Navigate to /provenance",
+      "duration": 1809
+    },
+    {
+      "name": "Navigate to /forecasting",
+      "duration": 1814
+    },
+    {
+      "name": "Navigate to /agent",
+      "duration": 2052
+    },
+    {
+      "name": "Navigate to /buyer/dashboard",
+      "duration": 1778
+    }
+  ],
+  "consoleErrors": [],
+  "assertions": [
+    {
+      "message": "Hero headline rendered with expected brand title: \"Procurement, Powered by Intelligence\n.\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Primary Call-To-Action (Start Procurement) visible",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Hover interaction on \"CTA / Feature Button on Landing Page\" exhibits smooth dynamic micro-interaction transition",
+      "pass": true,
+      "metadata": {
+        "computedTransform": "matrix(1, 0, 0, 1, 0, -3)",
+        "classes": "inline-flex items-center justify-center transition-all duration-200 ease-out foc"
+      }
+    },
+    {
+      "message": "Sign-In heading rendered: \"Sign In to Your ProcureAI Portal\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Buyer Portal login gateway option available",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Supplier Portal login gateway option available",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Admin Control Tower login gateway option available",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Hover interaction on \"Buyer Portal Role Selector Card\" exhibits smooth dynamic micro-interaction transition",
+      "pass": true,
+      "metadata": {
+        "computedTransform": "matrix(1, 0, 0, 1, 0, -3)",
+        "classes": "text-left p-3.5 rounded-xl border transition-all duration-200 text-xs flex flex-"
+      }
+    },
+    {
+      "message": "Buyer dashboard title confirms overview context: \"Procurement Overview\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Buyer KPI metric cards rendered",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Hover interaction on \"Buyer Metric KPI Card\" exhibits smooth dynamic micro-interaction transition",
+      "pass": true,
+      "metadata": {
+        "computedTransform": "matrix(1, 0, 0, 1, 0, -3)",
+        "classes": "p-4 rounded-2xl bg-[#EDE6DC] border border-[rgba(19,17,15,0.08)] flex flex-col s"
+      }
+    },
+    {
+      "message": "Notification Bell button is visible in top header",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Notification box appears directly under menu on click",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Product Catalogue page rendered: \"Product catalogue\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Search filtering returns matching products (found 12)",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Category filter pills available",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Hover interaction on \"Product Card in Catalogue\" exhibits smooth dynamic micro-interaction transition",
+      "pass": true,
+      "metadata": {
+        "computedTransform": "matrix(1, 0, 0, 1, 0, -3)",
+        "classes": "bg-white rounded-2xl shadow-[0_1px_3px_rgba(19,17,15,0.03)] transition-all durat"
+      }
+    },
+    {
+      "message": "Sidebar menu item \"Authorizations\" is visible",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Old menu label \"Approvals\" has been completely removed",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Authorizations page heading is \"Authorizations\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Primary action button on authorization request is \"Submit PO\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Old button text \"Approve\" is not present",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Review modal primary action button is \"Submit PO\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Supplier portal authenticated: \"Supplier Fulfillment Hub\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Supplier Dashboard displays comprehensive enterprise KPIs (count: 53)",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Supplier Available Stock is elevated to enterprise depth (found 2140 units, expected >= 1,000)",
+      "pass": true,
+      "metadata": {
+        "availableStockCount": 2140
+      }
+    },
+    {
+      "message": "Quick restock \"+50 Restock\" button is present and active",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Bulk \"Restock All (+100)\" button is present in inventory header",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Quick restock triggered immediate state increment (2140 -> 2190 units)",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "RFQ quotation action is labeled \"Accept Quotation\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Admin Control Tower loaded: \"Platform Operations & Governance\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Provenance Ledger loaded with cryptographic verification: \"Provenance Audit Ledger\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Provenance audit records rendered in ledger (count: 27)",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Demand Forecasting page loaded: \"Demand forecasting\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "AI Agent orchestration page loaded: \"Autonomous Procurement Agent\"",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Interactive UI elements present across dashboard (53 detected)",
+      "pass": true,
+      "metadata": {}
+    },
+    {
+      "message": "Hover interaction on \"Buyer Dashboard Card Hover Float\" exhibits smooth dynamic micro-interaction transition",
+      "pass": true,
+      "metadata": {
+        "computedTransform": "matrix(1, 0, 0, 1, 0, -3)",
+        "classes": "p-4 rounded-2xl bg-[#EDE6DC] border border-[rgba(19,17,15,0.08)] flex flex-col s"
+      }
+    },
+    {
+      "message": "Zero unhandled JavaScript console errors detected (errors count: 0)",
+      "pass": true,
+      "metadata": {
+        "errors": []
+      }
+    },
+    {
+      "message": "Average warm page navigation & action latency is within responsive SLA: 1976ms (target < 2500ms)",
+      "pass": true,
+      "metadata": {}
+    }
+  ]
+}
