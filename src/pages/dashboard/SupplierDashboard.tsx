@@ -67,7 +67,7 @@ export const SupplierDashboard: React.FC = () => {
   const [editLeadTime, setEditLeadTime] = useState<number>(3);
 
   // Filter supplier data to authenticated supplier: OmniOffice Direct Ltd (sup-01)
-  const mySupplier = suppliers.find(s => s.id === 'sup-01') || suppliers[0];
+  const mySupplier = suppliers.find(s => s.id === 'sup-01' || s.company_name.toLowerCase().includes('omni')) || suppliers[0];
 
   useEffect(() => {
     const unsub = store.subscribe(() => {
@@ -83,7 +83,11 @@ export const SupplierDashboard: React.FC = () => {
 
   // OmniOffice Direct scoped data (Memoized)
   const myListings = useMemo<SupplierProduct[]>(() => {
-    return supplierProducts.filter((sp: SupplierProduct) => sp.supplier_id === mySupplier.id);
+    return supplierProducts.filter((sp: SupplierProduct) =>
+      sp.supplier_id === mySupplier.id ||
+      sp.supplier_id === 'sup-01' ||
+      sp.supplier_name?.toLowerCase().includes('omni')
+    );
   }, [supplierProducts, mySupplier.id]);
 
   const myOrders = useMemo<PurchaseOrder[]>(() => {
@@ -151,7 +155,11 @@ export const SupplierDashboard: React.FC = () => {
   };
 
   const handleQuickRestock = (listingId: string) => {
-    store.updateSupplierProductStock(listingId, 25);
+    store.updateSupplierProductStock(listingId, 50);
+  };
+
+  const handleBulkRestockAll = () => {
+    store.bulkRestockSupplier(mySupplier.id, 100);
   };
 
   const handleToggleListingStatus = (listingId: string, currentStatus: string) => {
@@ -569,12 +577,23 @@ export const SupplierDashboard: React.FC = () => {
           </div>
 
           <div className="rounded-2xl bg-white border border-[rgba(19,17,15,0.08)] shadow-subtle overflow-hidden">
-            <div className="p-4 border-b border-[rgba(19,17,15,0.08)] flex items-center justify-between">
+            <div className="p-4 border-b border-[rgba(19,17,15,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-[#13110F]" />
                 <h3 className="text-xs font-semibold text-[#13110F]">Real-time Inventory Replenishment & Stock Levels</h3>
               </div>
-              <span className="text-[11px] text-[#6B6560]">OmniOffice Peenya Facility</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleBulkRestockAll}
+                  leftIcon={<Plus className="w-3.5 h-3.5" />}
+                  className="rounded-xl text-xs py-1"
+                >
+                  Restock All (+100)
+                </Button>
+                <span className="text-[11px] text-[#6B6560]">OmniOffice Peenya Facility</span>
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -618,7 +637,7 @@ export const SupplierDashboard: React.FC = () => {
                             onClick={() => handleQuickRestock(listing.id)}
                             className="rounded-xl text-xs py-1"
                           >
-                            +25 Restock
+                            +50 Restock
                           </Button>
                         </td>
                       </tr>
@@ -1311,7 +1330,7 @@ export const SupplierDashboard: React.FC = () => {
                             onClick={() => handleQuickRestock(listing.id)}
                             className="rounded-xl text-xs py-1"
                           >
-                            +25 Restock
+                            +50 Restock
                           </Button>
                           <Button
                             variant="secondary"

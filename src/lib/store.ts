@@ -166,24 +166,24 @@ export interface AdminDashboardMetrics {
 }
 
 class ReactiveDataStore {
-  private organisations: Organisation[];
-  private profiles: Profile[];
-  private currentProfileId: string;
-  private currentRole: UserRole;
-  private isAuthenticatedUser: boolean;
-  private suppliers: Supplier[];
-  private categories: ProductCategory[];
-  private products: Product[];
-  private supplierProducts: SupplierProduct[];
-  private purchaseOrders: PurchaseOrder[];
-  private approvalRequests: ApprovalRequest[];
-  private checkoutSessions: CheckoutSession[];
-  private payments: PaymentRecord[];
-  private provenanceEvents: ProvenanceEvent[];
-  private demandForecasts: DemandForecast[];
-  private notifications: NotificationItem[];
-  private rfqs: SupplierRFQ[];
-  private quotations: SupplierQuotation[];
+  private organisations!: Organisation[];
+  private profiles!: Profile[];
+  private currentProfileId!: string;
+  private currentRole!: UserRole;
+  private isAuthenticatedUser!: boolean;
+  private suppliers!: Supplier[];
+  private categories!: ProductCategory[];
+  private products!: Product[];
+  private supplierProducts!: SupplierProduct[];
+  private purchaseOrders!: PurchaseOrder[];
+  private approvalRequests!: ApprovalRequest[];
+  private checkoutSessions!: CheckoutSession[];
+  private payments!: PaymentRecord[];
+  private provenanceEvents!: ProvenanceEvent[];
+  private demandForecasts!: DemandForecast[];
+  private notifications!: NotificationItem[];
+  private rfqs!: SupplierRFQ[];
+  private quotations!: SupplierQuotation[];
   private listeners: Set<() => void> = new Set();
 
   // --- High-Performance Lookups & Indexed Caches ($O(1)$) ---
@@ -213,8 +213,27 @@ class ReactiveDataStore {
     this.suppliers = this.load('procureai_suppliers', SEED_SUPPLIERS);
     this.categories = this.load('procureai_categories', SEED_CATEGORIES);
     this.products = this.load('procureai_products', SEED_PRODUCTS);
-    this.supplierProducts = this.load('procureai_supplier_products', SEED_SUPPLIER_PRODUCTS);
+    const loadedSupplierProducts: SupplierProduct[] = this.load('procureai_supplier_products', SEED_SUPPLIER_PRODUCTS);
+    // Ensure all supplier products have increased healthy stock levels (elevates even for existing localStorage caches)
+    this.supplierProducts = loadedSupplierProducts.map(sp => {
+      const seed = SEED_SUPPLIER_PRODUCTS.find(s => s.id === sp.id);
+      const targetStock = seed ? Math.max(sp.available_stock, seed.available_stock) : Math.max(sp.available_stock, 350);
+      return { ...sp, available_stock: targetStock };
+    });
+    try {
+      localStorage.setItem('procureai_supplier_products', JSON.stringify(this.supplierProducts));
+    } catch (e) {}
     this.purchaseOrders = this.load('procureai_purchase_orders', SEED_PURCHASE_ORDERS);
+    const loadedPOs: PurchaseOrder[] = this.purchaseOrders;
+    const existingPoIds = new Set(loadedPOs.map(po => po.id));
+    const missingPOs = SEED_PURCHASE_ORDERS.filter(s => !existingPoIds.has(s.id));
+    if (missingPOs.length > 0) {
+      this.purchaseOrders = [...loadedPOs, ...missingPOs];
+      try {
+        localStorage.setItem('procureai_purchase_orders', JSON.stringify(this.purchaseOrders));
+      } catch (e) {}
+    }
+
     this.demandForecasts = this.load('procureai_demand_forecasts', SEED_DEMAND_FORECASTS);
     this.provenanceEvents = this.load('procureai_provenance_events', SEED_PROVENANCE_EVENTS);
     const loadedNotifs: NotificationItem[] = this.load('procureai_notifications', SEED_NOTIFICATIONS);
@@ -225,7 +244,15 @@ class ReactiveDataStore {
     this.quotations = this.load('procureai_quotations', INITIAL_QUOTATIONS);
     this.checkoutSessions = this.load('procureai_checkout_sessions', []);
     this.payments = this.load('procureai_payments', []);
-    this.approvalRequests = this.load('procureai_approval_requests', this.generateInitialApprovals());
+
+    const loadedApprovals: ApprovalRequest[] = this.load('procureai_approval_requests', this.generateInitialApprovals());
+    const existingApprIds = new Set(loadedApprovals.map(a => a.id));
+    const initialApprovals = this.generateInitialApprovals();
+    const missingApprovals = initialApprovals.filter(a => !existingApprIds.has(a.id));
+    this.approvalRequests = missingApprovals.length > 0 ? [...loadedApprovals, ...missingApprovals] : loadedApprovals;
+    try {
+      localStorage.setItem('procureai_approval_requests', JSON.stringify(this.approvalRequests));
+    } catch (e) {}
 
     // Build initial $O(1)$ fast lookup indices
     this.rebuildIndices();
@@ -696,6 +723,15 @@ class ReactiveDataStore {
     this.supplierProducts = this.supplierProducts.map(sp =>
       sp.id === listingId
         ? { ...sp, available_stock: Math.max(0, sp.available_stock + delta), last_updated: new Date().toISOString() }
+        : sp
+    );
+    this.save('procureai_supplier_products', this.supplierProducts);
+  }
+
+  public bulkRestockSupplier(supplierId: string = 'sup-01', delta: number = 100): void {
+    this.supplierProducts = this.supplierProducts.map(sp =>
+      !supplierId || sp.supplier_id === supplierId
+        ? { ...sp, available_stock: sp.available_stock + delta, last_updated: new Date().toISOString() }
         : sp
     );
     this.save('procureai_supplier_products', this.supplierProducts);

@@ -142,7 +142,7 @@ export const ApprovalsPage: React.FC = () => {
                           isLoading={isSubmitting}
                           onClick={() => handleApprove(appr.id)}
                         >
-                          Approve
+                          Submit PO
                         </Button>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ export const ApprovalsPage: React.FC = () => {
                 isLoading={isSubmitting}
                 onClick={() => handleApprove(selectedApproval.id)}
               >
-                Approve order
+                Submit PO
               </Button>
             </div>
           </div>

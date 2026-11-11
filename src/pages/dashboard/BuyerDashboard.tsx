@@ -156,7 +156,7 @@ export const BuyerDashboard: React.FC = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-[#D97706]" /> Action Required
             </span>
           </div>
-          <span className="text-xs font-medium text-[#6B6560] block">Pending approvals</span>
+          <span className="text-xs font-medium text-[#6B6560] block">Pending authorizations</span>
           <p className="text-2xl sm:text-3xl font-bold text-[#13110F] mt-1 tabular-nums font-mono tracking-tight">
             {pendingApprovals}
           </p>

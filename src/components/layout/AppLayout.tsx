@@ -212,7 +212,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       { label: 'Demand Forecasting', path: '/forecasting', icon: TrendingUp },
       { label: 'Purchase Orders', path: '/orders', icon: FileText },
       {
-        label: 'Approvals',
+        label: 'Authorizations',
         path: '/approvals',
         icon: CheckSquare,
         badge: store.getApprovalRequests().filter(a => a.status === 'pending').length
